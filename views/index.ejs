@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title><%= config.title %></title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="/style.css">
+    <script type="module" crossorigin src="/client.js"></script>
+    <link rel="stylesheet" href="/client.css">
+  </head>
+  <body>
+    <!-- TODO: header/navbar/... -->
+    <header>
+      <a href="/"><%= config.base %></a>
+    </header>
+    <main>
+      <% if(uri) { %>
+       <%- include('item') %>
+      <% } else { %>
+       <%- include('root') %>
+      <% } %>
+    </main>
+    <footer>
+      <a href="https://www.gbv.de/impressum">Verbundzentrale des GBV (VZG)</a><br>
+      <% if(uri) { %>
+        <a href="<%= relUri %>"><%= uri %></a>
+        &nbsp;<a href="<%= relUri %>?format=jskos">jskos</a>
+        &nbsp;<a href="<%= relUri %>?format=turtle">turtle</a>
+        &nbsp;<a href="<%= relUri %>?format=rdfxml">rdfxml</a>
+        &nbsp;<a href="<%= relUri %>?format=nt">ntriples</a>
+      <% } %>
+    </footer>
+  </body>
+</html>
+

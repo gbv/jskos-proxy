@@ -1,57 +1,66 @@
-import portfinder from "portfinder"
 import express from "express"
+import portfinder from "portfinder"
 import { URL } from "node:url"
+import { initBackend } from "./src/backends.js"
+import fs from "fs"
 
-// configuration
-const config = {
-  port: 3555,
-  base: "http://uri.gbv.de/terminology/",
-  backend: "https://api.dante.gbv.de/data",
-}
-const staticDir = "./public"
+import config from "./src/config.js"
 
 const app = express()
-app.set("json spaces", 2)
 
-// serve static files, including index.html
-app.use(express.static(staticDir))
-// Configure view engine to render EJS templates.
-//app.set("views", __dirname + "/views")
-//app.set("view engine", "ejs")
+// serve static files and EJS templates
+app.use(express.static('public'))
+app.set("views", "./views")
+app.set("view engine", "ejs")
+app.get("/", serveHtml)
 
+// serve build Vue application
+const assets = fs.readdirSync('dist/assets/')
+const root = 'dist/assets/'
+if (assets.length) {
+  console.log(`Serving Vue application from ${assets}`)
+  app.get("/client.js", (req, res) => res.sendFile(assets.filter(f => f.endsWith('js'))[0], { root }))
+  app.get("/client.css", (req, res) => res.sendFile(assets.filter(f => f.endsWith('css'))[0], { root }))
+}
+
+function serveHtml(req, res, uri, jskos) {
+  res.setHeader("Content-Type", "text/html")
+  const relUri = uri ? uri.pathname : ''
+  res.render("index", { config, uri, relUri, jskos })
+}
 
 // serve JSKOS data
+app.set("json spaces", 2)
 app.use(async (req, res) => {
   const uri = new URL("."+req.url, config.base)
   uri.search = ""
 
+  if (uri == config.base) {
+    serveHtml(req, res)
+     return
+  }
+
   const format = req.query.format || requestFormat(req) || "jsonld"
   if (!format.match(/^(html|json|jsonld|jskos)$/) && !rdfTypes[format]) {
     res.status(400)
-    res.set("Content-Type", "text/plain")
-    res.send("Serialization format not supported!")
+    res.send(`Serialization format ${format} not supported!`)
     return
   }
 
-  // TODO: hardcoded objects from file, e.g. a static ndjson file?
-
+  const backend = app.get("backend")
   // TODO catch error and send 5xx error in case
-  const data = await queryBackend(uri)
-  res.status(data ? "200" : "404")
+  const data = await backend.getItem(`${uri}`)
+  res.status(data ? 200 : 404)
+
+  console.log((data ? "got " : "missing ") + uri)
 
   if (format === "html") {
-    res.set("Content-Type", "text/html")
-    // TODO: use jskos-web
-    if (data) {
-      res.send(`HTML for ${uri}`)
-    } else {
-      res.send(`Not found: ${uri}`)
-    }
+    serveHtml(req, res, `${uri}`, data)
   } else {
-    const type = rdfTypes[format]
-    if (type) {
-      res.set("Content-Type", type)
-      await serializeRDF(data, type)
+    const contentType = rdfTypes[format]
+    if (contentType && contentType != "application/json") {
+      res.set("Content-Type", contentType)
+      res.send(await serializeRDF(data, contentType))
     } else {
       res.json(data)
     }
@@ -62,6 +71,7 @@ const rdfTypes = {
   nt: "application/n-triples",
   ntriples: "application/n-triples",
   json: "application/json",
+  jskos: "application/json",
   jsonld: "application/json",
   turtle: "text/turtle",
   ttl: "text/turtle",
@@ -69,51 +79,40 @@ const rdfTypes = {
   xml: "application/rdf+xml",
 }
 
-const mimeTypes = {
-  // RDF/XML
-  "application/rdf+xml": "rdfxml",
-  "text/rdf": "rdfxml",
-  // NTriples
-  "application/n-triples": "ntriples",
-  "text/plain": "ntriples",
-  // Turtle
-  "text/turtle": "turtle",
-  "application/turtle": "turtle",
-  "application/x-turtle": "turtle",
-  "text/n3": "turtle",
-  "text/rdf+n3": "turtle",
-  "application/rdf+n3": "turtle",
-  // JSON-LD (default)
-  "application/ld+json": "jsonld",
-  "application/json": "jsonld",
-  // HTML
-  "text/html": "html",
-  "application/xhtml+xml": "html",
-}
-
 function requestFormat(req) {
-  for (let [type, format] of Object.entries(mimeTypes)) {
-    if (req.accepts(type)) {
-      return format
+
+  // supported Content Types, sorted by priority
+  const formats = [
+    [ "html", ["text/html", "application/xhtml+xml"] ],
+    [ "jsonld", ["application/ld+json", "application/json"] ],
+    [ "ntriples", ["application/n-triples", "text/plain"] ],
+    [ "turtle", [ "text/turtle", "application/turtle", "application/x-turtle", "text/n3", "text/rdf+n3", "application/rdf+n3" ] ],
+    [ "rdfxml", ["application/rdf+xml", "text/rdf"] ],
+  ]
+
+  for (let [format, types] of formats) {
+    for (let type of types) {
+      if (req.accepts(type)) {
+        return format
+      }
     }
   }
 }
 
-async function serializeRDF(item, type) {
-  return `TODO: serialize ${item} as ${type}`
-  // TODO: see https://github.com/gbv/bartoc.org/blob/dev/src/rdf.js#L37
-}
+// import jskosContext from `./src/context.json` assert { type: `json` }
+const jskosContext = JSON.parse(await fs.promises.readFile(new URL("./src/context.json", import.meta.url)))
 
-async function queryBackend(uri) {
-  // TODO: query backend instead
-  // get `${backend}?uri=${uri}&properties=*
+import jsonld from "jsonld"
 
-  if (uri == config.base + "null") {
-    return
+async function serializeRDF(item, format) {
+  item["@context"] = jskosContext
+
+  if (format === "application/n-triples") {
+    return jsonld.toRDF(item, { format: "application/n-quads" })
   }
 
-  // TODO: optional languages parameter?
-  return {prefLabel:{en:"test"}}
+  // TODO: else flatten and map to another serialization
+  // TODO: see https://github.com/gbv/bartoc.org/blob/dev/src/rdf.js#L37
 }
 
 const start = async () => {
@@ -121,8 +120,12 @@ const start = async () => {
     portfinder.basePort = config.port
     config.port = await portfinder.getPortPromise()
   }
+
+  const backend = await initBackend(config.backend)
+  app.set("backend", backend)
+
   app.listen(config.port, () => {
-    console.log(`JSKOS proxy ${config.base} from ${config.backend} listening on port ${config.port}`)
+    console.log(`JSKOS proxy ${config.base} from ${backend.name} listening on port ${config.port}`)
   })
 }
 
