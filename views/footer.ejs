@@ -1,0 +1,17 @@
+<footer>
+  <!-- TODO: version number and link to source/issues -->
+  <a href="https://www.gbv.de/impressum">Verbundzentrale des GBV (VZG)</a><br>
+  <% if(uri) { %>
+    <a href="<%= relUri %>"><%= uri %></a>
+    &nbsp;<a href="<%= relUri %>?format=jskos">jskos</a>
+    &nbsp;<a href="<%= relUri %>?format=turtle">turtle</a>
+    &nbsp;<a href="<%= relUri %>?format=rdfxml">rdfxml</a>
+    &nbsp;<a href="<%= relUri %>?format=nt">ntriples</a>
+    <br>
+  <% } %>
+  <% if (item?._source) { %>
+    <div style="padding-top: 0.2rem">
+      <a href="<%= item._source %>" style="color:#999">JSKOS API source</a>
+    </div>
+  <% } %>
+</footer>

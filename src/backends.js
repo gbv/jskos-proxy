@@ -43,10 +43,14 @@ export class ApiBackend {
 
   async getItem(uri) {
     // TODO: add languges?
-    const url = `${this.base}/data?` + new URLSearchParams({uri, properties: '*'})
+    const url = `${this.base}/data?` + new URLSearchParams({uri, properties: "*"})
     console.log(url)
     return axios.get(url)
       .then(res => Array.isArray(res.data) ? res.data[0] : null)
+      .then(item => {
+        if (item) { item._source = url }
+        return item
+      })
   }
 }
 

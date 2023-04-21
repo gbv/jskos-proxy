@@ -7,14 +7,15 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Vite + Vue</title>
   </head>
-  <body>
+  <body base="http://uri.gbv.de/terminology/" backend="https://api.dante.gbv.de/">
+    <p>Hallo default</p>
     <div id="app"></div>
     <script type="module" src="/src/main.js"></script>
-<script type="application/json" id="currentItem">
+<script type="application/json" id="item">
 {
-  "uri": "http://uri.gbv.de/terminology/bk/17.00",
+  "uri": "http://uri.gbv.de/terminology/bk/",
   "type": [
-    "http://www.w3.org/2004/02/skos/core#Concept"
+    "http://www.w3.org/2004/02/skos/core#ConceptScheme"
   ],
   "@context": "https://gbv.github.io/jskos/context.json",
   "inScheme": [
@@ -134,5 +135,6 @@
   ]
 }
     </script>
+    <!--link rel="stylesheet" href="/public/style.css"-->
   </body>
 </html>

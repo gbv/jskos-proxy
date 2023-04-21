@@ -1,22 +1,59 @@
-body {
-  margin: 1em;
+:root {
+  --bar-color: #577fbb;
+  --link-color: rgb(96, 143, 219);
 }
+
+/* page layout */
+body {
+  margin: 0;
+}
+header {
+  background-color: var(--bar-color);
+}
+header a:link, header a:visited {
+  color: #eee;
+}
+nav {
+  padding: 0.5rem 1rem;
+  font-size: 1.17rem;
+}
+nav ul {
+  padding: 0;
+  margin: 0.5rem;
+}
+nav ul li {
+  display: inline;
+  padding-right: 0.85rem;
+}
+
+main {
+  padding: 1em;
+}
+footer {
+  border-top: 0.85rem solid var(--bar-color);
+  padding: 1em;
+  font-size: 0.85rem;
+}
+
 a:link, a:visited {
   text-decoration: none;
-  color: rgb(96, 143, 219);
+  color: var(--link-color);
 }
 a:hover, a:active {
   text-decoration: underline;
 }
 
-header {
-  border-bottom: 2px solid #6791c9;
-  padding: 2px;
+/* jskos-vue components */
+:root {
+  --jskos-vue-fontSize-small: 1rem;
 }
-main {
-  padding: 1em;
+.jskos-vue-itemDetails {
+  font-size: 1rem;
 }
-footer {
-  border-top: 12px solid #6791c9;
-  padding: 1em;
+.jskos-vue-itemDetails-name {
+  font-size: 2rem;
 }
+.jskos-vue-tabs-sm {
+  font-size: 1rem !important;
+}
+

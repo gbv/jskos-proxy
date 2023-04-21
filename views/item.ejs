@@ -1,10 +1,10 @@
-<% if(jskos) { %>
+<% if (item) { %>
   <script type="application/ld+json" id="item">
-    <%- JSON.stringify(jskos).replaceAll('<','\u003C') %>
+    <%- JSON.stringify(item).replaceAll('<','\u003C') %>
   </script>
   <div id="app">
     <!-- TODO: minimal preview without client side JavaScript -->
-    <%= jskos.prefLabel?.en %>
+    <%= item.prefLabel?.en %>
     uri: <a href="<%= uri %>"><%= uri %></a>
   </div>
 <% } else { %>

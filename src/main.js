@@ -16,6 +16,4 @@ app.use(ItemDetailsTabs)
 app.use(AutoLink)
 app.use(LoadingIndicator)
 
-console.log("hello")
-
 app.mount("#app")

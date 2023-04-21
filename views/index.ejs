@@ -4,32 +4,35 @@
     <meta charset="utf-8">
     <title><%= config.title %></title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="/style.css">
     <script type="module" crossorigin src="/client.js"></script>
     <link rel="stylesheet" href="/client.css">
+    <link rel="stylesheet" href="/style.css">
   </head>
-  <body>
-    <!-- TODO: header/navbar/... -->
+  <body base="<%= config.base %>" backend="<%= config.backend %>">
     <header>
-      <a href="/"><%= config.base %></a>
+      <nav>
+        <ul class="nav">
+        <% if (config.homeUrl) { %>
+          <li>
+            <a href="<%= config.homeUrl %>"><%= config.homeLabel || config.homeUrl %></a>
+          </li>
+        <% } %>
+          <li>
+            <a href="/"><%= config.baseLabel || config.base %></a>
+          </li>
+          <!-- TODO: add vocid, if known -->
+        </ul>
+        <!-- TODO: add help and language selector -->
+      </nav>
     </header>
     <main>
       <% if(uri) { %>
-       <%- include('item') %>
+       <%- include("item") %>
       <% } else { %>
-       <%- include('root') %>
+       <%- include("root") %>
       <% } %>
     </main>
-    <footer>
-      <a href="https://www.gbv.de/impressum">Verbundzentrale des GBV (VZG)</a><br>
-      <% if(uri) { %>
-        <a href="<%= relUri %>"><%= uri %></a>
-        &nbsp;<a href="<%= relUri %>?format=jskos">jskos</a>
-        &nbsp;<a href="<%= relUri %>?format=turtle">turtle</a>
-        &nbsp;<a href="<%= relUri %>?format=rdfxml">rdfxml</a>
-        &nbsp;<a href="<%= relUri %>?format=nt">ntriples</a>
-      <% } %>
-    </footer>
+    <%- include("footer") %>
   </body>
 </html>
 

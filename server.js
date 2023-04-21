@@ -9,24 +9,24 @@ import config from "./src/config.js"
 const app = express()
 
 // serve static files and EJS templates
-app.use(express.static('public'))
+app.use(express.static("public"))
 app.set("views", "./views")
 app.set("view engine", "ejs")
 app.get("/", serveHtml)
 
 // serve build Vue application
-const assets = fs.readdirSync('dist/assets/')
-const root = 'dist/assets/'
+const assets = fs.readdirSync("dist/assets/")
+const root = "dist/assets/"
 if (assets.length) {
   console.log(`Serving Vue application from ${assets}`)
-  app.get("/client.js", (req, res) => res.sendFile(assets.filter(f => f.endsWith('js'))[0], { root }))
-  app.get("/client.css", (req, res) => res.sendFile(assets.filter(f => f.endsWith('css'))[0], { root }))
+  app.get("/client.js", (req, res) => res.sendFile(assets.filter(f => f.endsWith("js"))[0], { root }))
+  app.get("/client.css", (req, res) => res.sendFile(assets.filter(f => f.endsWith("css"))[0], { root }))
 }
 
-function serveHtml(req, res, uri, jskos) {
+function serveHtml(req, res, uri, item) {
   res.setHeader("Content-Type", "text/html")
-  const relUri = uri ? uri.pathname : ''
-  res.render("index", { config, uri, relUri, jskos })
+  const relUri = uri ? uri.pathname : ""
+  res.render("index", { config, uri, relUri, item })
 }
 
 // serve JSKOS data
@@ -37,7 +37,7 @@ app.use(async (req, res) => {
 
   if (uri == config.base) {
     serveHtml(req, res)
-     return
+    return
   }
 
   const format = req.query.format || requestFormat(req) || "jsonld"

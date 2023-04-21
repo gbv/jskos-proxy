@@ -1,6 +1,6 @@
 # jskos-proxy
 
-HTTP Proxy to serve JSKOS objects in multiple formats
+> Serve JSKOS objects in multiple formats, including HTML
 
 ## Table of Contents
 
@@ -21,12 +21,20 @@ Create a local file `.env` with the following keys:
 - `BASE`
 - `BACKEND`
 
+...
+
 For instance:
 
     BASE=http://uri.gbv.de/terminology/
     BACKEND=https://api.dante.gbv.de/
 
 ## Usage
+
+### Compile client-side JavaScript
+
+```bash
+npm run build
+```
 
 ### Run Server
 

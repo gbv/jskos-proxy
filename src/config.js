@@ -1,17 +1,20 @@
 import * as dotenv from "dotenv"
 
-const env = process.env.NODE_ENV || "development"
+const NODE_ENV = process.env.NODE_ENV || "development"
 
-if (env !== "test") {
+if (NODE_ENV !== "test") {
   dotenv.config()
 }
 
-const { TITLE, PORT, BASE, BACKEND } = process.env
+const { env } = process
 
 export default {
-  env,
-  title: TITLE || "JSKOS Proxy",
-  port: PORT || 3555,
-  base: BASE || "http://example.org/",
-  backend: BACKEND || "test/items.ndjson",
+  env: NODE_ENV,
+  title: env.TITLE || "JSKOS Proxy",
+  port: env.PORT || 3555,
+  base: env.BASE || "http://example.org/",
+  baseLabel: env.BASE_LABEL,
+  homeUrl: env.HOME_URL,
+  homeLabel: env.HOME_LABEL,
+  backend: env.BACKEND || "test/items.ndjson",
 }
