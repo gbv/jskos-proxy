@@ -2,6 +2,7 @@ import express from "express"
 import portfinder from "portfinder"
 import { URL } from "node:url"
 import { initBackend } from "./src/backends.js"
+import { serialize } from "./src/rdf.js"
 import fs from "fs"
 
 import config from "./src/config.js"
@@ -12,9 +13,9 @@ const app = express()
 app.use(express.static("public"))
 app.set("views", "./views")
 app.set("view engine", "ejs")
-app.get("/", serveHtml)
+app.get("/", serve)
 
-// serve build Vue application
+// serve Vue application
 const assets = fs.readdirSync("dist/assets/")
 const root = "dist/assets/"
 if (assets.length) {
@@ -23,10 +24,15 @@ if (assets.length) {
   app.get("/client.css", (req, res) => res.sendFile(assets.filter(f => f.endsWith("css"))[0], { root }))
 }
 
-function serveHtml(req, res, uri, item) {
-  res.setHeader("Content-Type", "text/html")
+function serve(req, res, uri, item) {
   const relUri = uri ? uri.pathname : ""
-  res.render("index", { config, uri, relUri, item })
+  const options = { config, uri, relUri, item }
+
+  if (req.query.format === "debug") {
+    res.json(options)
+  } else {
+    res.render("index", options)
+  }
 }
 
 // serve JSKOS data
@@ -36,12 +42,12 @@ app.use(async (req, res) => {
   uri.search = ""
 
   if (uri == config.base) {
-    serveHtml(req, res)
+    serve(req, res)
     return
   }
 
   const format = req.query.format || requestFormat(req) || "jsonld"
-  if (!format.match(/^(html|json|jsonld|jskos)$/) && !rdfTypes[format]) {
+  if (!format.match(/^(html|debug|json|jsonld|jskos)$/) && !rdfTypes[format]) {
     res.status(400)
     res.send(`Serialization format ${format} not supported!`)
     return
@@ -54,13 +60,13 @@ app.use(async (req, res) => {
 
   console.log((data ? "got " : "missing ") + uri)
 
-  if (format === "html") {
-    serveHtml(req, res, `${uri}`, data)
+  if (format === "html" || format === "debug") {
+    serve(req, res, `${uri}`, data)
   } else {
     const contentType = rdfTypes[format]
     if (contentType && contentType != "application/json") {
       res.set("Content-Type", contentType)
-      res.send(await serializeRDF(data, contentType))
+      res.send(await serialize(data, contentType))
     } else {
       res.json(data)
     }
@@ -99,22 +105,7 @@ function requestFormat(req) {
   }
 }
 
-// import jskosContext from `./src/context.json` assert { type: `json` }
-const jskosContext = JSON.parse(await fs.promises.readFile(new URL("./src/context.json", import.meta.url)))
-
-import jsonld from "jsonld"
-
-async function serializeRDF(item, format) {
-  item["@context"] = jskosContext
-
-  if (format === "application/n-triples") {
-    return jsonld.toRDF(item, { format: "application/n-quads" })
-  }
-
-  // TODO: else flatten and map to another serialization
-  // TODO: see https://github.com/gbv/bartoc.org/blob/dev/src/rdf.js#L37
-}
-
+// start the proxy server
 const start = async () => {
   if (config.env == "test") {
     portfinder.basePort = config.port

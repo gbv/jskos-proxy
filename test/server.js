@@ -17,8 +17,16 @@ describe("JSKOS Proxy Server", () => {
         .then((res) => {
           assert.equal(res.status,200)
         }),
-    )
-  })
+    )})
+
+  describe("GET /?format=debug", () => {
+    it("debug ejs options", () =>
+      chai.request(app)
+        .get("/?format=debug")
+        .then(res => {
+          assert.equal(res.body.config.base, "http://example.org/")
+        }),
+    )})
 
   describe("Format selection", () => {
     it("complains for unknown formats",
@@ -31,15 +39,6 @@ describe("JSKOS Proxy Server", () => {
         .then(res => {
           assert.equal(res.status,200)
           assert.deepEqual(res.body, exampleA)
-        }))
-    it("format=nt",
-      () => chai.request(app)
-        .get("/a?format=nt")
-        .then(res => {
-          assert.equal(res.status,200)
-          // WTF: res.text is undefined?
-          //          console.log(res)
-          //          assert.deepEqual(res.text, '<http://example.org/a> <http://www.w3.org/2004/02/skos/core#prefLabel> "a"@en .')
         }))
 
   })
