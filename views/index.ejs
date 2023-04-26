@@ -2,23 +2,23 @@
 <html>
   <head>
     <meta charset="utf-8">
-    <title><%= config.title %></title>
+    <title><%= title %></title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <script type="module" crossorigin src="<%= root %>client.js"></script>
     <link rel="stylesheet" href="<%= root %>client.css">
     <link rel="stylesheet" href="<%= root %>style.css">
   </head>
-  <body base="<%= config.base %>" backend="<%= config.backend %>">
+  <body base="<%= base %>" api="<%= locals.api %>">
     <header>
       <nav>
         <ul class="nav">
-        <% if (config.homeUrl) { %>
+        <% if (host && hostLabel) { %>
           <li>
-            <a href="<%= config.homeUrl %>"><%= config.homeLabel || config.homeUrl %></a>
+            <a href="//<%= host %>"><%= hostLabel %></a>
           </li>
         <% } %>
           <li>
-            <a href="<%= root %>"><%= config.baseLabel || config.base %></a>
+            <a href="<%= root %>"><%= rootLabel || root %></a>
           </li>
           <!-- TODO: add vocid, if known -->
         </ul>
@@ -26,7 +26,7 @@
       </nav>
     </header>
     <main>
-      <% if(uri) { %>
+      <% if (locals.uri) { %>
        <%- include("item") %>
       <% } else { %>
        <%- include("root") %>

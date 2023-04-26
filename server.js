@@ -5,7 +5,18 @@ import { serialize, contentTypes } from "./src/rdf.js"
 import fs from "fs"
 
 import config from "./src/config.js"
-const { log, debug } = config
+const { log, info } = config
+
+// FIXME: test this and move to another location
+config.relativeUrl = url => {
+  if (url.startsWith(`http://${config.host}`) || url.startsWith(`https://${config.host}`)) {
+    return new URL(url).pathname
+  }
+  return url
+}
+
+// JSKOS API
+config.api = "https://api.dante.gbv.de/"
 
 const app = express()
 
@@ -13,7 +24,6 @@ const app = express()
 app.use(express.static("public"))
 app.set("views", "./views")
 app.set("view engine", "ejs")
-app.get("/", serve)
 
 // find Vue application
 const assetsDir = "dist/assets/"
@@ -24,10 +34,11 @@ if (assets.length) {
   app.get("/client.css", (req, res) => res.sendFile(assets.filter(f => f.endsWith("css"))[0], { root: assetsDir }))
 }
 
-// server HTML view or debug information
-function serve(req, res, uri, item) {
-  const relUri = uri ? uri.pathname : "" // FIXME: remove root
-  const options = { config, uri, relUri, item, root: "/" }
+// server HTML view or info information
+function serve(req, res, vars) {
+  const relUri = vars.uri ? vars.uri.pathname : "" // FIXME: remove root
+  vars.source = vars.item?._source || vars.items?.source
+  const options = { ...config, ...vars, relUri }
 
   if (req.query.format === "debug") {
     res.json(options)
@@ -62,10 +73,17 @@ app.use(async (req, res) => {
   const uri = new URL("."+req.url, base)
   uri.search = ""
 
-  debug(`get ${uri}`)
+  info(`get ${uri}`)
 
   if (uri == base) {
-    serve(req, res)
+    var items = []
+    const indexBackend = app.get("index")
+    if (indexBackend) {
+      // TODO: slow query, better query in the client?
+      info(`Loading items from ${indexBackend.name}`)
+      items = await indexBackend.listItems()
+    }
+    serve(req, res, { items })
     return
   }
 
@@ -78,20 +96,20 @@ app.use(async (req, res) => {
 
   const backend = app.get("backend")
   // TODO catch error and send 5xx error in case
-  const data = await backend.getItem(`${uri}`)
-  res.status(data ? 200 : 404)
+  const item = await backend.getItem(`${uri}`)
+  res.status(item ? 200 : 404)
 
-  debug((data ? "got " : "missing ") + uri)
+  info((item ? "got " : "missing ") + uri)
 
-  if (format === "html" || format === "debug") {
-    serve(req, res, `${uri}`, data)
+  if (format === "html" || format === "info") {
+    serve(req, res, { uri: `${uri}`, item })
   } else {
     const contentType = contentTypes[format]
     if (contentType && contentType != "application/json") {
       res.set("Content-Type", contentType)
-      res.send(await serialize(data, contentType))
+      res.send(await serialize(item, contentType))
     } else {
-      res.json(data)
+      res.json(item)
     }
   }
 })
@@ -106,11 +124,23 @@ const start = async () => {
   const backend = await initBackend(config)
   app.set("backend", backend)
 
+  if (config.index) {
+    app.set("index", await initBackend({...config, backend: config.index}))
+  }
+
   app.listen(config.port, () => {
     log(`JSKOS proxy ${config.base} from ${backend.name} listening on port ${config.port}`)
   })
 }
 
 start()
+
+/*
+ * TODO: mount at /${root} for testing.
+ * Current workaround is to use a reverse proxy, e.g. Apache with:
+ *
+ * ProxyPass /terminology/ http://127.0.0.1:3555/
+ * ProxyPassReverse /terminology/ http://127.0.0.1:3555/
+ */
 
 export { app }

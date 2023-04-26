@@ -30,6 +30,10 @@ export class FileBackend {
   async getItem(uri) {
     return this.items[uri]
   }
+
+  async listItems() {
+    return Object.values(this.items)
+  }
 }
 
 export class ApiBackend {
@@ -51,6 +55,17 @@ export class ApiBackend {
       .then(item => {
         if (item) { item._source = url }
         return item
+      })
+  }
+
+  async listItems() {
+    const url = `${this.base}?properties=*`
+    this.log(url)
+    return axios.get(url)
+      .then(res => {
+        res = Array.isArray(res.data) ? res.data : []
+        res._source = url
+        return res
       })
   }
 }

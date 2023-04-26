@@ -35,16 +35,21 @@
 import { reactive } from "vue"
 import jskos from "jskos-tools"
 
+// current item(s)
 const item = reactive(JSON.parse(document.getElementById("item")?.textContent||"{}"))
-const base = document.getElementsByTagName("body")[0]?.getAttribute("base")
-const backend = document.getElementsByTagName("body")[0]?.getAttribute("backend")
 
-// TODO: load more details via backend
+// configuration
+const body = document.getElementsByTagName("body")[0]
+const base = body?.getAttribute("base")
+const root = body?.getAttribute("root") || "/"
+const api = body?.getAttribute("api")
+
+// TODO: load more details via backend (requires cocoda-sdk and API endpoint)
 const jskosType = jskos.guessObjectType(item)
 if (jskosType == "ConceptScheme") {
-  if (backend && !item.topConcepts) { // TODO: also if last of narrower is null
+  if (api && !item.topConcepts) { // TODO: also if last of narrower is null
     // TODO: show loadingIndicator
-    fetch(`${backend}voc/top?uri=${item.uri}`)
+    fetch(`${api}voc/top?uri=${item.uri}`)
       .then(res => res.json())
       .then(items => {
         item.topConcepts = items
@@ -54,9 +59,8 @@ if (jskosType == "ConceptScheme") {
 
 const inScheme = (item.inScheme||[])[0]
 const selectItem = (url) => {
-  if (url.startsWith(base)) {
-    // FIXME: won't work if mounted in subdirectory
-    url = "/" + url.slice(base.length)
+  if (url.startsWith(base)) { // FIXME
+    url = root + url.slice(base.length)
   }
   location.href = url
 }

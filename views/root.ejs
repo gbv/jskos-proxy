@@ -1,5 +1,13 @@
 <%# start page included at root when no JSKOS data is looked up %>
-<h2>Configuration</h2>
+<h2><%= title %></h2>
 <div>
-  <pre><code><%= JSON.stringify(config, null, 2) %></code></pre>
+  <% if (locals.items?.length) { %>
+  <ul>
+    <% for (let item of items) { %>
+    <li>
+      <a href="<%= relativeUrl(item.uri) %>"><%= item.uri %></a>
+    </li>
+    <% } %>
+  </ul>
+  <% } %>
 </div>

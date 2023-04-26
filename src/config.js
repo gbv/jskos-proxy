@@ -11,18 +11,17 @@ const log = msg => console.log(msg)
 
 const config = {
   env: NODE_ENV,
-  title: env.TITLE || "JSKOS Proxy",
   port: env.PORT || 3555,
   host: env.HOST || "example.org",
   root: env.ROOT || "/",
-
-  baseLabel: env.BASE_LABEL,
-  homeUrl: env.HOME_URL,
-  homeLabel: env.HOME_LABEL,
   backend: env.BACKEND || "test/items.ndjson",
+  index: env.INDEX,
+  title: env.TITLE || "JSKOS Proxy",
+  hostLabel: env.HOST_LABEL,
+  rootLabel: env.ROOT_LABEL,
 
   log,
-  debug: (NODE_ENV === "development" ? log : () => {}),
+  info: (NODE_ENV === "development" ? log : () => {}),
 }
 
 config.base = `//${config.host}${config.root}`
