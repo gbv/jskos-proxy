@@ -3,6 +3,18 @@ import jsonld from "jsonld"
 import $rdf from "rdflib"
 import { promisify } from "util"
 
+export const contentTypes = {
+  nt: "application/n-triples",
+  ntriples: "application/n-triples",
+  json: "application/json",
+  jskos: "application/json",
+  jsonld: "application/json",
+  turtle: "text/turtle",
+  ttl: "text/turtle",
+  rdfxml: "application/rdf+xml",
+  xml: "application/rdf+xml",
+}
+
 const parseRDF = promisify($rdf.parse)
 
 export const namespaces = {

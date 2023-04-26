@@ -1,7 +1,7 @@
 import express from "express"
 import portfinder from "portfinder"
 import { initBackend } from "./src/backends.js"
-import { serialize } from "./src/rdf.js"
+import { serialize, contentTypes } from "./src/rdf.js"
 import fs from "fs"
 
 import config from "./src/config.js"
@@ -15,7 +15,7 @@ app.set("views", "./views")
 app.set("view engine", "ejs")
 app.get("/", serve)
 
-// serve Vue application
+// find Vue application
 const assetsDir = "dist/assets/"
 const assets = fs.readdirSync(assetsDir)
 if (assets.length) {
@@ -24,6 +24,7 @@ if (assets.length) {
   app.get("/client.css", (req, res) => res.sendFile(assets.filter(f => f.endsWith("css"))[0], { root: assetsDir }))
 }
 
+// server HTML view or debug information
 function serve(req, res, uri, item) {
   const relUri = uri ? uri.pathname : "" // FIXME: remove root
   const options = { config, uri, relUri, item, root: "/" }
@@ -32,6 +33,25 @@ function serve(req, res, uri, item) {
     res.json(options)
   } else {
     res.render("index", options)
+  }
+}
+
+// guess requested format from Accept-header
+function requestFormat(req) {
+  const formats = [
+    [ "html", ["text/html", "application/xhtml+xml"] ],
+    [ "jsonld", ["application/ld+json", "application/json"] ],
+    [ "ntriples", ["application/n-triples", "text/plain"] ],
+    [ "turtle", [ "text/turtle", "application/turtle", "application/x-turtle", "text/n3", "text/rdf+n3", "application/rdf+n3" ] ],
+    [ "rdfxml", ["application/rdf+xml", "text/rdf"] ],
+  ]
+
+  for (let [format, types] of formats) {
+    for (let type of types) {
+      if (req.accepts(type)) {
+        return format
+      }
+    }
   }
 }
 
@@ -50,7 +70,7 @@ app.use(async (req, res) => {
   }
 
   const format = req.query.format || requestFormat(req) || "jsonld"
-  if (!format.match(/^(html|debug|json|jsonld|jskos)$/) && !rdfTypes[format]) {
+  if (!format.match(/^(html|debug|json|jsonld|jskos)$/) && !contentTypes[format]) {
     res.status(400)
     res.send(`Serialization format ${format} not supported!`)
     return
@@ -66,7 +86,7 @@ app.use(async (req, res) => {
   if (format === "html" || format === "debug") {
     serve(req, res, `${uri}`, data)
   } else {
-    const contentType = rdfTypes[format]
+    const contentType = contentTypes[format]
     if (contentType && contentType != "application/json") {
       res.set("Content-Type", contentType)
       res.send(await serialize(data, contentType))
@@ -75,38 +95,6 @@ app.use(async (req, res) => {
     }
   }
 })
-
-const rdfTypes = {
-  nt: "application/n-triples",
-  ntriples: "application/n-triples",
-  json: "application/json",
-  jskos: "application/json",
-  jsonld: "application/json",
-  turtle: "text/turtle",
-  ttl: "text/turtle",
-  rdfxml: "application/rdf+xml",
-  xml: "application/rdf+xml",
-}
-
-function requestFormat(req) {
-
-  // supported Content Types, sorted by priority
-  const formats = [
-    [ "html", ["text/html", "application/xhtml+xml"] ],
-    [ "jsonld", ["application/ld+json", "application/json"] ],
-    [ "ntriples", ["application/n-triples", "text/plain"] ],
-    [ "turtle", [ "text/turtle", "application/turtle", "application/x-turtle", "text/n3", "text/rdf+n3", "application/rdf+n3" ] ],
-    [ "rdfxml", ["application/rdf+xml", "text/rdf"] ],
-  ]
-
-  for (let [format, types] of formats) {
-    for (let type of types) {
-      if (req.accepts(type)) {
-        return format
-      }
-    }
-  }
-}
 
 // start the proxy server
 const start = async () => {

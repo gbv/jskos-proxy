@@ -1,6 +1,8 @@
 <template>
   <div v-if="Object.keys(item).length">
-    <h3 v-if="inScheme" class="inScheme">
+    <h3
+      v-if="inScheme"
+      class="inScheme">
       <item-name
         :item="inScheme"
         @click="selectItem(inScheme.uri)" />
@@ -15,7 +17,9 @@
       :show-ancestors="false"
       :dropzone="false"
       @select="selectItem($event.item.uri)" />
-    <item-details-tabs :item="item" active-color="#577fbb" />
+    <item-details-tabs
+      :item="item"
+      active-color="#577fbb" />
     <!-- TODO: customize tabs, include raw JSKOS -->
     <div v-if="(item.topConcepts||[]).length">
       <h4>Top Concepts</h4>
@@ -28,12 +32,12 @@
 </template>
 
 <script setup>
-import { reactive, computed } from "vue"
+import { reactive } from "vue"
 import jskos from "jskos-tools"
 
-const item = reactive(JSON.parse(document.getElementById('item')?.textContent||'{}'))
-const base = document.getElementsByTagName('body')[0]?.getAttribute('base')
-const backend = document.getElementsByTagName('body')[0]?.getAttribute('backend')
+const item = reactive(JSON.parse(document.getElementById("item")?.textContent||"{}"))
+const base = document.getElementsByTagName("body")[0]?.getAttribute("base")
+const backend = document.getElementsByTagName("body")[0]?.getAttribute("backend")
 
 // TODO: load more details via backend
 const jskosType = jskos.guessObjectType(item)
@@ -43,7 +47,7 @@ if (jskosType == "ConceptScheme") {
     fetch(`${backend}voc/top?uri=${item.uri}`)
       .then(res => res.json())
       .then(items => {
-        item.topConcepts = items;
+        item.topConcepts = items
       })
   }
 }
@@ -52,7 +56,7 @@ const inScheme = (item.inScheme||[])[0]
 const selectItem = (url) => {
   if (url.startsWith(base)) {
     // FIXME: won't work if mounted in subdirectory
-    url = '/' + url.slice(base.length)
+    url = "/" + url.slice(base.length)
   }
   location.href = url
 }

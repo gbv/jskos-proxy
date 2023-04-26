@@ -1,6 +1,9 @@
 # jskos-proxy
 
-> Serve JSKOS objects in multiple formats, including HTML
+> Serve JSKOS objects in multiple formats over HTTP, in particular RDF and HTML
+
+This web service can be put in front of JSKOS data sources to provide RDF
+serializations and browseable HTML display at a common base URL.
 
 ## Table of Contents
 
