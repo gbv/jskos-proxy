@@ -17,15 +17,16 @@
 
 Create a local file `.env` with the following keys:
 
-- `PORT`
-- `BASE`
-- `BACKEND`
-
-...
+- `PORT` - which port to run the service on (default: `3555`)
+- `HOST` - URI host of all objects served via this proxy (default: `example.org`)
+- `ROOT` - URI path of all objects served via this proxy (default: `/`)
+- `BACKEND` - JSKOS API base URL or local NDJSON file
+- `TITLE` - Title of the service (default `JSKOS Proxy`)
 
 For instance:
 
-    BASE=http://uri.gbv.de/terminology/
+    BASE=uri.gbv.de
+    ROOT=/terminology/
     BACKEND=https://api.dante.gbv.de/
 
 ## Usage
@@ -35,6 +36,10 @@ For instance:
 ```bash
 npm run build
 ```
+
+### Configure
+
+See [configuration](#configuration) above.
 
 ### Run Server
 

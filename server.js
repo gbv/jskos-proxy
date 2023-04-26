@@ -1,11 +1,11 @@
 import express from "express"
 import portfinder from "portfinder"
-import { URL } from "node:url"
 import { initBackend } from "./src/backends.js"
 import { serialize } from "./src/rdf.js"
 import fs from "fs"
 
 import config from "./src/config.js"
+const { log, debug } = config
 
 const app = express()
 
@@ -16,17 +16,17 @@ app.set("view engine", "ejs")
 app.get("/", serve)
 
 // serve Vue application
-const assets = fs.readdirSync("dist/assets/")
-const root = "dist/assets/"
+const assetsDir = "dist/assets/"
+const assets = fs.readdirSync(assetsDir)
 if (assets.length) {
-  console.log(`Serving Vue application from ${assets}`)
-  app.get("/client.js", (req, res) => res.sendFile(assets.filter(f => f.endsWith("js"))[0], { root }))
-  app.get("/client.css", (req, res) => res.sendFile(assets.filter(f => f.endsWith("css"))[0], { root }))
+  log(`Serving Vue application from ${assetsDir}`)
+  app.get("/client.js", (req, res) => res.sendFile(assets.filter(f => f.endsWith("js"))[0], { root: assetsDir }))
+  app.get("/client.css", (req, res) => res.sendFile(assets.filter(f => f.endsWith("css"))[0], { root: assetsDir }))
 }
 
 function serve(req, res, uri, item) {
-  const relUri = uri ? uri.pathname : ""
-  const options = { config, uri, relUri, item }
+  const relUri = uri ? uri.pathname : "" // FIXME: remove root
+  const options = { config, uri, relUri, item, root: "/" }
 
   if (req.query.format === "debug") {
     res.json(options)
@@ -38,10 +38,13 @@ function serve(req, res, uri, item) {
 // serve JSKOS data
 app.set("json spaces", 2)
 app.use(async (req, res) => {
-  const uri = new URL("."+req.url, config.base)
+  const base = `http:${config.base}` // TODO: configure protocol
+  const uri = new URL("."+req.url, base)
   uri.search = ""
 
-  if (uri == config.base) {
+  debug(`get ${uri}`)
+
+  if (uri == base) {
     serve(req, res)
     return
   }
@@ -58,7 +61,7 @@ app.use(async (req, res) => {
   const data = await backend.getItem(`${uri}`)
   res.status(data ? 200 : 404)
 
-  console.log((data ? "got " : "missing ") + uri)
+  debug((data ? "got " : "missing ") + uri)
 
   if (format === "html" || format === "debug") {
     serve(req, res, `${uri}`, data)
@@ -112,11 +115,11 @@ const start = async () => {
     config.port = await portfinder.getPortPromise()
   }
 
-  const backend = await initBackend(config.backend)
+  const backend = await initBackend(config)
   app.set("backend", backend)
 
   app.listen(config.port, () => {
-    console.log(`JSKOS proxy ${config.base} from ${backend.name} listening on port ${config.port}`)
+    log(`JSKOS proxy ${config.base} from ${backend.name} listening on port ${config.port}`)
   })
 }
 

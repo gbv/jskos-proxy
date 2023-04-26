@@ -24,7 +24,7 @@ describe("JSKOS Proxy Server", () => {
       chai.request(app)
         .get("/?format=debug")
         .then(res => {
-          assert.equal(res.body.config.base, "http://example.org/")
+          assert.equal(res.body.config.base, "//example.org/")
         }),
     )})
 

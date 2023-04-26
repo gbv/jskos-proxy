@@ -2,8 +2,9 @@ import fs from "node:fs"
 import axios from "axios"
 
 export class FileBackend {
-  constructor(file) {
+  constructor(file, log) {
     this.file = file
+    this.log= log
     this.items = {}
     fs.watch(file, () => this.load())
     this.load()
@@ -22,7 +23,7 @@ export class FileBackend {
         items[item.uri] = item
       }
     }
-    console.log(`loaded ${Object.keys(items).length} JSKOS items from ${this.file}`)
+    this.log(`loaded ${Object.keys(items).length} JSKOS items from ${this.file}`)
     this.items = items
   }
 
@@ -32,9 +33,9 @@ export class FileBackend {
 }
 
 export class ApiBackend {
-  constructor(base) {
-    base = base.replace(/\/$/,"")
-    this.base = base
+  constructor( base, log ) {
+    this.base = base.replace(/\/$/,"")
+    this.log = log
   }
 
   get name() {
@@ -44,7 +45,7 @@ export class ApiBackend {
   async getItem(uri) {
     // TODO: add languges?
     const url = `${this.base}/data?` + new URLSearchParams({uri, properties: "*"})
-    console.log(url)
+    this.log(url)
     return axios.get(url)
       .then(res => Array.isArray(res.data) ? res.data[0] : null)
       .then(item => {
@@ -54,10 +55,10 @@ export class ApiBackend {
   }
 }
 
-export async function initBackend(backend) {
+export async function initBackend({ backend, log }) {
   if (backend.match(/^https?:/)) {
-    return new ApiBackend(backend)
+    return new ApiBackend(backend, log)
   } else {
-    return new FileBackend(backend)
+    return new FileBackend(backend, log)
   }
 }
