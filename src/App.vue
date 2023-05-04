@@ -1,48 +1,37 @@
 <template>
-  <div v-if="Object.keys(item).length">
-    <h3
-      v-if="inScheme"
-      class="inScheme">
-      <item-name
-        :item="inScheme"
-        @click="selectItem(inScheme.uri)" />
-    </h3>
-    <item-list
-      :items="(item.ancestors || []).filter(Boolean).reverse()"
-      class="jskos-vue-itemDetails-ancestors"
-      @select="selectItem($event.item.uri)" />
-    <item-details
+  <div v-if="uri">
+    <concept-scheme-view
+      v-if="jskosType=='ConceptScheme'"
       :item="item"
-      :show-tabs="false"
-      :show-ancestors="false"
-      :dropzone="false"
-      @select="selectItem($event.item.uri)" />
-    <item-details-tabs
+      @select="selectItem" />
+    <item-view
+      v-else
       :item="item"
-      active-color="#577fbb" />
-    <!-- TODO: customize tabs, include raw JSKOS -->
-    <div v-if="(item.topConcepts||[]).length">
-      <h4>Top Concepts</h4>
-      <item-list
-        :items="item.topConcepts"
-        class="jskos-vue-itemDetails-narrower"
-        @select="selectItem($event.item.uri)" />
-    </div>
+      @select="selectItem" />
+  </div>
+  <div v-else-if="api">
+    <concept-scheme-selection
+      :api="api"
+      @select="selectItem" />
   </div>
 </template>
 
 <script setup>
+import ConceptSchemeSelection from "./components/ConceptSchemeSelection.vue"
+import ConceptSchemeView from "./components/ConceptSchemeView.vue"
+import ItemView from "./components/ItemView.vue"
+
 import { reactive } from "vue"
 import jskos from "jskos-tools"
 
-// current item(s)
+// current item
+const uri = [...document.getElementsByTagName("link")].find(e => e.rel=="self")?.href
 const item = reactive(JSON.parse(document.getElementById("item")?.textContent||"{}"))
 
 // configuration
 const body = document.getElementsByTagName("body")[0]
-const base = body?.getAttribute("base")
-const root = body?.getAttribute("root") || "/"
-const api = body?.getAttribute("api")
+const base = body.getAttribute("base")
+const api = body.getAttribute("api")
 
 // TODO: load more details via backend (requires cocoda-sdk and API endpoint)
 const jskosType = jskos.guessObjectType(item)
@@ -57,25 +46,15 @@ if (jskosType == "ConceptScheme") {
   }
 }
 
-const inScheme = (item.inScheme||[])[0]
-const selectItem = (url) => {
-  if (url.startsWith(base)) { // FIXME
-    url = root + url.slice(base.length)
+const selectItem = item => {
+  console.log(item)
+  if (item.uri) {
+    const url = new URL(item.uri)
+    if (`//${url.host}${url.pathname}`.startsWith(base)) {
+      location.href = url.pathname
+    }
   }
-  location.href = url
 }
 
 // TODO: set title of HTML page (better elsewhere?)
 </script>
-
-<style>
-h3.inScheme {
-  font-size: 1.17em;
-  margin: 0.85rem 0;
-  font-weight: normal;
-}
-.inScheme:hover {
-  cursor: pointer;
-  background-color: var(--jskos-vue-itemList-hover-bgColor);
-}
-</style>

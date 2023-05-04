@@ -7,32 +7,28 @@
     <script type="module" crossorigin src="<%= root %>client.js"></script>
     <link rel="stylesheet" href="<%= root %>client.css">
     <link rel="stylesheet" href="<%= root %>style.css">
+    <% if (locals.uri) { %>
+      <link rel="self" href="<%= uri %>">
+    <% } %>
   </head>
   <body base="<%= base %>" api="<%= locals.api %>">
-    <header>
-      <nav>
-        <ul class="nav">
-        <% if (host && hostLabel) { %>
-          <li>
-            <a href="//<%= host %>"><%= hostLabel %></a>
-          </li>
-        <% } %>
-          <li>
-            <a href="<%= root %>"><%= rootLabel || root %></a>
-          </li>
-          <!-- TODO: add vocid, if known -->
-        </ul>
-        <!-- TODO: add help and language selector -->
-      </nav>
-    </header>
+    <%- include("header") %>
     <main>
-      <% if (locals.uri) { %>
-       <%- include("item") %>
-      <% } else { %>
-       <%- include("root") %>
+      <% if (!locals.item) { %>
+        <h2><%= title %></h2>
+        <% if (locals.uri) { %>
+          <p>
+            <a href="<%= uri %>"><%= uri %></a> not found
+          </p>
+        <% } %>
       <% } %>
+      <div id="app"></div>
     </main>
     <%- include("footer") %>
   </body>
+  <% if (locals.item) { %>
+    <script type="application/ld+json" id="item">
+      <%- JSON.stringify(item).replaceAll('<','\u003C') %>
+    </script>
+  <% } %>
 </html>
-

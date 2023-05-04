@@ -6,7 +6,11 @@ if (NODE_ENV !== "test") {
   dotenv.config()
 }
 
-import pkg from "../package.json" assert { type: "json" }
+// eslint does not like: import pkg from "../package.json" assert { type: "json" }
+import { readFile } from "node:fs/promises"
+const fileUrl = new URL("../package.json", import.meta.url)
+const pkg = JSON.parse(await readFile(fileUrl, "utf8"))
+
 const { name, version, homepage } = pkg
 
 const { env } = process

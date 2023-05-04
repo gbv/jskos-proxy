@@ -37,7 +37,7 @@ if (assets.length) {
 // server HTML view or info information
 function serve(req, res, vars) {
   const relUri = vars.uri ? vars.uri.pathname : "" // FIXME: remove root
-  vars.source = vars.item?._source || vars.items?.source
+  vars.source = vars.item?._source
   const options = { ...config, ...vars, relUri }
 
   if (req.query.format === "debug") {
@@ -76,14 +76,7 @@ app.use(async (req, res) => {
   info(`get ${uri}`)
 
   if (uri == base) {
-    var items = []
-    const indexBackend = app.get("index")
-    if (indexBackend) {
-      // TODO: slow query, better query in the client?
-      info(`Loading items from ${indexBackend.name}`)
-      items = await indexBackend.listItems()
-    }
-    serve(req, res, { items })
+    serve(req, res, { })
     return
   }
 
