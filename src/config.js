@@ -6,11 +6,15 @@ if (NODE_ENV !== "test") {
   dotenv.config()
 }
 
+import pkg from "../package.json" assert { type: "json" }
+const { name, version, homepage } = pkg
+
 const { env } = process
 const log = msg => console.log(msg)
 
 const config = {
   env: NODE_ENV,
+  name, version, homepage,
   port: env.PORT || 3555,
   host: env.HOST || "example.org",
   root: env.ROOT || "/",

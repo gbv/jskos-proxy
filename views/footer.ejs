@@ -1,17 +1,18 @@
 <footer>
-  <!-- TODO: version number and link to source/issues -->
-  <a href="https://www.gbv.de/impressum">Verbundzentrale des GBV (VZG)</a><br>
-  <% if (locals.uri) { %>
-    <a href="<%= relUri %>"><%= uri %></a>
-    &nbsp;<a href="<%= relUri %>?format=jskos">jskos</a>
-    &nbsp;<a href="<%= relUri %>?format=turtle">turtle</a>
-    &nbsp;<a href="<%= relUri %>?format=rdfxml">rdfxml</a>
-    &nbsp;<a href="<%= relUri %>?format=nt">ntriples</a>
+  <div style="float:left">
+    <a href="https://www.gbv.de/impressum">Verbundzentrale des GBV (VZG)</a>
+  </div>
+  <div style="float:right;text-align:right">
+    <% if (locals.uri) { %>
+      <a href="<%= relUri %>"><%= uri %></a>
+      <br>
+      &nbsp;<a href="<%= relUri %>?format=jskos">jskos</a>
+      &nbsp;<a href="<%= relUri %>?format=turtle">turtle</a>
+      &nbsp;<a href="<%= relUri %>?format=rdfxml">rdfxml</a>
+      &nbsp;<a href="<%= relUri %>?format=nt">ntriples</a>
+      <a href="<%= source %>" style="color:#999">source</a>
+    <% } %>
     <br>
-  <% } %>
-  <% if (source) { %>
-    <div style="padding-top: 0.2rem">
-      <a href="<%= source %>" style="color:#999">JSKOS API source</a>
-    </div>
-  <% } %>
+    <a href="<%= homepage %>"><%= name %> <%= version %>
+  </div>
 </footer>
