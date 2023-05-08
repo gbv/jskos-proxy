@@ -1,5 +1,6 @@
 <template>
   <div v-if="uri">
+    <div v-if="Object.keys(item).length > 0">
     <concept-scheme-view
       v-if="jskosType=='ConceptScheme'"
       :item="item"
@@ -8,6 +9,10 @@
       v-else
       :item="item"
       @select="selectItem" />
+    </div>
+    <div v-else>
+      <!-- 404: TODO show search form -->
+    </div>
   </div>
   <div v-else-if="api">
     <concept-scheme-selection
