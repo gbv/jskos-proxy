@@ -27,7 +27,7 @@ nav ul li {
 }
 
 main {
-  padding: 1em;
+  padding: calc(1px + (100vw - 300px) / 50) calc((100vw - 250px) / 6);
 }
 footer {
   border-top: 0.85rem solid var(--bar-color);
@@ -56,4 +56,3 @@ a:hover, a:active {
 .jskos-vue-tabs-sm {
   font-size: 1rem !important;
 }
-
