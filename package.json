@@ -33,6 +33,7 @@
     "jskos-vue": "^0.2.7",
     "jsonld": "^8.1.1",
     "nodemon": "^2.0.22",
+    "portfinder": "^1.0.32",
     "rdflib": "^2.2.32",
     "vite": "^4.3.0"
   },
@@ -44,7 +45,6 @@
     "eslint-config-gbv": "^1.0.4",
     "eslint-plugin-vue": "^9.11.0",
     "mocha": "^10.2.0",
-    "mocha-eslint": "^7.0.0",
-    "portfinder": "^1.0.32"
+    "mocha-eslint": "^7.0.0"
   }
 }
