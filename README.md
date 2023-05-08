@@ -29,6 +29,8 @@ cd jskos-proxy
 npm ci
 ```
 
+To deploy with PM2 copy `ecosystem.example.json` to `ecosystem.config.json`.
+
 ### Configuration
 
 Create a local file `.env` with the following keys:
