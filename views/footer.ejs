@@ -10,7 +10,7 @@
       &nbsp;<a href="<%= relUri %>?format=turtle">turtle</a>
       &nbsp;<a href="<%= relUri %>?format=rdfxml">rdfxml</a>
       &nbsp;<a href="<%= relUri %>?format=nt">ntriples</a>
-      <%= if (locals.source) %>
+      <% if (locals.source) { %>
         <a href="<%= source %>" style="color:#999">source</a>
       <% } %>
     <% } %>
