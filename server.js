@@ -94,7 +94,7 @@ app.use(async (req, res) => {
 
   info((item ? "got " : "missing ") + uri)
 
-  if (format === "html" || format === "info") {
+  if (format === "html" || format === "debug") {
     serve(req, res, { uri: `${uri}`, item })
   } else {
     const contentType = contentTypes[format]
