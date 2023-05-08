@@ -47,11 +47,12 @@ if (jskosType == "ConceptScheme") {
 }
 
 const selectItem = item => {
-  console.log(item)
   if (item.uri) {
     const url = new URL(item.uri)
     if (`//${url.host}${url.pathname}`.startsWith(base)) {
       location.href = url.pathname
+    } else {
+      console.warn(`Cannot select ${item.uri}: mismatching base URI`)
     }
   }
 }

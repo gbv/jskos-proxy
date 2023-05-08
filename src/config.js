@@ -23,7 +23,6 @@ const config = {
   host: env.HOST || "example.org",
   root: env.ROOT || "/",
   backend: env.BACKEND || "test/items.ndjson",
-  index: env.INDEX,
   title: env.TITLE || "JSKOS Proxy",
   hostLabel: env.HOST_LABEL,
   rootLabel: env.ROOT_LABEL,

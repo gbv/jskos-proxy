@@ -39,14 +39,13 @@ Create a local file `.env` with the following keys:
 - `HOST` - URI host of all objects served via this proxy (default: `example.org`)
 - `ROOT` - URI path of all objects served via this proxy (default: `/`)
 - `BACKEND` - JSKOS API base URL or local NDJSON file
-- `INDEX` - Optional backend to serve at the root
 - `TITLE` - Title of the service (default `JSKOS Proxy`)
 - `ROOT_LABEL` - Optional name for linking to the root (default: same as `ROOT`)
 - `HOST_LABEL` - Optional name for linking to the host (default: none)
 
 For instance:
 
-    BASE=uri.gbv.de
+    HOST=uri.gbv.de
     ROOT=/terminology/
     BACKEND=https://api.dante.gbv.de/
 
