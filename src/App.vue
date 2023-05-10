@@ -1,14 +1,14 @@
 <template>
   <div v-if="uri">
     <div v-if="Object.keys(item).length > 0">
-    <concept-scheme-view
-      v-if="jskosType=='ConceptScheme'"
-      :item="item"
-      @select="selectItem" />
-    <item-view
-      v-else
-      :item="item"
-      @select="selectItem" />
+      <concept-scheme-view
+        v-if="jskosType=='ConceptScheme'"
+        :item="item"
+        @select="selectItem" />
+      <item-view
+        v-else
+        :item="item"
+        @select="selectItem" />
     </div>
     <div v-else>
       <!-- 404: TODO show search form -->
@@ -57,7 +57,8 @@ const selectItem = item => {
     if (`//${url.host}${url.pathname}`.startsWith(base)) {
       location.href = url.pathname
     } else {
-      console.warn(`Cannot select ${item.uri}: mismatching base URI`)
+      // TODO: use relative URL
+      location.href = base + `?` + new URLSearchParams({uri: url})
     }
   }
 }

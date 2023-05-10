@@ -70,8 +70,27 @@ function requestFormat(req) {
 app.set("json spaces", 2)
 app.use(async (req, res) => {
   const base = `http:${config.base}` // TODO: configure protocol
-  const uri = new URL("."+req.url, base)
+
+  // URI given by query parameter
+  const queryURI = req.query.uri || ""
+  if (queryURI.startsWith(`http:${config.base}`) ||
+      queryURI.startsWith(`https:${config.base}`)) {
+    res.redirect(301,queryURI.replace(/^https?:/,"").substr(config.host.length+2))
+    return
+  }
+
+  var uri = new URL("."+req.url, base)
   uri.search = ""
+
+  if (queryURI) {
+    try {
+      uri = new URL(queryURI)
+    } catch {
+      res.status(400)
+      res.send("Invalid URI")
+      return
+    }
+  }
 
   info(`get ${uri}`)
 

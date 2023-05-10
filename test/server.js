@@ -8,6 +8,7 @@ process.env.BACKEND = "./test/items.ndjson"
 const { app } = await import("../server.js")
 
 const exampleA = { uri: "http://example.org/a", prefLabel: { en: "a" } }
+const exampleC = { uri: "http://example.com/c", prefLabel: { en: "c" } }
 
 describe("JSKOS Proxy Server", () => {
   describe("GET /", () => {
@@ -40,6 +41,29 @@ describe("JSKOS Proxy Server", () => {
           assert.equal(res.status,200)
           assert.deepEqual(res.body, exampleA)
         }))
+  })
 
+  describe("Get item via URI", () => {
+    it("support ?uri= parameter",
+      () => chai.request(app)
+        .get("/?uri=http://example.com/c&format=json")
+        .then(res => {
+          assert.equal(res.status,200)
+          assert.deepEqual(res.body, exampleC)
+        }))
+    it("complains on invalid query URI",
+      () => chai.request(app)
+        .get("/?uri=xy")
+        .then(res => {
+          assert.equal(res.status,400)
+        }))
+    it("redirects ?uri= for local URI",
+      () => chai.request(app)
+        .get("/?uri=http://example.org/a")
+        .redirects(0)
+        .then(res => {
+          assert.equal(res.status,301)
+          assert.equal(res.headers.location, "/a")
+        }))
   })
 })
