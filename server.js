@@ -7,14 +7,6 @@ import fs from "fs"
 import config from "./src/config.js"
 const { log, info } = config
 
-// FIXME: test this and move to another location
-config.relativeUrl = url => {
-  if (url.startsWith(`http://${config.host}`) || url.startsWith(`https://${config.host}`)) {
-    return new URL(url).pathname
-  }
-  return url
-}
-
 // JSKOS API
 config.api = "https://api.dante.gbv.de/"
 

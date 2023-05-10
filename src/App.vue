@@ -53,12 +53,11 @@ if (jskosType == "ConceptScheme") {
 
 const selectItem = item => {
   if (item.uri) {
-    const url = new URL(item.uri)
-    if (`//${url.host}${url.pathname}`.startsWith(base)) {
-      location.href = url.pathname
+    const uri = new URL(item.uri)
+    if (`//${uri.host}${uri.pathname}`.startsWith(base)) {
+      location.href = uri.pathname
     } else {
-      // TODO: use relative URL
-      location.href = base + `?` + new URLSearchParams({uri: url})
+      location.href = base.replace(/^..[^/]+/,"") + "?" + new URLSearchParams({uri})
     }
   }
 }
