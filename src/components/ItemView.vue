@@ -43,7 +43,7 @@ const inScheme = computed(() => (props.item.inScheme||[])[0])
 h3.inScheme {
   font-size: 1.17em;
   margin: 0.85rem 0;
-  font-weight: normal;
+  font-weight: bold;
 }
 .inScheme:hover {
   cursor: pointer;
