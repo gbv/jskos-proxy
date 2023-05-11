@@ -10,7 +10,7 @@ export class FileBackend {
     this.load()
   }
 
-  get name() {
+  toString() {
     return this.file
   }
 
@@ -42,7 +42,7 @@ export class ApiBackend {
     this.log = log
   }
 
-  get name() {
+  toString() {
     return this.base
   }
 

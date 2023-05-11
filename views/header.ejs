@@ -1,13 +1,8 @@
 <header>
   <nav>
     <ul class="nav">
-    <% if (host && hostLabel) { %>
       <li>
-        <a href="//<%= host %>"><%= hostLabel %></a>
-      </li>
-    <% } %>
-      <li>
-        <a href="<%= root %>"><%= rootLabel || root %></a>
+        <a href="<%= namespace.pathname %>"><%= namespace.pathname %></a>
       </li>
       <!-- TODO: add vocid, if known -->
     </ul>

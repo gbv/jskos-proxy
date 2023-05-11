@@ -4,12 +4,12 @@
   </div>
   <div style="float:right;text-align:right">
     <% if (locals.uri) { %>
-      <a href="<%= relUri %>"><%= uri %></a>
+      <a href="<%= link(uri,namespace) %>"><%= uri %></a>
       <br>
-      &nbsp;<a href="<%= relUri %>?format=jskos">jskos</a>
-      &nbsp;<a href="<%= relUri %>?format=turtle">turtle</a>
-      &nbsp;<a href="<%= relUri %>?format=rdfxml">rdfxml</a>
-      &nbsp;<a href="<%= relUri %>?format=nt">ntriples</a>
+      &nbsp;<a href="<%= link(uri,namespace,"jskos") %>">jskos</a>
+      &nbsp;<a href="<%= link(uri,namespace,"turtle") %>">turtle</a>
+      &nbsp;<a href="<%= link(uri,namespace,"rdfxml") %>">rdfxml</a>
+      &nbsp;<a href="<%= link(uri,namespace,"ntriples") %>">ntriples</a>
       <% if (locals.source) { %>
         <a href="<%= source %>" style="color:#999">source</a>
       <% } %>

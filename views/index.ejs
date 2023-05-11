@@ -4,14 +4,14 @@
     <meta charset="utf-8">
     <title><%= title %></title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <script type="module" crossorigin src="<%= root %>client.js"></script>
-    <link rel="stylesheet" href="<%= root %>client.css">
-    <link rel="stylesheet" href="<%= root %>style.css">
+    <script type="module" crossorigin src="<%= namespace.pathname %>client.js"></script>
+    <link rel="stylesheet" href="<%= namespace.pathname %>client.css">
+    <link rel="stylesheet" href="<%= namespace.pathname %>style.css">
     <% if (locals.uri) { %>
       <link rel="self" href="<%= uri %>">
     <% } %>
   </head>
-  <body base="<%= base %>" api="<%= locals.api %>">
+  <body data-namespace="<%= namespace %>" data-backend="<%= locals.backend %>">
     <%- include("header") %>
     <main>
       <% if (!locals.item) { %>

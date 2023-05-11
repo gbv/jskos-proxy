@@ -36,17 +36,14 @@ To deploy with PM2 copy `ecosystem.example.json` to `ecosystem.config.json`.
 Create a local file `.env` with the following keys:
 
 - `PORT` - which port to run the service on (default: `3555`)
-- `HOST` - URI host of all objects served via this proxy (default: `example.org`)
-- `ROOT` - URI path of all objects served via this proxy (default: `/`)
+- `NAMESPACE` - URI namespace of all objects served via this proxy.
+   Must end with a slash (default: `http://example.org/`)
 - `BACKEND` - JSKOS API base URL or local NDJSON file
 - `TITLE` - Title of the service (default `JSKOS Proxy`)
-- `ROOT_LABEL` - Optional name for linking to the root (default: same as `ROOT`)
-- `HOST_LABEL` - Optional name for linking to the host (default: none)
 
 For instance:
 
-    HOST=uri.gbv.de
-    ROOT=/terminology/
+    NAMESPACE=http://uri.gbv.de/terminology/
     BACKEND=https://api.dante.gbv.de/
 
 ## Usage

@@ -14,9 +14,9 @@
       <!-- 404: TODO show search form -->
     </div>
   </div>
-  <div v-else-if="api">
+  <div v-else-if="backend">
     <concept-scheme-selection
-      :api="api"
+      :api="backend"
       @select="selectItem" />
   </div>
 </template>
@@ -25,7 +25,7 @@
 import ConceptSchemeSelection from "./components/ConceptSchemeSelection.vue"
 import ConceptSchemeView from "./components/ConceptSchemeView.vue"
 import ItemView from "./components/ItemView.vue"
-
+import { link } from "./utils.js"
 import { reactive } from "vue"
 import jskos from "jskos-tools"
 
@@ -35,15 +35,15 @@ const item = reactive(JSON.parse(document.getElementById("item")?.textContent||"
 
 // configuration
 const body = document.getElementsByTagName("body")[0]
-const base = body.getAttribute("base")
-const api = body.getAttribute("api")
+const namespace = new URL(body.dataset.namespace)
+const backend = body.dataset.backend
 
 // TODO: load more details via backend (requires cocoda-sdk and API endpoint)
 const jskosType = jskos.guessObjectType(item)
 if (jskosType == "ConceptScheme") {
-  if (api && !item.topConcepts) { // TODO: also if last of narrower is null
+  if (backend && !item.topConcepts) { // TODO: also if last of narrower is null
     // TODO: show loadingIndicator
-    fetch(`${api}voc/top?uri=${item.uri}`)
+    fetch(`${backend}voc/top?uri=${item.uri}`)
       .then(res => res.json())
       .then(items => {
         item.topConcepts = items
@@ -53,12 +53,7 @@ if (jskosType == "ConceptScheme") {
 
 const selectItem = item => {
   if (item.uri) {
-    const uri = new URL(item.uri)
-    if (`//${uri.host}${uri.pathname}`.startsWith(base)) {
-      location.href = uri.pathname
-    } else {
-      location.href = base.replace(/^..[^/]+/,"") + "?" + new URLSearchParams({uri})
-    }
+    location.href = link(item.uri, namespace)
   }
 }
 
