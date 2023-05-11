@@ -4,19 +4,21 @@
       <concept-scheme-view
         v-if="jskosType=='ConceptScheme'"
         :item="item"
+        :registry="registry"
         @select="selectItem" />
       <item-view
         v-else
         :item="item"
+        :registry="registry"
         @select="selectItem" />
     </div>
     <div v-else>
-      <!-- 404: TODO show search form -->
+      <!-- 404: TODO show search form to search vocabularies -->
     </div>
   </div>
   <div v-else-if="backend">
     <concept-scheme-selection
-      :api="backend"
+      :registry="registry"
       @select="selectItem" />
   </div>
 </template>
@@ -28,6 +30,7 @@ import ItemView from "./components/ItemView.vue"
 import { link } from "./utils.js"
 import { reactive } from "vue"
 import jskos from "jskos-tools"
+import { cdk } from "cocoda-sdk"
 
 // current item
 const uri = [...document.getElementsByTagName("link")].find(e => e.rel=="self")?.href
@@ -38,24 +41,19 @@ const body = document.getElementsByTagName("body")[0]
 const namespace = new URL(body.dataset.namespace)
 const backend = body.dataset.backend
 
-// TODO: load more details via backend (requires cocoda-sdk and API endpoint)
-const jskosType = jskos.guessObjectType(item)
-if (jskosType == "ConceptScheme") {
-  if (backend && !item.topConcepts) { // TODO: also if last of narrower is null
-    // TODO: show loadingIndicator
-    fetch(`${backend}voc/top?uri=${item.uri}`)
-      .then(res => res.json())
-      .then(items => {
-        item.topConcepts = items
-      })
-  }
+var registry
+if (backend.match(/^https?:/)) {
+  registry = cdk.initializeRegistry({
+    provider: "ConceptApi",
+    status: backend+"status",
+  })
 }
+
+const jskosType = jskos.guessObjectType(item)
 
 const selectItem = item => {
   if (item.uri) {
     location.href = link(item.uri, namespace)
   }
 }
-
-// TODO: set title of HTML page (better elsewhere?)
 </script>

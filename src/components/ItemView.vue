@@ -30,13 +30,11 @@
 <script setup>
 import { computed } from "vue"
 
-const props = defineProps({
-  item: { type: Object, default: () => ({}) },
-})
+const props = defineProps({ item: Object, registry: Object })
 
 defineEmits("select")
 
-const inScheme = computed(() => (props.item.inScheme||[])[0])
+const inScheme = computed(() => (props.item?.inScheme||[])[0])
 </script>
 
 <style>
