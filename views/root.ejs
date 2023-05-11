@@ -1,23 +1,39 @@
 <html>
   <head>
-    <title><%= title %></title>
+    <title><%= title %> configuration</title>
   </head>
   <body>
     <h1><%= title %></h1>
     <p>
       The application is configured to be served from root path
-      <a href="<%= namespace.pathname %>"><%= namespace %></a>.
+      <b><a href="<%= namespace.pathname %>"><%= namespace.pathname %></a></b>.
     </p>
+    <h2>Installation</h2>
     <p>
       To serve other content alongside this application, put the
-      application behind a HTTP reverse proxy.
+      application behind a HTTP reverse proxy of
+      <code><%= namespace.host %></code> so it is accessible
+      at <a href="<%= namespace %>"><%= namespace %></a>.
     </p>
+    <h3>Apache</h3>
     <p>
-      Apache webserver settings for <code><%= namespace.host %></code> would be:
+      <pre><code>
+    ProxyPass <%= namespace.pathname %> http://localhost:<%= port %><%= namespace.pathname %>
+    ProxyPassReverse <%= namespace.pathname %> http://localhost:<%= port %><%= namespace.pathname %>
+      </code></pre>
     </p>
-<pre><code>
-ProxyPass <%= namespace.pathname %> http://localhost:<%= port %><%= namespace.pathname %>
-ProxyPassReverse <%= namespace.pathname %> http://localhost:<%= port %><%= namespace.pathname %>
-</code></pre>
+    <h3>Nginx</h3>
+    <p>
+      <pre><code>
+    location /terminology/ {
+            proxy_pass http://localhost:3555/terminology/;
+    }
+      </code></pre>
+    </p>
+    <h2>Configuration</h2>
+<% const {settings, _locals, cache, ...config} = locals %>
+    <pre><code>
+<%=JSON.stringify(config,null,2)%>
+    </code></pre>
   </body>
 </html>

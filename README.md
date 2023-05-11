@@ -14,6 +14,7 @@ This web service can be put in front of [JSKOS] data sources to provide RDF seri
 
 - [Install](#install)
   - [Configuration](#configuration)
+  - [Installation](#installation)
 - [Usage](#usage)
 - [API](#api)
 - [Maintainers](#maintainers)
@@ -45,6 +46,19 @@ For instance:
 
     NAMESPACE=http://uri.gbv.de/terminology/
     BACKEND=https://api.dante.gbv.de/
+
+### Installation
+
+For production the application should be put behind a reverse HTTP proxy, e.g.
+
+    # Apache
+    ProxyPass /terminology/ http://localhost:3555/terminology/
+    ProxyPassReverse /terminology/ http://localhost:3555/terminology/
+
+    # Nginx
+    location /terminology/ {
+        proxy_pass http://localhost:3555/terminology/;
+    }
 
 ## Usage
 
