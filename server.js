@@ -5,7 +5,7 @@ import { serialize, contentTypes } from "./src/rdf.js"
 import fs from "fs"
 
 import config from "./src/config.js"
-const { log, info } = config
+const { log, info, root } = config
 
 // JSKOS API
 config.api = "https://api.dante.gbv.de/"
@@ -17,13 +17,21 @@ app.use(express.static("public"))
 app.set("views", "./views")
 app.set("view engine", "ejs")
 
-// find Vue application
+// serve message on root if mounted at a specific root path
+if (root !== "/") {
+  app.get("/", (req, res) => {
+    res.render("root", config)
+  })
+}
+
+// serve Vue application
 const assetsDir = "dist/assets/"
 const assets = fs.readdirSync(assetsDir)
 if (assets.length) {
-  log(`Serving Vue application from ${assetsDir}`)
-  app.get("/client.js", (req, res) => res.sendFile(assets.filter(f => f.endsWith("js"))[0], { root: assetsDir }))
-  app.get("/client.css", (req, res) => res.sendFile(assets.filter(f => f.endsWith("css"))[0], { root: assetsDir }))
+  log(`Serving Vue application from ${assetsDir} at ${root}`)
+  const assetFiles = filter => ((req, res) => res.sendFile(assets.filter(filter)[0], { root: assetsDir }))
+  app.get(`${root}client.js`, assetFiles(f => f.endsWith("js")))
+  app.get(`${root}client.css`, assetFiles(f => f.endsWith("css")))
 }
 
 // server HTML view or info information
@@ -71,6 +79,7 @@ app.use(async (req, res) => {
     return
   }
 
+  //var uri = new URL("."+req.url, base)
   var uri = new URL("."+req.url, base)
   uri.search = ""
 

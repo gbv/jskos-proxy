@@ -1,0 +1,21 @@
+<html>
+  <head>
+    <title><%= title %></title>
+  </head>
+  <body>
+    <h1><%= title %></h1>
+    <p>
+      The application is configured to be served from root path
+      <a href="<%= root %>"><%= root %></a>.
+    </p>
+    <p>
+      To serve other content alongside this application, put the
+      application behind a HTTP reverse proxy. Settings for Apache
+      webserver are:
+    </p>
+<pre><code>
+ProxyPass <%= root %> http://localhost:<%= port %><%= root %>
+ProxyPassReverse <%= root %> http://localhost:<%= port %><%= root %>
+</code></pre>
+  </body>
+</html>
