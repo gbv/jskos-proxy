@@ -1,12 +1,12 @@
 # jskos-proxy
 
-[![License](https://img.shields.io/github/license/gbv/jskos-proxy.svg)](https://github.com/gbv/jskos-proxy/blob/master/LICENSE)
 [![Test](https://github.com/gbv/jskos-proxy/actions/workflows/test.yml/badge.svg)](https://github.com/gbv/jskos-proxy/actions/workflows/test.yml)
+[![License](https://img.shields.io/github/license/gbv/jskos-proxy.svg)](https://github.com/gbv/jskos-proxy/blob/master/LICENSE)
 [![standard-readme compliant](https://img.shields.io/badge/readme%20style-standard-brightgreen.svg)](https://github.com/RichardLitt/standard-readme)
 
 > Serve [JSKOS] objects in multiple formats over HTTP, in particular HTML and RDF
 
-This web service can be put in front of [JSKOS] data sources to provide RDF serializations and browseable HTML display at a common base URL.
+This web service can be put in front of [JSKOS] data sources to provide RDF serializations and browseable HTML display of controlled vocabularies at a common base URL.
 
 [JSKOS]: https://gbv.github.io/jskos/jskos.html
 
@@ -60,6 +60,8 @@ For production the application should be put behind a reverse HTTP proxy, e.g.
         proxy_pass http://localhost:3555/terminology/;
     }
 
+See file `ecosystem.example.json` for deployment with [PM2](https://pm2.keymetrics.io/).
+
 ## Usage
 
 ### Compile client-side JavaScript
@@ -84,15 +86,21 @@ NODE_ENV=production node ./server.js
 
 ## API
 
-The proxy translates a HTTP requests to an URIs queries this URI in the backend, and returns the result in HTML or a requested RDF serialization format. The format is determined based on query parameter `format` (if given) or HTTP Accept header (otherwise). The following formats are supported:
+The proxy translates HTTP requests to an URI query. The URI is determined from query path and configured `NAMESPACE` or given with optional query parameter `uri`.
 
-- HTML (with embedded JSON-LD)
+The URI is then looked up in the backend, and returned in a requested RDF serialization format or in HTML. The format is determined based on query parameter `format` (if given) or HTTP Accept header (otherwise). The following formats are supported:
+
+- HTML with embedded JSON-LD (default)
 - JSON-LD (format `json`, `jskos` or `jsonld`)
 - NTriples (format `nt` or `ntriples`)
 - Turtle (format `ttl` or `turtle`)
 - RDF/XML (format `rdfxml` or `xml`)
 
 In addition format `debug` will return JSON data that is used internally to create the HTML format.
+
+## Related works
+
+See <https://bartoc.org/software> for a collection of software for knowledge organization systems (aka controlled vocabularies). Browsing interfaces similar to jskos-proxy are provided by [Skohub](https://github.com/skohub-io/skohub-vocabs) and [Skosmos](http://skosmos.org/), among other solutions.
 
 ## Maintainers
 
@@ -102,4 +110,3 @@ In addition format `debug` will return JSON data that is used internally to crea
 ## License
 
 MIT © 2023- Verbundzentrale des GBV (VZG)
-
