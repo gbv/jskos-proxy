@@ -85,9 +85,6 @@ app.use(namespace.pathname, async (req, res) => {
     }
   } else {
     // URI given by HTTP request
-    // FIXME: /terminology/prizepapers_scripttype/46b61a9b-048f-4193-8894-25e7c00c8cd0
-    // => http://uri.gbv.de/prizepapers_scripttype/46b61a9b-048f-4193-8894-25e7c00c8cd0
-    // req.url == "/" => uri = namespace
     uri = new URL(req.url.substr(1), namespace) // namespace.href?
     uri.search = ""
   }
@@ -101,8 +98,7 @@ app.use(namespace.pathname, async (req, res) => {
     return
   }
 
-  if (protocolless(uri) === protocolless(namespace)) {
-    // TODO: configure whether to serve index item
+  if (config.listing && protocolless(uri) === protocolless(namespace)) {
     serve(req, res, { })
     return
   }
@@ -138,10 +134,6 @@ const start = async () => {
 
   const backend = await initBackend(config)
   app.set("backend", backend)
-
-  if (config.index) {
-    app.set("index", await initBackend({...config, backend: config.index}))
-  }
 
   app.listen(config.port, () => {
     log(`JSKOS proxy ${namespace} from ${backend} at http://localhost:${config.port}/`)

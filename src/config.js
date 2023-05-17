@@ -26,6 +26,7 @@ const config = {
   name,
   version,
   homepage,
+  listing: !(env.LISTING||"").match(/^0|false$/),
 
   // methods
   log,

@@ -40,6 +40,7 @@ Create a local file `.env` with the following keys:
 - `NAMESPACE` - URI namespace of all objects served via this proxy.
    Must end with a slash (default: `http://example.org/`)
 - `BACKEND` - JSKOS API base URL or local NDJSON file
+- `LISTING` - whether to show list of vocabularies from backend API on NAMESPACE URL (enabled by default, disable with `0` or `false`)
 - `TITLE` - Title of the service (default `JSKOS Proxy`)
 
 For instance:
