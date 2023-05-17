@@ -43,10 +43,18 @@ Create a local file `.env` with the following keys:
 - `LISTING` - whether to show list of vocabularies from backend API on NAMESPACE URL (enabled by default, disable with `0` or `false`)
 - `TITLE` - Title of the service (default `JSKOS Proxy`)
 
-For instance:
+#### Examples
+
+DANTE Vocabularies
 
     NAMESPACE=http://uri.gbv.de/terminology/
     BACKEND=https://api.dante.gbv.de/
+
+RVK
+
+    NAMESPACE=http://uri.gbv.de/terminology/rvk/
+    BACKEND=https://coli-conc.gbv.de/rvk/api/
+    LISTING=false
 
 ### Installation
 

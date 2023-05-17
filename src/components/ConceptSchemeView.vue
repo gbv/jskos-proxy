@@ -24,10 +24,16 @@
 const props = defineProps({ item: Object, registry: Object })
 defineEmits("select")
 
-if (props.registry && !props.item?.topConcepts) {
+const incompleteArray = a => {
+  return !a || a.findIndex(x => x === null) > -1
+}
+
+if (props.registry) {
   // FIXME: vue/no-mutating-props
-  props.registry.getTop({scheme: props.item}).then(topConcepts => {
-    props.item.topConcepts = topConcepts
-  })
+  if (incompleteArray(props.item?.topConcepts)) {
+    props.registry.getTop({scheme: props.item}).then(topConcepts => {
+      props.item.topConcepts = topConcepts
+    })
+  }
 }
 </script>
