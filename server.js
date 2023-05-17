@@ -27,9 +27,16 @@ const assetsDir = "dist/assets/"
 const assets = fs.readdirSync(assetsDir)
 if (assets.length) {
   log(`Serving Vue application from ${assetsDir} at ${namespace.pathname}`)
-  const assetFiles = filter => ((req, res) => res.sendFile(assets.filter(filter)[0], { root: assetsDir }))
-  app.get(`${namespace.pathname}client.js`, assetFiles(f => f.endsWith("js")))
-  app.get(`${namespace.pathname}client.css`, assetFiles(f => f.endsWith("css")))
+  assets.forEach(file => {
+    // Client JS and CSS are served as client.js/client.css
+    // ? This might cause issues with browser caching as the filename stays the same.
+    const clientMatch = file.match(/^index-.*\.(css|js)$/)
+    if (clientMatch) {
+      app.get(`${namespace.pathname}client.${clientMatch[1]}`, (req, res) => res.sendFile(file, { root: assetsDir }))
+    }
+    // Serve files with their original filenames
+    app.get(`${namespace.pathname}${file}`, (req, res) => res.sendFile(file, { root: assetsDir }))
+  })
 }
 
 // server HTML view or info information
