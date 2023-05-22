@@ -5,7 +5,9 @@ import assert from "node:assert"
 
 process.env.BASE = "http://example.org/"
 process.env.BACKEND = "./test/items.ndjson"
-const { app } = await import("../server.js")
+const { app, startPromise } = await import("../server.js")
+// Wait for server to start
+await startPromise
 
 const rdf = {
   nt: `<http://example.org/a> <http://www.w3.org/2004/02/skos/core#prefLabel> "a"@en .

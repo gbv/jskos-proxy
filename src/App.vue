@@ -27,7 +27,7 @@
 import ConceptSchemeSelection from "./components/ConceptSchemeSelection.vue"
 import ConceptSchemeView from "./components/ConceptSchemeView.vue"
 import ItemView from "./components/ItemView.vue"
-import { link } from "./utils.js"
+import { link } from "../lib/utils.js"
 import { reactive } from "vue"
 import jskos from "jskos-tools"
 import { cdk } from "cocoda-sdk"

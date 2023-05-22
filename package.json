@@ -5,12 +5,13 @@
   "type": "module",
   "exports": "./server.js",
   "scripts": {
-    "start": "nodemon server.js",
+    "dev": "nodemon --watch .env --watch lib/ --watch '*.js' server.js",
+    "start": "npm run dev",
     "test": "NODE_ENV=test mocha --exit",
     "lint": "eslint --ignore-path .gitignore --ext .js,.vue .",
     "fix": "npm run lint -- --fix",
-    "vite": "vite",
-    "build": "vite build"
+    "build": "vite build",
+    "serve": "NODE_ENV=production node server.js"
   },
   "repository": {
     "type": "git",
@@ -36,7 +37,9 @@
     "nodemon": "^2.0.22",
     "portfinder": "^1.0.32",
     "rdflib": "^2.2.32",
-    "vite": "^4.3.7"
+    "serve-static": "^1.15.0",
+    "vite": "^4.3.7",
+    "vue": "^3.3.4"
   },
   "devDependencies": {
     "@vitejs/plugin-vue": "^4.2.3",

@@ -12,11 +12,15 @@ This web service can be put in front of [JSKOS] data sources to provide RDF seri
 
 ## Table of Contents
 
+- [Table of Contents](#table-of-contents)
 - [Install](#install)
   - [Configuration](#configuration)
   - [Installation](#installation)
 - [Usage](#usage)
+  - [Configure](#configure)
+  - [Run Server](#run-server)
 - [API](#api)
+- [Related works](#related-works)
 - [Maintainers](#maintainers)
 - [License](#license)
 
@@ -37,6 +41,7 @@ To deploy with PM2 copy `ecosystem.example.json` to `ecosystem.config.json`.
 Create a local file `.env` with the following keys:
 
 - `PORT` - which port to run the service on (default: `3555`)
+- `HMR_PORT` - port for Vite hot module reloading in development (default: `3556`)
 - `NAMESPACE` - URI namespace of all objects served via this proxy.
    Must end with a slash (default: `http://example.org/`)
 - `BACKEND` - JSKOS API base URL or local NDJSON file
@@ -73,12 +78,6 @@ See file `ecosystem.example.json` for deployment with [PM2](https://pm2.keymetri
 
 ## Usage
 
-### Compile client-side JavaScript
-
-```bash
-npm run build
-```
-
 ### Configure
 
 See [configuration](#configuration) above.
@@ -87,11 +86,18 @@ See [configuration](#configuration) above.
 
 ```bash
 # Development server with hot reload:
-npm run start
+npm run dev
 
-# run the server in production (less verbose logging):
+# Production server (less verbose logging, no hot reload):
+# 1. Build production front-end
+npm run build
+# 2. Start the server in production mode
 NODE_ENV=production node ./server.js
+# or
+npm run serve
 ```
+
+Note about hot reload: Changes to the server (i.e. in `server.js`, files in `lib/`, or configuration in `.env`) will reload the server, but not the front-end. In that case, the front-end needs to be manually reloaded. Changes in `src/` will only reload the front-end.
 
 ## API
 

@@ -5,7 +5,9 @@ import assert from "node:assert"
 
 process.env.BASE = "http://example.org/"
 process.env.BACKEND = "./test/items.ndjson"
-const { app } = await import("../server.js")
+const { app, startPromise } = await import("../server.js")
+// Wait for server to start
+await startPromise
 
 const exampleA = { uri: "http://example.org/a", prefLabel: { en: "a" } }
 const exampleC = { uri: "http://example.com/c", prefLabel: { en: "c" } }
