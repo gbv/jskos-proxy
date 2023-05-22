@@ -22,7 +22,7 @@
 
 <script setup>
 const props = defineProps({ item: Object, registry: Object })
-defineEmits("select")
+defineEmits(["select"])
 
 const incompleteArray = a => {
   return !a || a.findIndex(x => x === null) > -1

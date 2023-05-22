@@ -20,7 +20,7 @@ import { ref } from "vue"
 
 const props = defineProps({ registry: Object })
 
-defineEmits("select")
+defineEmits(["select"])
 
 const schemes = ref([])
 

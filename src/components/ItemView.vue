@@ -32,7 +32,7 @@ import { computed } from "vue"
 
 const props = defineProps({ item: Object, registry: Object })
 
-defineEmits("select")
+defineEmits(["select"])
 
 const inScheme = computed(() => (props.item?.inScheme||[])[0])
 </script>
