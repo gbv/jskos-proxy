@@ -92,9 +92,7 @@ npm run dev
 # 1. Build production front-end
 npm run build
 # 2. Start the server in production mode
-NODE_ENV=production node ./server.js
-# or
-npm run serve
+npm run start
 ```
 
 Note about hot reload: Changes to the server (i.e. in `server.js`, files in `lib/`, or configuration in `.env`) will reload the server, but not the front-end. In that case, the front-end needs to be manually reloaded. Changes in `src/` will only reload the front-end.

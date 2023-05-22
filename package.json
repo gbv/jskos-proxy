@@ -6,12 +6,11 @@
   "exports": "./server.js",
   "scripts": {
     "dev": "nodemon --watch .env --watch lib/ --watch '*.js' server.js",
-    "start": "npm run dev",
     "test": "NODE_ENV=test mocha --exit",
     "lint": "eslint --ignore-path .gitignore --ext .js,.vue .",
     "fix": "npm run lint -- --fix",
     "build": "vite build",
-    "serve": "NODE_ENV=production node server.js"
+    "start": "NODE_ENV=production node server.js"
   },
   "repository": {
     "type": "git",
