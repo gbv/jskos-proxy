@@ -6,11 +6,11 @@ import { serialize, contentTypes } from "./lib/rdf.js"
 import fs from "node:fs"
 import path from "node:path"
 import { fileURLToPath } from "node:url"
+import config from "./lib/config.js"
+import jskos from "jskos-tools"
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 const resolve = (p) => path.resolve(__dirname, p)
-
-import config from "./lib/config.js"
 const isProduction = config.isProduction
 const { log, info, namespace } = config
 
@@ -45,6 +45,7 @@ async function init() {
       res.render("root", config)
     })
   }
+
   // serve Vue application under subpath _vite
   let vite
   if (!isProduction) {
@@ -68,10 +69,22 @@ async function init() {
 
   let productionHeader = isProduction ? fs.readFileSync(resolve("dist/index.html"), "utf-8").split("\n").map(line => line.trim()).filter(line => line.startsWith("<script type=\"module\"") || line.startsWith("<link rel=\"stylesheet\"")).map(line => line.replace("/", namespace.pathname + "_vite/")).join("\n") : null
 
+  // Load backend
+  const backend = await initBackend(config)
+  app.set("backend", backend)
+
+  // Preload scheme if listing is off
+  const scheme = config.listing ? null : await backend.getItem(namespace)
+
   // serve HTML view or info information
   async function serve(req, res, vars) {
     vars.source = vars.item?._source
     const options = { ...config, ...vars, link }
+
+    // Replace inScheme with scheme if possible
+    if (scheme && jskos.compare(scheme, options.item?.inScheme?.[0])) {
+      options.item.inScheme[0] = scheme
+    }
 
     if (req.query.format === "debug") {
       res.json(options)
@@ -108,8 +121,8 @@ async function init() {
         return
       }
     } else {
-    // URI given by HTTP request
-      uri = new URL(req.url.substr(1), namespace) // namespace.href?
+      // URI given by HTTP request
+      uri = new URL(req.url.substring(1), namespace) // namespace.href?
       uri.search = ""
     }
 
@@ -127,9 +140,14 @@ async function init() {
       return
     }
 
-    const backend = app.get("backend")
-    // TODO catch error and send 5xx error in case
-    const item = await backend.getItem(`${uri}`)
+    let item
+    if (jskos.compare({ uri: `${uri}` }, scheme)) {
+      item = scheme
+    } else {
+      // TODO catch error and send 5xx error in case
+      item = await backend.getItem(`${uri}`)
+    }
+
     res.status(item ? 200 : 404)
 
     info((item ? "got " : "missing ") + uri)
@@ -161,12 +179,9 @@ const start = async () => {
     config.port = await portfinder.getPortPromise()
   }
 
-  const backend = await initBackend(config)
-  app.set("backend", backend)
-
   return new Promise(resolve => {
     app.listen(config.port, () => {
-      log(`JSKOS proxy ${namespace} from ${backend} at http://localhost:${config.port}/`)
+      log(`JSKOS proxy ${namespace} from ${app.backend} at http://localhost:${config.port}/`)
       resolve(app)
     })
   })
