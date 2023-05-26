@@ -12,17 +12,26 @@
     active-color="#577fbb" />
   <div v-if="(item.topConcepts||[null]).length">
     <h4>Top Concepts</h4>
-    <item-list
+    <concept-tree
       v-if="item.topConcepts?.length"
-      :items="item.topConcepts"
-      :draggable="false"
-      class="jskos-vue-itemDetails-narrower"
-      @select="$emit('select',$event.item)" />
+      :concepts="item.topConcepts"
+      :item-list-options="{ draggable: false }"
+      @open="loadNarrower"
+      @select="$emit('select', $event.item)" />
     <loading-indicator v-else />
   </div>
 </template>
 
 <script setup>
-defineProps({ item: Object, registry: Object })
+import jskos from "jskos-tools"
+
+const props = defineProps({ item: Object, registry: Object })
 defineEmits(["select"])
+
+const loadNarrower = async (concept) => {
+  if (!concept.narrower || concept.narrower.includes(null)) {
+    const narrower = jskos.sortConcepts(await props.registry.getNarrower({ concept }))
+    concept.narrower = narrower
+  }
+}
 </script>
