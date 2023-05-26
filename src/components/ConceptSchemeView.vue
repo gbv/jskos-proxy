@@ -5,8 +5,11 @@
     :show-ancestors="false"
     :show-narrower="false"
     :dropzone="false"
-    :draggable="false"
-    @select="$emit('select',$event.item)" />
+    :draggable="false" />
+  <concept-suggest
+    :scheme="item"
+    :registry="registry"
+    @select="$emit('select', $event)" />
   <item-details-tabs
     :item="item"
     active-color="#577fbb" />
@@ -24,6 +27,7 @@
 
 <script setup>
 import jskos from "jskos-tools"
+import ConceptSuggest from "./ConceptSuggest.vue"
 
 const props = defineProps({ item: Object, registry: Object })
 defineEmits(["select"])

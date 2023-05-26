@@ -7,6 +7,11 @@
       :show-notation="false"
       @click="$emit('select',inScheme)" />
   </h3>
+  <concept-suggest
+    v-if="inScheme"
+    :scheme="inScheme"
+    :registry="registry"
+    @select="$emit('select',$event)" />
   <item-list
     :items="(item.ancestors || []).filter(Boolean).reverse()"
     :draggable="false"
@@ -32,6 +37,7 @@
 
 <script setup>
 import { computed } from "vue"
+import ConceptSuggest from "./ConceptSuggest.vue"
 
 const props = defineProps({ item: Object, registry: Object })
 
