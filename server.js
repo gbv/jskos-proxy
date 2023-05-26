@@ -81,6 +81,11 @@ async function init() {
     vars.source = vars.item?._source
     const options = { ...config, ...vars, link }
 
+    const itemLabel = jskos.prefLabel(options.item, { fallbackToUri: false })
+    if (itemLabel) {
+      options.title = `${options.title} - ${itemLabel}`
+    }
+
     // Replace inScheme with scheme if possible
     if (scheme && jskos.compare(scheme, options.item?.inScheme?.[0])) {
       options.item.inScheme[0] = scheme
