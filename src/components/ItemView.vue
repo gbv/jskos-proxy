@@ -49,11 +49,15 @@ const inScheme = computed(() => (props.item?.inScheme||[])[0])
 <style>
 h3.inScheme {
   font-size: 1.17em;
-  margin: 0.85rem 0;
+  margin-bottom: 5px;
   font-weight: bold;
 }
 .inScheme:hover {
   cursor: pointer;
   background-color: var(--jskos-vue-itemList-hover-bgColor);
+}
+.jskos-vue-itemDetails-name {
+  font-size: 1.5em !important;
+  margin-top: 10px;
 }
 </style>
