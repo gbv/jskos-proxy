@@ -3,7 +3,8 @@
     <item-list
       v-if="schemes.length"
       :items="schemes"
-      :item-name-options="{ draggable:false, 'show-notation':false }"
+      :item-name-options="{ 'show-notation':false }"
+      :draggable="false"
       @select="$emit('select',$event.item)" />
     <div v-else>
       <loading-indicator />

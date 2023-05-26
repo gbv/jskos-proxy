@@ -9,6 +9,7 @@
   </h3>
   <item-list
     :items="(item.ancestors || []).filter(Boolean).reverse()"
+    :draggable="false"
     class="jskos-vue-itemDetails-ancestors"
     @select="$emit('select',$event.item)" />
   <item-details
@@ -17,12 +18,14 @@
     :show-ancestors="false"
     :show-narrower="false"
     :dropzone="false"
+    :draggable="false"
     @select="$emit('select',$event.item)" />
   <item-details-tabs
     :item="item"
     active-color="#577fbb" />
   <item-list
     :items="item.narrower || []"
+    :draggable="false"
     class="jskos-vue-itemDetails-narrower"
     @select="$emit('select',$event.item)" />
 </template>

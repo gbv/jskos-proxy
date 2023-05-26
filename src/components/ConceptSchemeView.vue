@@ -5,6 +5,7 @@
     :show-ancestors="false"
     :show-narrower="false"
     :dropzone="false"
+    :draggable="false"
     @select="$emit('select',$event.item)" />
   <item-details-tabs
     :item="item"
@@ -14,6 +15,7 @@
     <item-list
       v-if="item.topConcepts?.length"
       :items="item.topConcepts"
+      :draggable="false"
       class="jskos-vue-itemDetails-narrower"
       @select="$emit('select',$event.item)" />
     <loading-indicator v-else />
