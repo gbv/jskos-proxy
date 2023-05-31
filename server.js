@@ -3,7 +3,7 @@ import portfinder from "portfinder"
 import cookieParser from "cookie-parser"
 import { protocolless, uriPath, link } from "./lib/utils.js"
 import { initBackend } from "./lib/backends.js"
-import { serialize, contentTypes } from "./lib/rdf.js"
+import { serialize, contentTypes, requestFormat } from "./lib/rdf.js"
 import fs from "node:fs"
 import path from "node:path"
 import { fileURLToPath } from "node:url"
@@ -15,31 +15,11 @@ const resolve = (p) => path.resolve(__dirname, p)
 const isProduction = config.isProduction
 const { log, info, namespace } = config
 
-// guess requested format from Accept-header
-function requestFormat(req) {
-  const formats = [
-    [ "html", ["text/html", "application/xhtml+xml"] ],
-    [ "jsonld", ["application/ld+json", "application/json"] ],
-    [ "ntriples", ["application/n-triples", "text/plain"] ],
-    [ "turtle", [ "text/turtle", "application/turtle", "application/x-turtle", "text/n3", "text/rdf+n3", "application/rdf+n3" ] ],
-    [ "rdfxml", ["application/rdf+xml", "text/rdf"] ],
-  ]
-
-  for (let [format, types] of formats) {
-    for (let type of types) {
-      if (req.accepts(type)) {
-        return format
-      }
-    }
-  }
-}
-
 const app = express()
 async function init() {
 
   app.set("views", "./views")
   app.set("view engine", "ejs")
-
 
   app.use(cookieParser())
 
@@ -50,10 +30,16 @@ async function init() {
     })
   }
 
-  // serve Vue application under subpath _vite
-  let vite
-  if (!isProduction) {
-    vite = await (await import("vite")).createServer({
+  let productionHeader
+  if (isProduction) {
+    // serve static files from dist
+    app.use(namespace.pathname + "_vite/", (await import("serve-static")).default(resolve("dist"), {
+      index: false,
+    }))
+    productionHeader = fs.readFileSync(resolve("dist/index.html"), "utf-8").split("\n").map(line => line.trim()).filter(line => line.startsWith("<script type=\"module\"") || line.startsWith("<link rel=\"stylesheet\"")).map(line => line.replace("/", namespace.pathname + "_vite/")).join("\n")
+  } else {
+    // serve Vue application under subpath _vite
+    const vite = await (await import("vite")).createServer({
       base: namespace.pathname + "_vite/",
       server: {
         middlewareMode: true,
@@ -64,14 +50,7 @@ async function init() {
       appType: "custom",
     })
     app.use(namespace.pathname + "_vite/", vite.middlewares)
-  } else {
-    // Serve static files from dist
-    app.use(namespace.pathname + "_vite/", (await import("serve-static")).default(resolve("dist"), {
-      index: false,
-    }))
   }
-
-  let productionHeader = isProduction ? fs.readFileSync(resolve("dist/index.html"), "utf-8").split("\n").map(line => line.trim()).filter(line => line.startsWith("<script type=\"module\"") || line.startsWith("<link rel=\"stylesheet\"")).map(line => line.replace("/", namespace.pathname + "_vite/")).join("\n") : null
 
   // Load backend
   const backend = await initBackend(config)
@@ -113,19 +92,19 @@ async function init() {
     if (req.query.format === "debug") {
       res.json(options)
     } else {
-      if (!isProduction) {
-        res.render("index", options)
-      } else {
+      if (isProduction) {
         app.render("index", options, async (error, template) => {
           // Inject production header from production index.html file
           template = template.replace("<!--production-header-->", productionHeader)
           res.set({ "Content-Type": "text/html" }).end(template)
         })
+      } else {
+        res.render("index", options)
       }
     }
   }
 
-  // serve JSKOS data
+  // serve JSKOS items
   app.set("json spaces", 2)
   app.use(namespace.pathname, async (req, res) => {
     var uri
@@ -153,7 +132,7 @@ async function init() {
     info(`get ${uri}`)
 
     const format = req.query.format || requestFormat(req) || "jsonld"
-    if (!format.match(/^(html|debug|json|jsonld|jskos)$/) && !contentTypes[format]) {
+    if (format !== "html" && format !== "debug" && !contentTypes[format]) {
       res.status(400)
       res.send(`Serialization format ${format} not supported!`)
       return
