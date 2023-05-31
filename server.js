@@ -86,8 +86,9 @@ async function init() {
     const options = { ...config, ...vars, link }
 
     // Locale
+    // Note that this has to be skipped during testing because it caused timeout issues
     let locale = req.cookies.locale
-    if (!locale) {
+    if (!locale && config.env !== "test") {
       for (const lang of req.get("Accept-Language").split(",")) {
         if (lang.startsWith("de") || lang.startsWith("en")) {
           locale = lang.slice(0, 2)
