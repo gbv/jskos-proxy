@@ -5,7 +5,11 @@
         <a href="<%= namespace.pathname %>"><%= namespace.pathname %></a>
       </li>
       <!-- TODO: add vocid, if known -->
+      <li style="flex: 1"></li>
+      <li>
+        <a href="" onclick="document.cookie=`locale=<%= locale === 'en' ? 'de' : 'en' %>;samesite=lax;path=<%= namespace.pathname %>`"><%= locale %></a>
+      </li>
+      <!-- TODO: add help -->
     </ul>
-    <!-- TODO: add help and language selector -->
   </nav>
 </header>

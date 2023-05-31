@@ -1,5 +1,6 @@
 import express from "express"
 import portfinder from "portfinder"
+import cookieParser from "cookie-parser"
 import { protocolless, uriPath, link } from "./lib/utils.js"
 import { initBackend } from "./lib/backends.js"
 import { serialize, contentTypes } from "./lib/rdf.js"
@@ -38,6 +39,9 @@ async function init() {
 
   app.set("views", "./views")
   app.set("view engine", "ejs")
+
+
+  app.use(cookieParser())
 
   // serve message on root if mounted at a specific root path
   if (namespace.pathname !== "/") {
@@ -81,7 +85,21 @@ async function init() {
     vars.source = vars.item?._source
     const options = { ...config, ...vars, link }
 
-    const itemLabel = jskos.prefLabel(options.item, { fallbackToUri: false })
+    // Locale
+    let locale = req.cookies.locale
+    if (!locale) {
+      for (const lang of req.get("Accept-Language").split(",")) {
+        if (lang.startsWith("de") || lang.startsWith("en")) {
+          locale = lang.slice(0, 2)
+          break
+        }
+      }
+      locale = locale || "en"
+      res.cookie("locale", locale, { sameSite: "lax", path: namespace.pathname })
+    }
+    options.locale = locale
+
+    const itemLabel = jskos.prefLabel(options.item, { fallbackToUri: false, language: locale })
     if (itemLabel) {
       options.title = `${options.title} - ${itemLabel}`
     }
