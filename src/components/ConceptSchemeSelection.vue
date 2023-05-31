@@ -8,11 +8,11 @@
       @select="$emit('select',$event.item)" />
     <div v-else>
       <loading-indicator />
-      loading vocabularies...
+      {{ $t("loadingVocabularies") }}
     </div>
   </div>
   <div v-else>
-    sorry, no API available
+    {{ $t("noApiAvailable") }}
   </div>
 </template>
 

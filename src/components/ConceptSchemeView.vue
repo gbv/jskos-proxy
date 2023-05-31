@@ -14,7 +14,7 @@
     :item="item"
     active-color="#577fbb" />
   <div v-if="(item.topConcepts||[null]).length">
-    <h4>Top Concepts</h4>
+    <h4>{{ $t("topConcepts") }}</h4>
     <concept-tree
       v-if="item.topConcepts?.length"
       :concepts="item.topConcepts"

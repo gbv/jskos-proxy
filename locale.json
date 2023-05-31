@@ -1,0 +1,12 @@
+{
+  "de": {
+    "topConcepts": "Oberkonzepte",
+    "loadingVocabularies": "Vokabulare werden geladen...",
+    "noApiAvailable": "Leider keine API verfügbar"
+  },
+  "en": {
+    "topConcepts": "Top Concepts",
+    "loadingVocabularies": "Loading vocabularies...",
+    "noApiAvailable": "Sorry, no API available"
+  }
+}
