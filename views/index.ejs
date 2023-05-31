@@ -26,7 +26,11 @@
           </p>
         <% } %>
       <% } %>
-      <div id="app"></div>
+      <% if (locals.static) { %>
+        <%- include(locals.static) %>
+      <% } else { %>
+        <div id="app"></div>
+      <% } %>
     </main>
     <%- include("footer") %>
   </body>

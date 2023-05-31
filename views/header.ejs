@@ -18,7 +18,9 @@
       <li>
         <a href="" onclick="document.cookie=`locale=<%= locale === 'en' ? 'de' : 'en' %>;samesite=lax;path=<%= namespace.pathname %>`"><%= locale %></a>
       </li>
-      <!-- TODO: add help -->
+      <li>
+        <a href="<%= namespace.pathname %>about/">about</a>
+      </li>
     </ul>
   </nav>
 </header>

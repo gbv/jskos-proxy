@@ -52,11 +52,11 @@ async function init() {
     app.use(namespace.pathname + "_vite/", vite.middlewares)
   }
 
-  // Load backend
+  // load backend
   const backend = await initBackend(config)
   app.set("backend", backend)
 
-  // Preload scheme if listing is off
+  // preload scheme if listing is off
   const scheme = config.listing ? null : await backend.getItem(namespace)
 
   // serve HTML view or info information
@@ -84,7 +84,7 @@ async function init() {
       options.title = `${options.title} - ${itemLabel}`
     }
 
-    // Replace inScheme with scheme if possible
+    // replace inScheme with scheme if possible
     if (scheme && jskos.compare(scheme, options.item?.inScheme?.[0])) {
       options.item.inScheme[0] = scheme
     }
@@ -94,7 +94,7 @@ async function init() {
     } else {
       if (isProduction) {
         app.render("index", options, async (error, template) => {
-          // Inject production header from production index.html file
+          // inject production header from production index.html file
           template = template.replace("<!--production-header-->", productionHeader)
           res.set({ "Content-Type": "text/html" }).end(template)
         })
@@ -103,6 +103,10 @@ async function init() {
       }
     }
   }
+
+  app.use(namespace.pathname + "about/", (req, res) => {
+    serve(req, res, { static: "about" })
+  })
 
   // serve JSKOS items
   app.set("json spaces", 2)
