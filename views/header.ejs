@@ -4,7 +4,16 @@
       <li>
         <a href="<%= namespace.pathname %>"><%= namespace.pathname %></a>
       </li>
-      <!-- TODO: add vocid, if known -->
+      <% if (locals.item) {
+           let voc = item.inScheme ? item.inScheme[0].uri : item.uri
+           let ns = namespace.toString()
+           if (voc.startsWith(ns) && voc != ns) {
+             vocpath = voc.substr(ns.length)
+      %>
+      <li>
+        <a href="<%= namespace.pathname %><%= vocpath %>"><%= vocpath %></a>
+      </li>
+      <% } } %>
       <li style="flex: 1"></li>
       <li>
         <a href="" onclick="document.cookie=`locale=<%= locale === 'en' ? 'de' : 'en' %>;samesite=lax;path=<%= namespace.pathname %>`"><%= locale %></a>
