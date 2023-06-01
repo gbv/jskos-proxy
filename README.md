@@ -17,7 +17,6 @@ This web service can be put in front of [JSKOS] data sources to provide RDF seri
   - [Configuration](#configuration)
   - [Installation](#installation)
 - [Usage](#usage)
-- [API](#api)
 - [Related works](#related-works)
 - [Maintainers](#maintainers)
 - [License](#license)
@@ -52,7 +51,22 @@ Directory `examples` contains configuration directories for some known terminolo
 
 ### Installation
 
-For production the application should be put behind a reverse HTTP proxy, e.g.
+For development:
+
+```bash
+npm run dev
+```
+
+Changes to the server (i.e. in `server.js`, files in `lib/`, or configuration in `.env`) will reload the server, but not the front-end. In that case, the front-end needs to be manually reloaded. Changes in `src/` will only reload the front-end.
+
+For production (less verbose logging, no reload), first build the Vue front-end and then start the server:
+
+```bash
+npm run build
+npm run start
+```
+
+The application should be put behind a reverse HTTP proxy to serve URLs starting with configured `NAMESPACE`, e.g.
 
     # Apache
     ProxyPass /terminology/ http://localhost:3555/terminology/
@@ -66,24 +80,6 @@ For production the application should be put behind a reverse HTTP proxy, e.g.
 See file `ecosystem.example.json` for deployment with [PM2](https://pm2.keymetrics.io/).
 
 ## Usage
-
-For production (less verbose logging, no reload), first build the Vue front-end and then start the server:
-
-```bash
-npm run build
-npm run start
-```
-
-For development with Vite:
-
-```bash
-npm run dev
-```
-
-Changes to the server (i.e. in `server.js`, files in `lib/`, or configuration in `.env`) will reload the server, but not the front-end. In that case, the front-end needs to be manually reloaded. Changes in `src/` will only reload the front-end.
-
-
-## API
 
 The proxy translates HTTP requests to an URI query. The URI is determined from query path and configured `NAMESPACE` or given with optional query parameter `uri`.
 
