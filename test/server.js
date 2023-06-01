@@ -46,12 +46,18 @@ describe("JSKOS Proxy Server", () => {
   })
 
   describe("Get item via URI", () => {
-    it("support ?uri= parameter",
+    it("support ?uri= parameter (also external URI)",
       () => chai.request(app)
         .get("/?uri=http://example.com/c&format=json")
         .then(res => {
           assert.equal(res.status,200)
           assert.deepEqual(res.body, exampleC)
+        }))
+    it("404 when item not found",
+      () => chai.request(app)
+        .get("/?uri=http://example.com/null&format=json")
+        .then(res => {
+          assert.equal(res.status,404)
         }))
     it("complains on invalid query URI",
       () => chai.request(app)
