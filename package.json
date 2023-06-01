@@ -32,7 +32,7 @@
     "axios": "^1.4.0",
     "cocoda-sdk": "^3.4.5",
     "cookie-parser": "^1.4.6",
-    "dotenv": "^16.0.3",
+    "dotenv": "^16.1.0",
     "ejs": "^3.1.9",
     "express": "^4.18.2",
     "jskos-tools": "^1.0.31",

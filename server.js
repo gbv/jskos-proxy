@@ -1,4 +1,5 @@
 import express from "express"
+import ejs from "ejs"
 import portfinder from "portfinder"
 import cookieParser from "cookie-parser"
 import { protocolless, uriPath, link } from "./lib/utils.js"
@@ -13,13 +14,25 @@ import jskos from "jskos-tools"
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 const resolve = (p) => path.resolve(__dirname, p)
 const isProduction = config.isProduction
-const { log, info, namespace } = config
+const { log, info, namespace, configDir } = config
 
 const app = express()
 async function init() {
 
-  app.set("views", "./views")
+  // configure template engine to look up views in config directory first
+  const views = [ path.resolve(configDir, "views"), "./views" ]
+  const includer = (original) => {
+    for (let view of views) {
+      const filename = path.resolve(view, original + ".ejs")
+      if (fs.existsSync(filename)) {
+        return { filename }
+      }
+    }
+  }
+  app.set("views", views)
+  app.engine("ejs", (path, data, cb) => ejs.renderFile(path, data, {includer}, cb))
   app.set("view engine", "ejs")
+
 
   app.use(cookieParser())
 
@@ -62,13 +75,14 @@ async function init() {
   // serve HTML view or info information
   async function serve(req, res, vars) {
     vars.source = vars.item?._source
-    const options = { ...config, ...vars, link }
+    const data = { ...config, ...vars, link }
 
     // Locale
     // Note that this has to be skipped during testing because it caused timeout issues
     let locale = req.cookies.locale
     if (!locale && config.env !== "test") {
-      for (const lang of req.get("Accept-Language").split(",")) {
+      const accept = req.get("Accept-Language") || ""
+      for (const lang of accept.split(",")) {
         if (lang.startsWith("de") || lang.startsWith("en")) {
           locale = lang.slice(0, 2)
           break
@@ -77,29 +91,29 @@ async function init() {
       locale = locale || "en"
       res.cookie("locale", locale, { sameSite: "lax", path: namespace.pathname })
     }
-    options.locale = locale
+    data.locale = locale
 
-    const itemLabel = jskos.prefLabel(options.item, { fallbackToUri: false, language: locale })
+    const itemLabel = jskos.prefLabel(data.item, { fallbackToUri: false, language: locale })
     if (itemLabel) {
-      options.title = `${options.title} - ${itemLabel}`
+      data.title = `${data.title} - ${itemLabel}`
     }
 
     // replace inScheme with scheme if possible
-    if (scheme && jskos.compare(scheme, options.item?.inScheme?.[0])) {
-      options.item.inScheme[0] = scheme
+    if (scheme && jskos.compare(scheme, data.item?.inScheme?.[0])) {
+      data.item.inScheme[0] = scheme
     }
 
     if (req.query.format === "debug") {
-      res.json(options)
+      res.json(data)
     } else {
       if (isProduction) {
-        app.render("index", options, async (error, template) => {
+        app.render("index", data, async (error, template) => {
           // inject production header from production index.html file
           template = template.replace("<!--production-header-->", productionHeader)
           res.set({ "Content-Type": "text/html" }).end(template)
         })
       } else {
-        res.render("index", options)
+        res.render("index", data)
       }
     }
   }

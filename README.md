@@ -17,8 +17,6 @@ This web service can be put in front of [JSKOS] data sources to provide RDF seri
   - [Configuration](#configuration)
   - [Installation](#installation)
 - [Usage](#usage)
-  - [Configure](#configure)
-  - [Run Server](#run-server)
 - [API](#api)
 - [Related works](#related-works)
 - [Maintainers](#maintainers)
@@ -36,28 +34,21 @@ npm ci
 
 ### Configuration
 
-Create a local file `.env` with the following keys:
+Instances of jskos-proxy are configured with environment variables, in local file `.env`, and files in an optional configuration directory. The following keys are supported:
 
 - `PORT` - which port to run the service on (default: `3555`)
 - `HMR_PORT` - port for Vite hot module reloading in development (default: `3556`)
-- `NAMESPACE` - URI namespace of all objects served via this proxy.
-   Must end with a slash (default: `http://example.org/`)
+- `NAMESPACE` - URI namespace of all objects served via this proxy. Must end with a slash (default: `http://example.org/`)
 - `BACKEND` - JSKOS API base URL or local NDJSON file
 - `LISTING` - whether to show list of vocabularies from backend API on NAMESPACE URL (enabled by default, disable with `0` or `false`)
 - `TITLE` - Title of the service (default `JSKOS Proxy`)
 
-#### Examples
+A **configuration directory** can set with environment variable `CONFIG` (default: `config`). It may contain:
 
-DANTE Vocabularies
+- file `config.env` with configuration keys documented above
+- directory `views` with [EJS templates](https://ejs.co/) to override default templates in directory `views`
 
-    NAMESPACE=http://uri.gbv.de/terminology/
-    BACKEND=https://api.dante.gbv.de/
-
-RVK
-
-    NAMESPACE=http://uri.gbv.de/terminology/rvk/
-    BACKEND=https://coli-conc.gbv.de/rvk/api/
-    LISTING=false
+Directory `examples` contains configuration directories for some known terminology services. To try out one of these example, set nothing but `CONFIG`, e.g. `CONFIG=examples/rvk`.
 
 ### Installation
 
@@ -76,24 +67,21 @@ See file `ecosystem.example.json` for deployment with [PM2](https://pm2.keymetri
 
 ## Usage
 
-### Configure
-
-See [configuration](#configuration) above.
-
-### Run Server
+For production (less verbose logging, no reload), first build the Vue front-end and then start the server:
 
 ```bash
-# Development server with hot reload:
-npm run dev
-
-# Production server (less verbose logging, no hot reload):
-# 1. Build production front-end
 npm run build
-# 2. Start the server in production mode
 npm run start
 ```
 
-Note about hot reload: Changes to the server (i.e. in `server.js`, files in `lib/`, or configuration in `.env`) will reload the server, but not the front-end. In that case, the front-end needs to be manually reloaded. Changes in `src/` will only reload the front-end.
+For development with Vite:
+
+```bash
+npm run dev
+```
+
+Changes to the server (i.e. in `server.js`, files in `lib/`, or configuration in `.env`) will reload the server, but not the front-end. In that case, the front-end needs to be manually reloaded. Changes in `src/` will only reload the front-end.
+
 
 ## API
 
