@@ -1,5 +1,6 @@
 import express from "express"
 import ejs from "ejs"
+import serveStatic from "serve-static"
 import portfinder from "portfinder"
 import cookieParser from "cookie-parser"
 import { protocolless, uriPath, link } from "./lib/utils.js"
@@ -12,7 +13,7 @@ import config from "./lib/config.js"
 import jskos from "jskos-tools"
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
-const resolve = (p) => path.resolve(__dirname, p)
+const resolve = (...p) => path.resolve(__dirname, ...p)
 const isProduction = config.isProduction
 const { log, info, namespace, configDir } = config
 
@@ -20,10 +21,10 @@ const app = express()
 async function init() {
 
   // configure template engine to look up views in config directory first
-  const views = [ path.resolve(configDir, "views"), "./views" ]
+  const views = [ resolve(configDir, "views"), "./views" ]
   const includer = (original) => {
     for (let view of views) {
-      const filename = path.resolve(view, original + ".ejs")
+      const filename = resolve(view, original + ".ejs")
       if (fs.existsSync(filename)) {
         return { filename }
       }
@@ -45,10 +46,7 @@ async function init() {
 
   let productionHeader
   if (isProduction) {
-    // serve static files from dist
-    app.use(namespace.pathname + "_vite/", (await import("serve-static")).default(resolve("dist"), {
-      index: false,
-    }))
+    app.use(namespace.pathname + "_vite/", serveStatic(resolve("dist"), { index: false }))
     productionHeader = fs.readFileSync(resolve("dist/index.html"), "utf-8").split("\n").map(line => line.trim()).filter(line => line.startsWith("<script type=\"module\"") || line.startsWith("<link rel=\"stylesheet\"")).map(line => line.replace("/", namespace.pathname + "_vite/")).join("\n")
   } else {
     // serve Vue application under subpath _vite
@@ -64,6 +62,11 @@ async function init() {
     })
     app.use(namespace.pathname + "_vite/", vite.middlewares)
   }
+
+  // static assets
+  const assets = resolve(configDir, "public")
+  app.use(namespace.pathname + "_public/", serveStatic(assets))
+  config.customStyle = fs.existsSync(resolve(assets, "style.css"))
 
   // load backend
   const backend = await initBackend(config)

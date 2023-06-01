@@ -14,6 +14,9 @@
       <script type="module" src="<%= namespace.pathname %>_vite/@vite/client"></script>
       <script type="module" src="<%= namespace.pathname %>_vite/src/main.js"></script>
     <% } %>
+    <% if (locals.customStyle) { %>
+      <link rel="stylesheet" href="<%= namespace.pathname %>_public/style.css">
+    <% } %>
   </head>
   <body data-namespace="<%= namespace %>" data-backend="<%= locals.backend %>">
     <%- include("header") %>

@@ -46,6 +46,7 @@ A **configuration directory** can set with environment variable `CONFIG` (defaul
 
 - file `config.env` with configuration keys documented above
 - directory `views` with [EJS templates](https://ejs.co/) to override default templates in directory `views`
+- directory `public` with static assets to be served at URL path `_public/`. A CSS file `style.css` is automatically included if present.
 
 Directory `examples` contains configuration directories for some known terminology services. To try out one of these example, set nothing but `CONFIG`, e.g. `CONFIG=examples/rvk`.
 
