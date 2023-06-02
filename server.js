@@ -1,4 +1,5 @@
 import express from "express"
+import "express-async-errors"
 import ejs from "ejs"
 import serveStatic from "serve-static"
 import portfinder from "portfinder"
