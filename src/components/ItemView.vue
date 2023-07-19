@@ -33,11 +33,15 @@
     :draggable="false"
     class="jskos-vue-itemDetails-narrower"
     @select="$emit('select',$event.item)" />
+  <mapping-list
+    v-if="item.mappings"
+    :mappings="item.mappings" />
 </template>
 
 <script setup>
 import { computed } from "vue"
 import ConceptSuggest from "./ConceptSuggest.vue"
+import MappingList from "./MappingList.vue"
 
 const props = defineProps({ item: Object, registry: Object })
 
