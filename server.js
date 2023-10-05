@@ -98,9 +98,7 @@ async function init() {
     data.locale = locale
 
     const itemLabel = jskos.prefLabel(data.item, { fallbackToUri: false, language: locale })
-    if (itemLabel) {
-      data.title = `${data.title} - ${itemLabel}`
-    }
+    data.fulltitle = itemLabel ? `${data.title} - ${itemLabel}` : data.title
 
     // replace inScheme with scheme if possible
     if (scheme && jskos.compare(scheme, data.item?.inScheme?.[0])) {

@@ -2,3 +2,15 @@
   --bar-color: #577fbb;
   --link-color: rgb(96, 143, 219);
 }
+header > nav {
+  padding: 2em 3em 1em 3em;
+}
+.brand img {
+  width: 50%;
+  display: block;
+}
+.brand a, .brand a:visited, .brand a:hover {
+  color: #fff;
+  font-size: 300%;
+  text-decoration: none;
+}

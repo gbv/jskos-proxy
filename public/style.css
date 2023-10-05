@@ -10,9 +10,13 @@ body {
 }
 header {
   background-color: var(--bar-color);
+  color: #eee;
 }
 header a:link, header a:visited {
   color: #eee;
+}
+.locale-selected {
+  font-weight: bold;
 }
 nav {
   padding: 0.5rem 1rem;
