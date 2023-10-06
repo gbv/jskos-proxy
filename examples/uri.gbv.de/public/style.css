@@ -6,14 +6,9 @@
 header > nav {
   padding: 2em 3em 1em 3em;
 }
-.brand img {
-  width: 50%;
+header > nav img {
+  width: 100%;
   display: block;
-}
-.brand a, .brand a:visited, .brand a:hover {
-  color: #fff;
-  font-size: 300%;
-  text-decoration: none;
 }
 /* scheme list */
 .jskos-vue-itemList.schemes-list > div {

@@ -1,11 +1,14 @@
 <header>
   <nav>
     <ul class="nav">
-      <li class="brand">
+      <li>
+        <a href="<%= namespace.pathname %>">
         <% if (logo) { %>
-        <img src="<%= namespace.pathname %>_public/<%= logo %>"/>
+          <img src="<%= namespace.pathname %>_public/<%= logo %>"/>
+        <% } else { %>
+          <%= title || namespace.pathname %>
         <% } %>
-        <a href="<%= namespace.pathname %>"><%= title || namespace.pathname %></a>
+        </a>
       </li>
       <li style="flex: 1"></li>
       <li>
