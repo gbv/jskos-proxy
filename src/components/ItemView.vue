@@ -33,6 +33,13 @@
     :draggable="false"
     class="jskos-vue-itemDetails-narrower"
     @select="$emit('select',$event.item)" />
+  <div v-if="item.related?.length">
+    <h4>Related</h4>
+    <item-list
+      :items="item.related || []"
+      :draggable="false"
+      @select="$emit('select',$event.item)" />
+  </div>
   <mapping-list
     v-if="item.mappings"
     :mappings="item.mappings" />

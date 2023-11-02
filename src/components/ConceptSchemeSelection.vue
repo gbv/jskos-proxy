@@ -1,8 +1,8 @@
 <template>
   <div v-if="registry">
     <item-list
-      class="schemes-list"
       v-if="schemes.length"
+      class="schemes-list"
       :items="schemes"
       :item-name-options="{ 'show-notation':false }"
       :draggable="false"
