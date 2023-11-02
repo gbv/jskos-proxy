@@ -27,7 +27,19 @@
     @select="$emit('select',$event.item)" />
   <item-details-tabs
     :item="item"
-    active-color="#577fbb" />
+    active-color="#577fbb">
+    <template #additionalTabs>
+      <tab
+        v-if="item.notation?.length"
+        title="Notations">
+        <ul class="jskos-vue-itemDetails-list">
+          <li v-for="n in item.notation">
+            {{ n }}
+          </li>
+        </ul>
+      </tab>
+    </template>
+  </item-details-tabs>
   <item-list
     :items="item.narrower || []"
     :draggable="false"
@@ -49,6 +61,7 @@
 import { computed } from "vue"
 import ConceptSuggest from "./ConceptSuggest.vue"
 import MappingList from "./MappingList.vue"
+import { Tab } from "jskos-vue-tabs"
 
 const props = defineProps({ item: Object, registry: Object })
 
