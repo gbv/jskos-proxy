@@ -1,0 +1,12 @@
+version: "3"
+
+services:
+  jskos-proxy:
+    build:
+      context: ..
+      dockerfile: .docker/Dockerfile
+    environment:
+      - CONFIG=examples/uri.gbv.de
+    ports:
+      - 3555:3555
+    restart: unless-stopped
