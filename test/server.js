@@ -20,7 +20,8 @@ describe("JSKOS Proxy Server", () => {
         .then((res) => {
           assert.equal(res.status,200)
         }),
-    )})
+    )
+  })
 
   describe("GET /?format=debug", () => {
     it("debug ejs options", () =>
@@ -29,7 +30,8 @@ describe("JSKOS Proxy Server", () => {
         .then(res => {
           assert.equal(res.body.namespace, "http://example.org/")
         }),
-    )})
+    )
+  })
 
   describe("Format selection", () => {
     it("complains for unknown formats",

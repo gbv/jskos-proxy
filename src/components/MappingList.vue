@@ -1,7 +1,9 @@
 <template>
   <h4>Mappings</h4>
   <table>
-    <tr v-for="mapping in mappings">
+    <tr
+      v-for="(mapping, i) in mappings"
+      :key="i">
       <td>{{ mappingSymbol(mapping) }}</td>
       <td>
         <item-list
@@ -16,6 +18,7 @@
 <script setup>
 import jskos from "jskos-tools"
 
+// eslint-disable-next-line no-unused-vars
 const props = defineProps({ mappings: Array})
 const openPage = e => window.open(e.item.uri,"_blank")
 

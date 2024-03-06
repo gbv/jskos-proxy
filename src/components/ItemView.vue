@@ -33,7 +33,9 @@
         v-if="item.notation?.length"
         title="Notations">
         <ul class="jskos-vue-itemDetails-list">
-          <li v-for="n in item.notation">
+          <li
+            v-for="(n, i) in item.notation"
+            :key="i">
             {{ n }}
           </li>
         </ul>
