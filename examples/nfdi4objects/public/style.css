@@ -1,0 +1,45 @@
+:root {
+  --bar-color: #FFF;
+  --link-color: #002e5c;
+}
+/* header */
+:header {
+  color: rgb(156, 107, 48);
+}
+header > nav {
+  padding: 1em 3em 1em 3em;
+}
+header > nav img {
+  width: 50%;
+  display: block;
+}
+
+.title {
+  text-align: center;
+  font-size: 30px;;
+}
+
+.nav-text {
+  color: #002e5c;
+}
+  
+/* scheme list */
+.jskos-vue-itemList.schemes-list > div {
+  display: inline-block;
+  line-height: 4em;
+  padding: 0;
+}
+.jskos-vue-itemList.schemes-list > div:hover {
+  background: none;
+}
+.jskos-vue-itemList.schemes-list > div > span {
+  white-space: nowrap;
+  border: 1px solid #666;
+  padding: 0.8em 1em;
+  margin: 0.5em 0.8em;
+}
+
+.jskos-vue-itemList.schemes-list > div > span:hover {
+  box-shadow: 3px 3px 3px #666;
+  margin: 0.4em 0.6em 0.6em 0.4em; /* TODO: shift 0.1em upwards */
+}
