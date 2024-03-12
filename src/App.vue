@@ -43,6 +43,7 @@ const backend = body.dataset.backend
 
 var registry
 if (backend.match(/^https?:/)) {
+  // Expect JSKOS API to retrieve vocabularies and concepts
   registry = cdk.initializeRegistry({
     provider: "ConceptApi",
     status: backend+"status",

@@ -38,7 +38,7 @@ Instances of jskos-proxy are configured with environment variables, in local fil
 - `PORT` - which port to run the service on (default: `3555`)
 - `HMR_PORT` - port for Vite hot module reloading in development (default: `3556`)
 - `NAMESPACE` - URI namespace of all objects served via this proxy. Must end with a slash (default: `http://example.org/`)
-- `BACKEND` - JSKOS API base URL or local NDJSON file
+- `BACKEND` - JSKOS API base URL (supports multiple vocabularies) or local NDJSON file (single vocabulary only)
 - `LISTING` - whether to show list of vocabularies from backend API on NAMESPACE URL (enabled by default, disable with `0` or `false`)
 - `TITLE` - Title of the service (default `JSKOS Proxy`)
 - `LOGO` - optional logo image file, must be placed in `public` directory
