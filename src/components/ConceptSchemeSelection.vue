@@ -21,13 +21,14 @@
 import { ref } from "vue"
 import jskos from "jskos-tools"
 
-const props = defineProps({ registry: Object })
+const props = defineProps({ registry: Object, params: Object })
 
 defineEmits(["select"])
 
 const schemes = ref([])
 
 if (props.registry) {
-  props.registry.getSchemes().then(vocs => schemes.value = jskos.sortSchemes(vocs))
+  const params = props.params || {}
+  props.registry.getSchemes({params}).then(vocs => schemes.value = jskos.sortSchemes(vocs))
 }
 </script>

@@ -19,6 +19,7 @@
   <div v-else-if="backend">
     <concept-scheme-selection
       :registry="registry"
+      :params="params"
       @select="selectItem" />
   </div>
 </template>
@@ -39,10 +40,13 @@ const item = reactive(JSON.parse(document.getElementById("item")?.textContent||"
 // configuration
 const body = document.getElementsByTagName("body")[0]
 const namespace = new URL(body.dataset.namespace)
-const backend = body.dataset.backend
 
-var registry
-if (backend.match(/^https?:/)) {
+var backend, registry, params
+if (body.dataset.backend?.match(/^https?:/)) {
+  backend = new URL(body.dataset.backend)
+  params =  Object.fromEntries(backend.searchParams)
+  backend.search = ""
+
   // Expect JSKOS API to retrieve vocabularies and concepts
   registry = cdk.initializeRegistry({
     provider: "ConceptApi",
