@@ -1,0 +1,26 @@
+<header>
+  <nav>
+    <ul class="nav">
+      <li>
+        <a href="<%= namespace.pathname %>">
+          <img src="<%= namespace.pathname %>_public/<%= logo %>"/>       
+        </a>
+      </li>
+      <li>
+        <a href="<%= namespace.pathname %>">
+
+
+          <p class="title nav-text"><%= title || namespace.pathname %></p>
+
+        </a>
+      </li>   
+      <li style="flex: 1"></li>
+      <li>
+        <a href="" onclick="document.cookie=`locale=<%= locale === 'en' ? 'de' : 'en' %>;samesite=lax;path=<%= namespace.pathname %>`"><span class="nav-text"><%= locale %></span></a>
+      </li>
+      <li>
+        <a href="<%= namespace.pathname %>about/"><span class="nav-text">about</span></a>
+      </li>
+    </ul>
+  </nav>
+</header>
