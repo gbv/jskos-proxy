@@ -1,0 +1,40 @@
+@import "./base.css";
+
+:root {
+  --color-background: #b13f12;
+}
+
+html, body, #app {
+  height: 100vh;
+  margin: 0;
+}
+
+#app {
+  display: flex;
+  flex-direction: column;
+}
+
+main {
+  flex: 1 1 auto;
+  margin: 5px auto;
+  width: 100%;
+  max-width: 1400px;
+}
+
+header, footer {
+  background-color: var(--color-background);
+  color: white;
+  padding: calc(5vh) calc(10vw);
+  flex: 0 1 auto;
+}
+
+header > .logo {
+  width: 40%;
+  min-width: 200px;
+  max-height: 100px;
+}
+footer > .logo {
+  width: 20%;
+  min-width: 150px;
+  max-height: 50px;
+}
