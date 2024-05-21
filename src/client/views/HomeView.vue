@@ -1,9 +1,9 @@
 <script setup>
 import { useRoute } from "vue-router"
-import config from "@/config.js"
 import * as jskos from "jskos-tools"
 import { schemes, quickSelection, publisherSelection, typeSelection } from "@/store.js"
 import { computed } from "vue"
+import { getRouterUrl } from "@/utils.js"
 
 const route = useRoute()
 
@@ -34,85 +34,71 @@ const filteredSchemes = computed(() => {
       return schemes.value.filter(s => s.type?.includes(route.query.type))
     case "search":
       // TODO: Improve search (probably use API instead)
-      return schemes.value.filter(s => JSON.stringify(s).toLowerCase().includes(route.query.search))
+      return schemes.value.filter(s => JSON.stringify(Object.entries(s).filter(([key]) => ["uri", "notation", "prefLabel", "definition"].includes(key)).map(([, value]) => value)).toLowerCase().includes(route.query.search))
     default:
-      return schemes.value
+      return quickSelection.value
   }
 })
 
 </script>
 
 <template>
-  {{ mode }}
   <template v-if="schemes">
-    <!-- Default view: show quick view, publisher selection, type selectio -->
-    <div
-      v-if="mode === 'default'">
+    <!-- Default section -->
+    <div class="section">
+      <h2 v-if="mode === 'default'">
+        Schnellzugriff
+      </h2>
+      <h2 v-else-if="mode === 'publisher'">
+        Publisher: {{ route.query.publisher }}
+      </h2>
+      <h2 v-else-if="mode === 'type'">
+        Vocabulartyp: {{ route.query.type }}
+      </h2>
+      <h2 v-else-if="mode === 'search'">
+        Searching for "{{ route.query.search }}"
+      </h2>
+      <h2 v-else-if="mode === 'conceptSearch'">
+        Concept Search: TODO
+      </h2>
       <div 
-        v-if="quickSelection.length"
-        class="section">
-        <h2>Schnellzugriff</h2>
-        <div class="schemeSelection">
-          <RouterLink
-            v-for="scheme in quickSelection"
-            :key="scheme.uri"
-            :to="`${config.namespace.pathname}${scheme.uri.replace(config.namespace, '')}`">
-            {{ jskos.prefLabel(scheme) }}
-          </RouterLink>
-        </div>
-      </div>
-      <div
-        v-if="publisherSelection.length"
-        class="section">
-        <h2>Herausgeber</h2>
-        <div class="categorySelection">
-          <RouterLink
-            v-for="publisher in publisherSelection"
-            :key="publisher"
-            :to="`?publisher=${encodeURIComponent(publisher)}`">
-            {{ publisher }}
-          </RouterLink>
-        </div>
-      </div>
-      <div
-        v-if="typeSelection.length"
-        class="section">
-        <h2>Vokabulartyp</h2>
-        <div class="categorySelection">
-          <RouterLink
-            v-for="t in typeSelection"
-            :key="t"
-            :to="`?type=${encodeURIComponent(t.uri)}`">
-            {{ jskos.prefLabel(t) }}
-          </RouterLink>
-        </div>
+        v-if="mode !== 'conceptSearch'"
+        class="schemeSelection">
+        <RouterLink
+          v-for="scheme in filteredSchemes"
+          :key="scheme.uri"
+          :to="getRouterUrl({ scheme })">
+          {{ jskos.prefLabel(scheme) }}
+        </RouterLink>
       </div>
     </div>
-    <!-- Publisher view: show schemes for particular publisher -->
-    <div v-if="mode === 'publisher'">
-      TODO - Publisher view: {{ route.query.publisher }}
+    <!-- Publisher selection section -->
+    <div
+      v-if="mode === 'default' && publisherSelection.length"
+      class="section">
+      <h2>Herausgeber</h2>
+      <div class="categorySelection">
+        <RouterLink
+          v-for="publisher in publisherSelection"
+          :key="publisher"
+          :to="`?publisher=${encodeURIComponent(publisher)}`">
+          {{ publisher }}
+        </RouterLink>
+      </div>
     </div>
-    <!-- Type view: show schemes for particular type -->
-    <div v-if="mode === 'type'">
-      TODO - Type view: {{ route.query.type }}
-    </div>
-    <!-- Search view: show scheme search results -->
-    <div v-if="mode === 'search'">
-      TODO - Search view: {{ route.query.search }}
-    </div>
-    <!-- Concept search view: show concept search results -->
-    <div v-if="mode === 'searchConcept'">
-      TODO - Concept search view: {{ route.query.searchConcept }}
-    </div>
-    <div 
-      v-if="mode === 'publisher' || mode === 'type' || mode === 'search'"
-      class="categorySelection">
-      <RouterLink
-        v-for="scheme in filteredSchemes"
-        :key="scheme.uri"
-        :to="`${config.namespace.pathname}${scheme.uri.replace(config.namespace, '')}`">
-        {{ jskos.prefLabel(scheme) }}
-      </RouterLink>
+    <!-- Type selection section -->
+    <div
+      v-if="mode === 'default' && typeSelection.length"
+      class="section">
+      <h2>Vokabulartyp</h2>
+      <div class="categorySelection">
+        <RouterLink
+          v-for="t in typeSelection"
+          :key="t"
+          :to="`?type=${encodeURIComponent(t.uri)}`">
+          {{ jskos.prefLabel(t) }}
+        </RouterLink>
+      </div>
     </div>
   </template>
   <div v-else>
