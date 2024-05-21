@@ -58,7 +58,7 @@ export function saveConcept(concept, { returnIfExists = false, returnNullOnError
   if (existing) {
     // Update certain properties (very basic)
     for (const prop of Object.getOwnPropertyNames(concept)) {
-      if (concept[prop] && (!existing[prop] || existing[prop]?.includes(null))) {
+      if (concept[prop] && (!existing[prop] || Array.isArray(existing[prop]) && existing[prop].includes(null))) {
         if (conceptProps.includes(prop)) {
           existing[prop] = saveConceptsWithOptions({ returnIfExists: true, returnNullOnError: true })(concept[prop])
         } else {
