@@ -5,13 +5,14 @@ import { schemes, registry, loadTop, loadNarrower, loadConcept, loadAncestors, g
 import { computed, ref, watch } from "vue"
 import { useRoute, useRouter } from "vue-router"
 import { utils } from "jskos-vue"
+import { getRouterUrl } from "@/utils.js"
 const route = useRoute()
 const router = useRouter()
 
 const conceptTreeRef = ref(null)
 
 const scheme = computed(() => {
-  return schemes.value?.find(s => jskos.compare(s, { uri: `${config.namespace}${route.params.voc}/` }))
+  return schemes.value?.find(s => jskos.compare(s, { uri: route.params.voc.match(/^https?:\/\//) ? route.params.voc : `${config.namespace}${route.params.voc}/` }))
 })
 
 const uri = computed(() => scheme.value && (route.params.id && `${config.namespace}${route.params.voc}/${route.params.id}` || route.query.uri))
@@ -23,15 +24,7 @@ const concept = computed({
     return getConceptByUri(uri.value)
   },
   set(value) {
-    if (!value?.uri) {
-      router.push(`${config.namespace.pathname}${route.params.voc}`)
-    } else {
-      if (value.uri.startsWith(config.namespace)) {
-        router.push(`${config.namespace.pathname}${value.uri.replace(config.namespace, "")}`)
-      } else {
-        router.push(`?uri=${encodeURIComponent(value.uri)}`)
-      }
-    }
+    router.push(getRouterUrl({ scheme: scheme.value, concept: value }))
   },
 })
 const conceptLoading = ref(true)
@@ -83,7 +76,7 @@ const topConcepts = computed(() => {
 
 <template>
   <h2>
-    <router-link :to="`${config.namespace.pathname}${route.params.voc}`">
+    <router-link :to="getRouterUrl({ scheme })">
       {{ jskos.prefLabel(scheme) }}
     </router-link>
   </h2>
