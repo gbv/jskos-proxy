@@ -1,6 +1,5 @@
 <script setup>
 import { inject, ref, watch } from "vue"
-import { utils } from "jskos-vue"
 import { useRouter } from "vue-router"
 
 const config = inject("config")
@@ -8,9 +7,9 @@ const router = useRouter()
 
 // TODO: Improve search (probably use API instead)
 const search = ref("")
-watch(search, utils.debounce((value) => {
+watch(search, (value) => {
   router.push(`${config.namespace.pathname}?search=${encodeURIComponent(value)}`)
-}, 150))
+})
 </script>
 
 <template>
