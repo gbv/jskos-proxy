@@ -23,6 +23,23 @@ const mode = computed(() => {
   return "default"
 })
 
+const filteredSchemes = computed(() => {
+  if (!schemes.value) {
+    return []
+  }
+  switch (mode.value) {
+    case "publisher":
+      return schemes.value.filter(s => s.publisher?.find(p => p.uri === route.query.publisher || jskos.prefLabel(p) === route.query.publisher))
+    case "type":
+      return schemes.value.filter(s => s.type?.includes(route.query.type))
+    case "search":
+      // TODO: Improve search (probably use API instead)
+      return schemes.value.filter(s => JSON.stringify(s).toLowerCase().includes(route.query.search))
+    default:
+      return schemes.value
+  }
+})
+
 </script>
 
 <template>
@@ -35,7 +52,7 @@ const mode = computed(() => {
         v-if="quickSelection.length"
         class="section">
         <h2>Schnellzugriff</h2>
-        <div class="quickSelection">
+        <div class="schemeSelection">
           <RouterLink
             v-for="scheme in quickSelection"
             :key="scheme.uri"
@@ -48,7 +65,7 @@ const mode = computed(() => {
         v-if="publisherSelection.length"
         class="section">
         <h2>Herausgeber</h2>
-        <div class="publisherSelection">
+        <div class="categorySelection">
           <RouterLink
             v-for="publisher in publisherSelection"
             :key="publisher"
@@ -61,7 +78,7 @@ const mode = computed(() => {
         v-if="typeSelection.length"
         class="section">
         <h2>Vokabulartyp</h2>
-        <div class="typeSelection">
+        <div class="categorySelection">
           <RouterLink
             v-for="t in typeSelection"
             :key="t"
@@ -87,6 +104,16 @@ const mode = computed(() => {
     <div v-if="mode === 'searchConcept'">
       TODO - Concept search view: {{ route.query.searchConcept }}
     </div>
+    <div 
+      v-if="mode === 'publisher' || mode === 'type' || mode === 'search'"
+      class="categorySelection">
+      <RouterLink
+        v-for="scheme in filteredSchemes"
+        :key="scheme.uri"
+        :to="`${config.namespace.pathname}${scheme.uri.replace(config.namespace, '')}`">
+        {{ jskos.prefLabel(scheme) }}
+      </RouterLink>
+    </div>
   </template>
   <div v-else>
     <LoadingIndicator />
@@ -102,12 +129,12 @@ const mode = computed(() => {
 .section > h2 {
   text-align: center;
 }
-.quickSelection, .publisherSelection, .typeSelection {
+.schemeSelection, .categorySelection {
   display: flex;
   flex-wrap: wrap;
   justify-content: center;
 }
-.quickSelection > a, .publisherSelection > a, .typeSelection > a {
+.schemeSelection > a, .categorySelection > a {
   padding: 10px;
 }
 </style>

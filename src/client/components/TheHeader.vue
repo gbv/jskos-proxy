@@ -1,6 +1,16 @@
 <script setup>
-import { inject } from "vue"
+import { inject, ref, watch } from "vue"
+import { utils } from "jskos-vue"
+import { useRouter } from "vue-router"
+
 const config = inject("config")
+const router = useRouter()
+
+// TODO: Improve search (probably use API instead)
+const search = ref("")
+watch(search, utils.debounce((value) => {
+  router.push(`${config.namespace.pathname}?search=${encodeURIComponent(value)}`)
+}, 150))
 </script>
 
 <template>
@@ -22,5 +32,8 @@ const config = inject("config")
     <RouterLink :to="`${config.namespace.pathname}bk/17.03`">
       BK 17.03
     </RouterLink>
+    <input 
+      v-model="search"
+      type="text">
   </nav>
 </template>
