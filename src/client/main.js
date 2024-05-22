@@ -2,12 +2,8 @@ import "./assets/main.css"
 
 import config from "@/config.js"
 
-// Try importing custom style
-try {
-  await import(`#/config/${config.configDir}/style.css`)
-} catch (error) {
-  // Ignore
-}
+// Import custom style
+import "#/config/current/style.css"
 
 import { createApp, defineAsyncComponent } from "vue"
 import App from "./App.vue"

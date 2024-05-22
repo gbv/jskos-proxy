@@ -1,6 +1,15 @@
 import * as dotenv from "dotenv"
 import path from "node:path"
-import fs from "node:fs"
+import fs from "node:fs/promises"
+
+async function exists(file) {
+  try {
+    await fs.access(file, fs.constants.F_OK)
+    return true
+  } catch {
+    return false
+  }
+}
 
 const log = msg => console.log(msg)
 
@@ -13,9 +22,12 @@ if (NODE_ENV !== "test") {
 
 const configDir = process.env.CONFIG || ""
 const configFile = path.resolve(`config/${configDir}`, "config.env")
-if (fs.existsSync(configFile)) {
-  dotenv.populate(process.env, dotenv.parse(fs.readFileSync(configFile)))
+if (await exists(configFile)) {
+  dotenv.populate(process.env, dotenv.parse(await fs.readFile(configFile, "utf8")))
   log(`Read configuration from ${configFile}`)
+  // Create "current" symlink (needed for front-end import of custom styles)
+  await fs.rm("config/current")
+  await fs.symlink(configDir, "config/current")
 }
 
 import { readFile } from "node:fs/promises"
