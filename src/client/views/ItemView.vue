@@ -55,7 +55,7 @@ watch(uri, async (value, prevValue) => {
     }
     // Scroll
     setTimeout(() => {
-      conceptTreeRef.value.scrollToUri(value)
+      conceptTreeRef.value.scrollToUri(value, true)
       hierarchyLoading.value = false
     }, 50)
   }
