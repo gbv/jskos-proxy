@@ -130,12 +130,11 @@ export async function loadAncestors(concept) {
   if (!concept || concept.ancestors && !concept.ancestors.includes(null)) {
     return concept?.ancestors
   }
-  console.log("loadAnceostrs", concept.uri)
   const ancestors = await concept._getAncestors()
   for (let i = 0; i < ancestors.length; i += 1) {
-    ancestors[i].ancestors = ancestors.slice(0, i)
+    ancestors[i].ancestors = ancestors.slice(i + 1)
   }
-  concept.ancestors = jskos.sortConcepts(saveConceptsWithOptions({ returnIfExists: true })(ancestors))
+  concept.ancestors = saveConceptsWithOptions({ returnIfExists: true })(ancestors)
   // Also load narrower
   await Promise.all(concept.ancestors.map(ancestor => loadNarrower(ancestor)))
   // // Also load narrower in hierarchy and include this concept at the right place
