@@ -119,9 +119,14 @@ export async function loadNarrower(concept) {
   }
   console.log("loadNarrower", concept.uri)
   const narrower = await concept._getNarrower()
-  narrower.forEach(narrow => {
-    narrow.ancestors = [...concept.ancestors, concept]
-  })
+  if (concept.ancestors && !concept.ancestors?.includes(null)) {
+    narrower.forEach(narrow => {
+      narrow.ancestors = [concept, ...concept.ancestors]
+      if (!narrow.broader || narrow.broader?.includes(null)) {
+        narrow.broader = [concept]
+      }
+    })
+  }
   concept.narrower = jskos.sortConcepts(saveConceptsWithOptions({ returnIfExists: true })(narrower))
   return concept.narrower
 }
@@ -130,11 +135,16 @@ export async function loadAncestors(concept) {
   if (!concept || concept.ancestors && !concept.ancestors.includes(null)) {
     return concept?.ancestors
   }
+  console.log("loadAncestors", concept.uri)
   const ancestors = await concept._getAncestors()
   for (let i = 0; i < ancestors.length; i += 1) {
     ancestors[i].ancestors = ancestors.slice(i + 1)
   }
   concept.ancestors = saveConceptsWithOptions({ returnIfExists: true })(ancestors)
+  // Set broader if necessary
+  if (!concept.broader || concept.broader?.includes(null)) {
+    concept.broader = [concept.ancestors[0]]
+  }
   // Also load narrower
   await Promise.all(concept.ancestors.map(ancestor => loadNarrower(ancestor)))
   // // Also load narrower in hierarchy and include this concept at the right place
