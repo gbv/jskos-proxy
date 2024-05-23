@@ -42,18 +42,33 @@ watch(scheme, () => {
 watch(uri, async (value, prevValue) => {
   console.log("watch uri")
   if (value && value !== prevValue) {
-    conceptLoading.value = true
-    hierarchyLoading.value = true
-    const concept = await loadConcept(value, scheme.value)
+    // Debounce loading values so that we prevent "flashing" loading overlays
+    conceptLoading.value = null
+    hierarchyLoading.value = null
+    utils.debounce(() => {
+      if (conceptLoading.value === null) {
+        conceptLoading.value = true
+      }
+      if (hierarchyLoading.value === null) {
+        hierarchyLoading.value = true
+      }
+    }, 100)()
+    // Load concept data
+    const loadedConcept = await loadConcept(value, scheme.value)
     conceptLoading.value = false
-    await loadAncestors(concept)
+    // Load concept ancestors/hierarchy
+    await loadAncestors(loadedConcept)
+    // Abort if concept has changed in the meantime
+    if (!jskos.compare({ uri: value }, concept.value)) {
+      return
+    }
     // Open all ancestors in hierarchy
-    for (const ancestor of concept.ancestors) {
+    for (const ancestor of loadedConcept.ancestors) {
       console.log("Open", ancestor.uri)
       conceptTreeRef.value?.open(ancestor)
       console.log(conceptTreeRef.value?.isOpen[ancestor.uri])
     }
-    // Scroll
+    // Scroll to concept in hierarchy
     setTimeout(() => {
       conceptTreeRef.value.scrollToUri(value, true)
       hierarchyLoading.value = false
@@ -87,28 +102,28 @@ const topConcepts = computed(() => {
       :search="utils.cdkRegistryToSuggestFunction(registry, { scheme })"
       @select="concept = { uri: $event.uri }" />
     <div class="itemView-split">
-      <div
-        :class="{
-          conceptHierarchy: true,
-          loading: hierarchyLoading,
-        }">
+      <div class="conceptHierarchy">
         <concept-tree
           v-if="topConcepts"
           ref="conceptTreeRef"
           v-model="concept"
           :concepts="topConcepts"
           @open="loadNarrower($event)" />
-        <div v-else>
-          Loading concepts...
+        <div
+          v-if="!topConcepts || hierarchyLoading"
+          class="loading">
+          <loading-indicator size="xl" />
         </div>
       </div>
-      <div
-        v-if="concept && !conceptLoading"
-        class="conceptDetails">
-        {{ concept.uri }}
-      </div>
-      <div v-else>
-        Loading...
+      <div class="conceptDetails">
+        <div
+          v-if="!concept || conceptLoading"
+          class="loading">
+          <loading-indicator size="xl" />
+        </div>
+        <div v-else>
+          {{ concept.uri }}
+        </div>
       </div>
     </div>
   </div>
@@ -137,8 +152,21 @@ const topConcepts = computed(() => {
   flex: 1;
   padding: 10px;
 }
-.conceptHierarchy {
+.conceptHierarchy, .conceptDetails {
   position: relative;
+}
+.loading {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 1;
+  /* TODO */
+  background-color: #f4f4f476;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 .jskos-vue-conceptTree {
   /* TODO: Fix this? */
