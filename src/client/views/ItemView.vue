@@ -117,13 +117,14 @@ const topConcepts = computed(() => {
       </div>
       <div class="conceptDetails">
         <div
-          v-if="!concept || conceptLoading"
+          v-if="!scheme || conceptLoading"
           class="loading">
           <loading-indicator size="xl" />
         </div>
-        <div v-else>
-          {{ concept.uri }}
-        </div>
+        <item-details 
+          v-else
+          :item="concept || scheme"
+          @select="concept = { uri: $event.item.uri }" />
       </div>
     </div>
   </div>
@@ -154,6 +155,9 @@ const topConcepts = computed(() => {
 }
 .conceptHierarchy, .conceptDetails {
   position: relative;
+}
+.conceptDetails {
+  padding-left: 25px;
 }
 .loading {
   position: absolute;
