@@ -27,8 +27,8 @@ const concept = computed({
     router.push(getRouterUrl({ scheme: scheme.value, concept: value }))
   },
 })
-const conceptLoading = ref(true)
-const hierarchyLoading = ref(true)
+const conceptLoading = ref(false)
+const hierarchyLoading = ref(false)
 
 // Load top concepts when scheme is ready
 watch(scheme, () => {
@@ -40,7 +40,7 @@ watch(scheme, () => {
 },{ immediate: true })
 
 watch(uri, async (value, prevValue) => {
-  console.log("watch uri")
+  console.log("watch uri", value)
   if (value && value !== prevValue) {
     // Debounce loading values so that we prevent "flashing" loading overlays
     conceptLoading.value = null
@@ -57,7 +57,7 @@ watch(uri, async (value, prevValue) => {
     const loadedConcept = await loadConcept(value, scheme.value)
     conceptLoading.value = false
     // Load concept ancestors/hierarchy
-    await loadAncestors(loadedConcept)
+    await Promise.all([loadAncestors(loadedConcept), loadNarrower(loadedConcept)])
     // Abort if concept has changed in the meantime
     if (!jskos.compare({ uri: value }, concept.value)) {
       return
