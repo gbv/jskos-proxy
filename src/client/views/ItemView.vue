@@ -75,54 +75,65 @@ const topConcepts = computed(() => {
 </script>
 
 <template>
-  <h2>
-    <router-link :to="getRouterUrl({ scheme })">
-      {{ jskos.prefLabel(scheme) }}
-    </router-link>
-  </h2>
-  <item-suggest
-    v-if="scheme"
-    class="conceptSuggest"
-    :search="utils.cdkRegistryToSuggestFunction(registry, { scheme })"
-    @select="concept = { uri: $event.uri }" />
   <div class="itemView">
-    <div
-      :class="{
-        conceptHierarchy: true,
-        loading: hierarchyLoading,
-      }">
-      <concept-tree
-        v-if="topConcepts"
-        ref="conceptTreeRef"
-        v-model="concept"
-        :concepts="topConcepts"
-        @open="loadNarrower($event)" />
-      <div v-else>
-        Loading concepts...
+    <h2>
+      <router-link :to="getRouterUrl({ scheme })">
+        {{ jskos.prefLabel(scheme) }}
+      </router-link>
+    </h2>
+    <item-suggest
+      v-if="scheme"
+      class="conceptSuggest"
+      :search="utils.cdkRegistryToSuggestFunction(registry, { scheme })"
+      @select="concept = { uri: $event.uri }" />
+    <div class="itemView-split">
+      <div
+        :class="{
+          conceptHierarchy: true,
+          loading: hierarchyLoading,
+        }">
+        <concept-tree
+          v-if="topConcepts"
+          ref="conceptTreeRef"
+          v-model="concept"
+          :concepts="topConcepts"
+          @open="loadNarrower($event)" />
+        <div v-else>
+          Loading concepts...
+        </div>
       </div>
-    </div>
-    <div
-      v-if="concept && !conceptLoading"
-      class="conceptDetails">
-      {{ concept.uri }}
-    </div>
-    <div v-else>
-      Loading...
+      <div
+        v-if="concept && !conceptLoading"
+        class="conceptDetails">
+        {{ concept.uri }}
+      </div>
+      <div v-else>
+        Loading...
+      </div>
     </div>
   </div>
 </template>
 
 <style scoped>
+.itemView {
+  width: 100%;
+  max-width: 1400px;
+  margin: 0 auto;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
 .conceptSuggest {
   max-width: 50%;
   margin-top: -10px;
   margin-bottom: 15px;
 }
-.itemView {
+.itemView-split {
   flex: 1;
   display: flex;
+  padding-bottom: 20px;
 }
-.itemView > * {
+.itemView-split > * {
   flex: 1;
   padding: 10px;
 }

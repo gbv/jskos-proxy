@@ -63,10 +63,11 @@ const filteredSchemes = computed(() => {
       </h2>
       <div 
         v-if="mode !== 'conceptSearch'"
-        class="schemeSelection">
+        class="selection">
         <RouterLink
           v-for="scheme in filteredSchemes"
           :key="scheme.uri"
+          class="scheme-selection"
           :to="getRouterUrl({ scheme })">
           {{ jskos.prefLabel(scheme) }}
         </RouterLink>
@@ -77,10 +78,11 @@ const filteredSchemes = computed(() => {
       v-if="mode === 'default' && publisherSelection.length"
       class="section">
       <h2>Herausgeber</h2>
-      <div class="categorySelection">
+      <div class="selection">
         <RouterLink
           v-for="publisher in publisherSelection"
           :key="publisher"
+          class="category-selection"
           :to="`?publisher=${encodeURIComponent(publisher)}`">
           {{ publisher }}
         </RouterLink>
@@ -91,10 +93,11 @@ const filteredSchemes = computed(() => {
       v-if="mode === 'default' && typeSelection.length"
       class="section">
       <h2>Vokabulartyp</h2>
-      <div class="categorySelection">
+      <div class="selection">
         <RouterLink
           v-for="t in typeSelection"
           :key="t"
+          class="category-selection"
           :to="`?type=${encodeURIComponent(t.uri)}`">
           {{ jskos.prefLabel(t) }}
         </RouterLink>
@@ -107,20 +110,4 @@ const filteredSchemes = computed(() => {
 </template>
 
 <style scoped>
-.section {
-  max-width: 1000px;
-  margin: 0 auto;
-  padding: 40px;
-}
-.section > h2 {
-  text-align: center;
-}
-.schemeSelection, .categorySelection {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-}
-.schemeSelection > a, .categorySelection > a {
-  padding: 10px;
-}
 </style>

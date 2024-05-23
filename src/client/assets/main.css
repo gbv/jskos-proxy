@@ -1,12 +1,24 @@
 @import "./base.css";
 
 :root {
-  --color-background: #b13f12;
+  --color-background: #5780C1;
+  --color-primary: #5780C1;
+  --color-text: #16181A;
+  --color-text-on-dark: #f8fafc;
+  --color-link: #2e5faf;
+  --color-link-hover: #4d77ba;
+  --color-button-background: #263D62;
+  --color-button-hover: #2c4978;
+  --color-button-text: var(--color-text-on-dark);
+  --color-section-background-primary: #f8fafc;
+  --color-section-background-secondary: #EAEAEA;
 }
 
 html, body, #app {
   height: 100vh;
   margin: 0;
+  color: var(--color-text);
+  background-color: var(--color-section-background-primary);
 }
 
 #app {
@@ -16,14 +28,12 @@ html, body, #app {
 
 main {
   flex: 1 1 auto;
-  margin: 5px auto;
   width: 100%;
-  max-width: 1400px;
 }
 
 header, footer {
   background-color: var(--color-background);
-  color: white;
+  color: var(--color-text-on-dark);
   padding: calc(5vh) calc(10vw);
   flex: 0 1 auto;
 }
@@ -37,4 +47,94 @@ footer > .logo {
   width: 20%;
   min-width: 150px;
   max-height: 50px;
+}
+
+/* TODO: Fix section backgrounds */
+.section {
+  padding: 80px 20px;
+  background-color: var(--color-section-background-primary);
+}
+.section:nth-child(2n) {
+  background-color: var(--color-section-background-secondary);
+}
+
+.section > h1, .section > h2 {
+  text-align: center;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  color: var(--color-primary);
+}
+h1 {
+  font-size: 32px;
+}
+h2 {
+  font-size: 28px;
+}
+h3 {
+  font-size: 24px;
+}
+h4 {
+  font-size: 20px;
+}
+
+a {
+  color: var(--color-link);
+  text-decoration: none;
+}
+
+a:hover {
+  color: var(--color-link-hover);
+}
+
+.selection {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+.category-selection, .scheme-selection {
+  display: inline-block;
+  position: relative;
+  color: var(--color-text);
+  padding: 10px;
+  margin: 8px;
+  font-weight: bold;
+}
+.category-selection {
+  border: 1px solid var(--color-text);
+  border-radius: 3px;
+  transition: 
+    background-color 0.1s;
+}
+.category-selection:hover {
+  background-color: var(--color-button-background);
+  color: var(--color-text-on-dark);
+}
+.scheme-selection::before,
+.scheme-selection::after {
+  position: absolute;
+  width: 15px;
+  height: 100%;
+  content: "";
+  border: 1px solid black;
+  transition: 
+    width 0.2s;
+}
+.scheme-selection::before {
+  left: 0;
+  top: 0;
+  border-right: none;
+}
+.scheme-selection::after {
+  right: 0;
+  bottom: 0;
+  border-left: none;
+}
+.scheme-selection:hover {
+  color: var(--color-text);
+}
+.scheme-selection:hover::before, .scheme-selection:hover::after {
+  width: 100%;
 }
