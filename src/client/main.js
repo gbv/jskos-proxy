@@ -26,6 +26,11 @@ for (const name of ["TheHeader", "TheFooter"]) {
   }))
 }
 
+// TODO: Add i18n for localization
+import jskos from "jskos-tools"
+app.config.globalProperties.jskos = jskos
+jskos.languagePreference.defaults = ["de"]
+
 // jskos-vue
 import "jskos-vue/dist/style.css"
 import { ItemName, ItemDetails, ItemDetailsTabs, ItemList, ItemSuggest, ConceptTree, AutoLink, LoadingIndicator } from "jskos-vue"
