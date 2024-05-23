@@ -90,7 +90,9 @@ export async function loadConcept(uri) {
   if (existing) {
     return existing
   }
+  console.time(`loadConcept ${uri}`)
   const concept = (await registry.getConcepts({ concepts: [{ uri }] }))[0]
+  console.timeEnd(`loadConcept ${uri}`)
   if (!concept) {
     throw new Error(`Error loading concept ${uri}`)
   }
@@ -103,13 +105,14 @@ export async function loadTop(scheme) {
   if (!scheme || scheme.topConcepts && !scheme.topConcepts.includes(null)) {
     return scheme?.topConcepts
   }
-  console.log("loadTop", scheme.uri)
+  console.time(`loadTop ${scheme.uri}`)
   const topConcepts = await registry.getTop({ scheme: { uri: scheme.uri } })
   topConcepts.forEach(concept => {
     concept.ancestors = []
   })
   // TODO: Maybe use saveConcepts here (because they might have additional data)
   scheme.topConcepts = jskos.sortConcepts(saveConceptsWithOptions({ returnIfExists: true })(topConcepts))
+  console.timeEnd(`loadTop ${scheme.uri}`)
   return scheme.topConcepts
 }
 
@@ -117,7 +120,7 @@ export async function loadNarrower(concept) {
   if (!concept || concept.narrower && !concept.narrower.includes(null)) {
     return concept?.narrower
   }
-  console.log("loadNarrower", concept.uri)
+  console.time(`loadNarrower ${concept.uri}`)
   const narrower = await concept._getNarrower()
   if (concept.ancestors && !concept.ancestors?.includes(null)) {
     narrower.forEach(narrow => {
@@ -128,6 +131,7 @@ export async function loadNarrower(concept) {
     })
   }
   concept.narrower = jskos.sortConcepts(saveConceptsWithOptions({ returnIfExists: true })(narrower))
+  console.timeEnd(`loadNarrower ${concept.uri}`)
   return concept.narrower
 }
 
@@ -135,7 +139,7 @@ export async function loadAncestors(concept) {
   if (!concept || concept.ancestors && !concept.ancestors.includes(null)) {
     return concept?.ancestors
   }
-  console.log("loadAncestors", concept.uri)
+  console.time(`loadAncestors ${concept.uri}`)
   const ancestors = await concept._getAncestors()
   for (let i = 0; i < ancestors.length; i += 1) {
     ancestors[i].ancestors = ancestors.slice(i + 1)
@@ -147,6 +151,7 @@ export async function loadAncestors(concept) {
   }
   // Also load narrower
   await Promise.all(concept.ancestors.map(ancestor => loadNarrower(ancestor)))
+  console.timeEnd(`loadAncestors ${concept.uri}`)
   // // Also load narrower in hierarchy and include this concept at the right place
   // const scheme = state.schemes?.find(s => jskos.compare(s, concept.inScheme[0]))
   // if (scheme) {
