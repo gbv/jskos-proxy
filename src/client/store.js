@@ -87,7 +87,7 @@ export function saveConceptsWithOptions(options) {
 
 export async function loadConcept(uri) {
   const existing = getConceptByUri(uri)
-  if (existing) {
+  if (existing?._registry) {
     return existing
   }
   console.time(`loadConcept ${uri}`)
@@ -122,15 +122,19 @@ export async function loadNarrower(concept) {
   }
   console.time(`loadNarrower ${concept.uri}`)
   const narrower = await concept._getNarrower()
+  concept.narrower = jskos.sortConcepts(saveConceptsWithOptions({ returnIfExists: true })(narrower))
+  // Set ancestors of narrower concepts
   if (concept.ancestors && !concept.ancestors?.includes(null)) {
-    narrower.forEach(narrow => {
+    concept.narrower.forEach(narrow => {
       narrow.ancestors = [concept, ...concept.ancestors]
-      if (!narrow.broader || narrow.broader?.includes(null)) {
-        narrow.broader = [concept]
-      }
     })
   }
-  concept.narrower = jskos.sortConcepts(saveConceptsWithOptions({ returnIfExists: true })(narrower))
+  // Set broader of narrower concepts
+  concept.narrower.forEach(narrow => {
+    if (!narrow.broader || narrow.broader?.includes(null)) {
+      narrow.broader = [concept]
+    }
+  })
   console.timeEnd(`loadNarrower ${concept.uri}`)
   return concept.narrower
 }

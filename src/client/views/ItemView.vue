@@ -1,7 +1,7 @@
 <script setup>
 import config from "@/config.js"
 import * as jskos from "jskos-tools"
-import { schemes, registry, loadTop, loadNarrower, loadConcept, loadAncestors, getConceptByUri } from "@/store.js"
+import { schemes, registry, loadTop, loadNarrower, loadConcept, loadAncestors, saveConcept } from "@/store.js"
 import { computed, ref, watch } from "vue"
 import { useRoute, useRouter } from "vue-router"
 import { utils } from "jskos-vue"
@@ -21,7 +21,7 @@ const concept = computed({
     if (!uri.value) {
       return null
     }
-    return getConceptByUri(uri.value)
+    return saveConcept({ uri: uri.value }, { returnIfExists: true, returnNullOnError: true })
   },
   set(value) {
     router.push(getRouterUrl({ scheme: scheme.value, concept: value }))
@@ -55,11 +55,15 @@ watch(uri, async (value, prevValue) => {
     }, 100)()
     // Load concept data
     const loadedConcept = await loadConcept(value, scheme.value)
+    // Abort if concept has changed in the meantime
+    if (value !== uri.value) {
+      return
+    }
     conceptLoading.value = false
     // Load concept ancestors/hierarchy
     await Promise.all([loadAncestors(loadedConcept), loadNarrower(loadedConcept)])
     // Abort if concept has changed in the meantime
-    if (!jskos.compare({ uri: value }, concept.value)) {
+    if (value !== uri.value) {
       return
     }
     // Open all ancestors in hierarchy
@@ -79,7 +83,6 @@ watch(uri, async (value, prevValue) => {
 
 // Top concepts computed
 const topConcepts = computed(() => {
-  console.log(scheme.value?.topConcepts)
   return scheme.value?.topConcepts
 })
 
