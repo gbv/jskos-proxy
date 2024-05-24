@@ -175,10 +175,10 @@ const topConcepts = computed(() => {
   align-items: center;
   justify-content: center;
 }
-.jskos-vue-conceptTree {
-  /* TODO: Fix this? */
+/* TODO: Fix this? */
+.jskos-vue-conceptTree, .jskos-vue-itemDetails {
   position: absolute;
-  top: 0; bottom: 20px; left: 0; right: 0;
+  top: 0; bottom: 20px; left: 10px; right: 10px;
   overflow-y: auto;
 }
 </style>
