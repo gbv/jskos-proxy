@@ -13,7 +13,6 @@ const app = createApp(App)
 
 app.use(router)
 app.provide("config", config)
-console.log(config)
 
 // Custom components
 for (const name of ["TheHeader", "TheFooter"]) {

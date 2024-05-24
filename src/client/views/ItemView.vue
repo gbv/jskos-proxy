@@ -32,15 +32,12 @@ const hierarchyLoading = ref(false)
 
 // Load top concepts when scheme is ready
 watch(scheme, () => {
-  console.log("watch scheme")
   if (scheme.value && (!scheme.value?.topConcepts || scheme.value?.topConcepts?.includes(null))) {
     loadTop(scheme.value)
   }
-  console.log("watch scheme end")
 },{ immediate: true })
 
 watch(uri, async (value, prevValue) => {
-  console.log("watch uri", value)
   if (value && value !== prevValue) {
     // Debounce loading values so that we prevent "flashing" loading overlays
     conceptLoading.value = null
@@ -68,9 +65,7 @@ watch(uri, async (value, prevValue) => {
     }
     // Open all ancestors in hierarchy
     for (const ancestor of loadedConcept.ancestors) {
-      console.log("Open", ancestor.uri)
       conceptTreeRef.value?.open(ancestor)
-      console.log(conceptTreeRef.value?.isOpen[ancestor.uri])
     }
     // Scroll to concept in hierarchy
     setTimeout(() => {
@@ -78,18 +73,12 @@ watch(uri, async (value, prevValue) => {
       hierarchyLoading.value = false
     }, 50)
   }
-  console.log("watch uri end")
 },{ immediate: true })
 
 // Top concepts computed
 const topConcepts = computed(() => {
   return scheme.value?.topConcepts
 })
-
-// function test(...params) {
-//   console.log(...params)
-// }
-// 
 </script>
 
 <template>
