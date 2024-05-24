@@ -37,16 +37,29 @@ header, footer {
   padding: calc(5vh) calc(10vw);
   flex: 0 1 auto;
 }
+header > nav {
+  display: flex;
+}
 
-header > .logo {
+header .logo {
   width: 40%;
   min-width: 200px;
-  max-height: 100px;
+  max-width: 365px;
 }
-footer > .logo {
+footer .logo {
   width: 20%;
   min-width: 150px;
   max-height: 50px;
+}
+
+/* TODO */
+header a, footer a {
+  color: var(--color-text-on-dark);
+  font-weight: bold;
+}
+header a:hover, footer a:hover {
+  color: var(--color-text-on-dark);
+  text-decoration: underline;
 }
 
 /* TODO: Fix section backgrounds */

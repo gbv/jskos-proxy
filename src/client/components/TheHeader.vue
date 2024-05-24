@@ -13,26 +13,31 @@ watch(search, (value) => {
 </script>
 
 <template>
-  <img
-    alt="Logo"
-    class="logo"
-    src="@/assets/logo.svg">
-
   <nav>
-    <RouterLink :to="`${config.namespace.pathname}`">
-      Home
-    </RouterLink>-
-    <RouterLink :to="`${config.namespace.pathname}about`">
-      About
-    </RouterLink>-
-    <RouterLink :to="`${config.namespace.pathname}bk`">
-      BK
-    </RouterLink>-
-    <RouterLink :to="`${config.namespace.pathname}bk/17.03`">
-      BK 17.03
+    <RouterLink 
+      style="flex: 1;"
+      :to="`${config.namespace.pathname}`">
+      <img
+        alt="Logo"
+        class="logo"
+        src="@/assets/logo.svg">
     </RouterLink>
-    <input 
-      v-model="search"
-      type="text">
+
+    <div style="text-align: right;">
+      <a
+        href=""
+        @click.stop.prevent="">DE</a> |
+      <a
+        href=""
+        @click.stop.prevent="">EN</a>
+      <br><br>
+      <RouterLink :to="`${config.namespace.pathname}about`">
+        About
+      </RouterLink>
+      <br>
+      <input 
+        v-model="search"
+        type="text">
+    </div>
   </nav>
 </template>
