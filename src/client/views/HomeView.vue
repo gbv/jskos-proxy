@@ -2,7 +2,7 @@
 import { useRoute } from "vue-router"
 import * as jskos from "jskos-tools"
 import { schemes, quickSelection, publisherSelection, typeSelection } from "@/store.js"
-import { computed } from "vue"
+import { computed, watch } from "vue"
 import { getRouterUrl } from "@/utils.js"
 
 const route = useRoute()
@@ -39,6 +39,13 @@ const filteredSchemes = computed(() => {
       return quickSelection.value
   }
 })
+
+watch(mode, () => {
+  window.scrollTo({
+    top: 0,
+    behavior: "smooth",
+  })
+}, { immediate: true })
 
 </script>
 
