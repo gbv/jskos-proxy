@@ -33,8 +33,36 @@ const filteredSchemes = computed(() => {
     case "type":
       return schemes.value.filter(s => s.type?.includes(route.query.type))
     case "search":
-      // TODO: Improve search (probably use API instead)
-      return schemes.value.filter(s => JSON.stringify(Object.entries(s).filter(([key]) => ["uri", "notation", "prefLabel", "definition"].includes(key)).map(([, value]) => value)).toLowerCase().includes(route.query.search))
+      // TODO: Optimize search (very rough at the moment)
+      return schemes.value
+        .map(scheme => {
+          let score = 0, current = 16
+          for (const array of [
+            // Array of priorities during search
+            // 1) notation, identifiers
+            [].concat(scheme.notation, [scheme.uri], scheme.identifier || []),
+            // 2) preferred label
+            Object.values(scheme.prefLabel),
+            // 3) definitions
+            Object.values(scheme.definition).reduce((prev, cur) => ([...prev, ...cur]), []),
+          ]) {
+            if (array.map(e => e.toUpperCase()).find(e => e.startsWith(route.query.search.toUpperCase()))) {
+              score += current
+            } else if (array.map(e => e.toUpperCase()).find(e => e.includes(route.query.search.toUpperCase()))) {
+              score += current / 2
+            }
+            if (current > 2) {
+              current /= 2
+            }
+          }
+          return {
+            scheme,
+            score,
+          }
+        })
+        .filter(e => e.score > 0)
+        .sort((a, b) => b.score - a.score)
+        .map(e => e.scheme)
     default:
       return quickSelection.value
   }
