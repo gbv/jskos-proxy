@@ -1,5 +1,6 @@
 import express from "express"
 import ViteExpress from "vite-express"
+import * as jskos from "jskos-tools"
 
 import config from "../../config/config.js"
 import * as rdf from "./rdf.js"
@@ -48,6 +49,12 @@ app.get(`${config.namespace.pathname}:voc?/:id?`, async (req, res, next) => {
 
     // TODO: Handle this better
     res.status(item ? 200 : 404)
+
+    if (Array.isArray(item)) {
+      item = item.map(i => jskos.copyDeep(i))
+    } else {
+      item = jskos.copyDeep(item)
+    }
 
     const contentType = rdf.contentTypes[format]
     if (contentType && contentType !== "application/json") {

@@ -63,7 +63,8 @@ export class ApiBackend {
           if (!this.schemes) {
             log(`Loaded ${result.length} schemes for backend.`)
           }
-          this.schemes = result
+          // Only return schemes that have concepts
+          this.schemes = result.filter(s => !s.concepts || s.concepts?.length > 0)
           resolve()
         },
         interval: 60 * 1000,
