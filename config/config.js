@@ -26,7 +26,11 @@ if (await exists(configFile)) {
   dotenv.populate(process.env, dotenv.parse(await fs.readFile(configFile, "utf8")))
   log(`Read configuration from ${configFile}`)
   // Create "current" symlink (needed for front-end import of custom styles)
-  await fs.rm("config/current")
+  try {
+    await fs.rm("config/current")
+  } catch (error) {
+    // ignore
+  }
   await fs.symlink(configDir, "config/current")
 }
 
