@@ -2,7 +2,7 @@
 import { inject, ref, watch } from "vue"
 import { useRouter, useRoute } from "vue-router"
 import { utils } from "jskos-vue"
-import { state, setLocale } from "@/store.js"
+import { locale } from "@/store.js"
 
 const config = inject("config")
 const router = useRouter()
@@ -35,18 +35,19 @@ watch(() => route.query.search, (value) => {
     </RouterLink>
 
     <div style="text-align: right;">
-      <a
-        href=""
-        :style="{
-          fontWeight: state.locale === 'de' ? 'bold' : 'normal',
-        }"
-        @click.stop.prevent="setLocale('de')">DE</a> |
-      <a
-        href=""
-        :style="{
-          fontWeight: state.locale === 'en' ? 'bold' : 'normal',
-        }"
-        @click.stop.prevent="setLocale('en')">EN</a>
+      <template
+        v-for="(locale_, index) in $i18n.availableLocales"
+        :key="locale_">
+        <template v-if="index > 0">
+          |
+        </template>
+        <a
+          href=""
+          :style="{
+            fontWeight: locale === locale_ ? 'bold' : 'normal',
+          }"
+          @click.stop.prevent="locale = locale_">{{ locale_.toUpperCase() }}</a>
+      </template>
       <br><br>
       <RouterLink :to="`${config.namespace.pathname}about`">
         About

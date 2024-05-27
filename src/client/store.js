@@ -7,7 +7,15 @@ export const state = reactive({
   schemes: null,
   concepts: {},
   languages: ["en", "de"],
-  locale: computed(() => state.languages[0]),
+})
+
+export const locale = computed({
+  get() {
+    return state.languages[0]
+  },
+  set(value) {
+    setLocale(value)
+  },
 })
 
 export function setLocale(value) {

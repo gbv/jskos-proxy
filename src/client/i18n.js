@@ -3,6 +3,7 @@ import messages from "#/locale.json"
 
 let locale
 
+// Try to ready locale from local storage
 try {
   locale = localStorage.getItem("locale")
 } catch (error) {
