@@ -34,25 +34,37 @@ main {
 header, footer {
   background-color: var(--color-background);
   color: var(--color-text-on-dark);
-  padding: calc(5vh) calc(10vw);
   flex: 0 1 auto;
 }
 header > nav {
   display: flex;
+  align-items: center;
 }
 
 header .logo {
   width: 40%;
   min-width: 200px;
-  max-width: 365px;
+  max-width: 350px;
+}
+header {
+  height: 15vh;
+  max-height: 200px;
+  padding: 10px 5vw
 }
 footer {
+  height: 10vh;
+  max-height: 120px;
+  padding: 5px 5vw;
+  font-size: small;
+  line-height: 1.1;
   display: flex;
+  align-items: center;
 }
 footer .logo {
   flex: 0 1 20%;
-  min-width: 150px;
+  min-width: 100px;
   max-height: 50px;
+  margin-right: 30px;
 }
 
 /* TODO */
