@@ -1,6 +1,7 @@
 <script setup>
 import config from "@/config.js"
 import * as jskos from "jskos-tools"
+import { Tab } from "jskos-vue-tabs"
 import { schemes, registry, loadTop, loadNarrower, loadConcept, loadAncestors, saveConcept } from "@/store.js"
 import { computed, ref, watch } from "vue"
 import { useRoute, useRouter } from "vue-router"
@@ -116,7 +117,19 @@ const topConcepts = computed(() => {
         <item-details 
           v-else
           :item="concept || scheme"
-          @select="concept = { uri: $event.item.uri }" />
+          @select="concept = { uri: $event.item.uri }">
+          <template #additionalTabs>
+            <tab title="Download">
+              <div
+                v-for="format in ['jskos', 'turtle', 'rdfxml', 'ntriples']"
+                :key="format">
+                <a :href="`?format=${format}`">
+                  {{ format }}
+                </a>
+              </div>
+            </tab>
+          </template>
+        </item-details>
       </div>
     </div>
   </div>
