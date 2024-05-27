@@ -1,4 +1,5 @@
 <script setup>
+import CustomFooter from "#/config/current/Footer.vue"
 </script>
 
 <template>
@@ -6,5 +7,5 @@
     alt="Logo"
     class="logo"
     src="@/assets/logo.svg">
-  Footer
+  <CustomFooter />
 </template>

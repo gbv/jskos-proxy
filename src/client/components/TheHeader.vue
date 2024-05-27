@@ -21,6 +21,8 @@ watch(() => route.query.search, (value) => {
     search.value = value
   }
 }, { immediate: true })
+
+import CustomHeader from "#/config/current/Header.vue"
 </script>
 
 <template>
@@ -58,4 +60,5 @@ watch(() => route.query.search, (value) => {
         type="text">
     </div>
   </nav>
+  <CustomHeader />
 </template>

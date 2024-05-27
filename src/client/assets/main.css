@@ -46,8 +46,11 @@ header .logo {
   min-width: 200px;
   max-width: 365px;
 }
+footer {
+  display: flex;
+}
 footer .logo {
-  width: 20%;
+  flex: 0 1 20%;
   min-width: 150px;
   max-height: 50px;
 }
