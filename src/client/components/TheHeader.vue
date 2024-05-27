@@ -50,7 +50,7 @@ watch(() => route.query.search, (value) => {
       </template>
       <br><br>
       <RouterLink :to="`${config.namespace.pathname}about`">
-        About
+        {{ $t("about") }}
       </RouterLink>
       <br>
       <input 

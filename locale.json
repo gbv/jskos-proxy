@@ -1,4 +1,20 @@
 {
-  "de": {},
-  "en": {}
+  "de": {
+    "about": "Über",
+    "aboutTitle": "Über diesen Dienst",
+    "quickSelection": "Schnellzugriff",
+    "publisher": "Herausgeber",
+    "vocabularyType": "Vokabulartyp",
+    "vocSearch": "Suche nach",
+    "conceptSearch": "Suche nach Konzept"
+  },
+  "en": {
+    "about": "About",
+    "aboutTitle": "About This Service",
+    "quickSelection": "Quick Selection",
+    "publisher": "Publisher",
+    "vocabularyType": "Vocabulary Type",
+    "vocSearch": "Searching for",
+    "conceptSearch": "Searching for concept"
+  }
 }

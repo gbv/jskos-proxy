@@ -82,19 +82,19 @@ watch(mode, () => {
     <!-- Default section -->
     <div class="section">
       <h2 v-if="mode === 'default'">
-        Schnellzugriff
+        {{ $t("quickSelection") }}
       </h2>
       <h2 v-else-if="mode === 'publisher'">
-        Publisher: {{ route.query.publisher }}
+        {{ $t("publisher") }}: {{ route.query.publisher }}
       </h2>
       <h2 v-else-if="mode === 'type'">
-        Vocabulartyp: {{ route.query.type }}
+        {{ $t("vocabularyType") }}: {{ route.query.type }}
       </h2>
       <h2 v-else-if="mode === 'search'">
-        Searching for "{{ route.query.search }}"
+        {{ $t("vocSearch") }} "{{ route.query.search }}"
       </h2>
       <h2 v-else-if="mode === 'conceptSearch'">
-        Concept Search: TODO
+        {{ $t("conceptSearch") }} "{{ route.query.conceptSearch }}" TODO
       </h2>
       <div 
         v-if="mode !== 'conceptSearch'"
@@ -112,7 +112,7 @@ watch(mode, () => {
     <div
       v-if="mode === 'default' && publisherSelection.length"
       class="section">
-      <h2>Herausgeber</h2>
+      <h2>{{ $t("publisher") }}</h2>
       <div class="selection">
         <RouterLink
           v-for="publisher in publisherSelection"
@@ -127,7 +127,7 @@ watch(mode, () => {
     <div
       v-if="mode === 'default' && typeSelection.length"
       class="section">
-      <h2>Vokabulartyp</h2>
+      <h2>{{ $t("vocabularyType") }}</h2>
       <div class="selection">
         <RouterLink
           v-for="t in typeSelection"
