@@ -119,7 +119,7 @@ const topConcepts = computed(() => {
           :item="concept || scheme"
           @select="concept = { uri: $event.item.uri }">
           <template #additionalTabs>
-            <tab title="Download">
+            <tab title="Linked Data">
               <div
                 v-for="format in ['jskos', 'turtle', 'rdfxml', 'ntriples']"
                 :key="format">
