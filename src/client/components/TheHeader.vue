@@ -2,6 +2,7 @@
 import { inject, ref, watch } from "vue"
 import { useRouter, useRoute } from "vue-router"
 import { utils } from "jskos-vue"
+import { state, setLocale } from "@/store.js"
 
 const config = inject("config")
 const router = useRouter()
@@ -36,10 +37,16 @@ watch(() => route.query.search, (value) => {
     <div style="text-align: right;">
       <a
         href=""
-        @click.stop.prevent="">DE</a> |
+        :style="{
+          fontWeight: state.locale === 'de' ? 'bold' : 'normal',
+        }"
+        @click.stop.prevent="setLocale('de')">DE</a> |
       <a
         href=""
-        @click.stop.prevent="">EN</a>
+        :style="{
+          fontWeight: state.locale === 'en' ? 'bold' : 'normal',
+        }"
+        @click.stop.prevent="setLocale('en')">EN</a>
       <br><br>
       <RouterLink :to="`${config.namespace.pathname}about`">
         About

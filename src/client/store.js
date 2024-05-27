@@ -1,11 +1,33 @@
 import { computed, reactive } from "vue"
 import config from "@/config.js"
 import * as jskos from "jskos-tools"
+import i18n from "@/i18n.js"
 
 export const state = reactive({
   schemes: null,
   concepts: {},
+  languages: ["en", "de"],
+  locale: computed(() => state.languages[0]),
 })
+
+export function setLocale(value) {
+  if (i18n.global.locale === value) {
+    return
+  }
+  const index = state.languages.findIndex(l => l === value)
+  if (index === -1) {
+    console.error("Error setting locale to", value)
+    return
+  }
+  i18n.global.locale = value
+  // Adjust state.languages inline so that jskos-tools "reacts"
+  state.languages.splice(0, 0, state.languages.splice(index, 1)[0])
+  try {
+    localStorage.setItem("locale", value)
+  } catch (error) {
+    console.error("Error storing locale in local storage", error)
+  }
+}
 
 export const schemeFetchPromise = fetch(config.namespace.pathname, { headers: { Accept: "application/json" } }).then(res => res.json()).then(data => {
   state.schemes = data

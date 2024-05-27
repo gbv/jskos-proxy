@@ -1,7 +1,9 @@
 import { fileURLToPath, URL } from "node:url"
+import { resolve, dirname } from "node:path"
 
 import { defineConfig } from "vite"
 import vue from "@vitejs/plugin-vue"
+import VueI18nPlugin from "@intlify/unplugin-vue-i18n/vite"
 
 import config from "./config/config.js"
 
@@ -9,6 +11,10 @@ import config from "./config/config.js"
 export default defineConfig({
   plugins: [
     vue(),
+    // See https://vue-i18n.intlify.dev/guide/advanced/optimization.html
+    VueI18nPlugin({
+      include: resolve(dirname(fileURLToPath(import.meta.url)), "./locale.json"),
+    }),
   ],
   resolve: {
     alias: {

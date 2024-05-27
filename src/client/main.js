@@ -25,10 +25,17 @@ for (const name of ["TheHeader", "TheFooter"]) {
   }))
 }
 
-// TODO: Add i18n for localization
+import { state, setLocale } from "@/store.js"
+
+import i18n from "@/i18n.js"
+app.use(i18n)
+setLocale(i18n.global.locale.value)
+
 import jskos from "jskos-tools"
 app.config.globalProperties.jskos = jskos
-jskos.languagePreference.defaults = ["de"]
+jskos.languagePreference.store = state
+jskos.languagePreference.path = "languages"
+jskos.languagePreference.defaults = i18n.global.availableLocales
 
 // jskos-vue
 import "jskos-vue/dist/style.css"
