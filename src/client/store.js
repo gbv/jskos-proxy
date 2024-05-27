@@ -141,7 +141,7 @@ export async function loadTop(scheme) {
     concept.ancestors = []
   })
   // TODO: Maybe use saveConcepts here (because they might have additional data)
-  scheme.topConcepts = jskos.sortConcepts(saveConceptsWithOptions({ returnIfExists: true })(topConcepts))
+  scheme.topConcepts = jskos.sortConcepts(saveConceptsWithOptions()(topConcepts))
   // Set broader to empty for top concepts
   scheme.topConcepts.forEach(top => {
     top.broader = []
@@ -156,7 +156,7 @@ export async function loadNarrower(concept) {
   }
   console.time(`loadNarrower ${concept.uri}`)
   const narrower = await concept._getNarrower()
-  concept.narrower = jskos.sortConcepts(saveConceptsWithOptions({ returnIfExists: true })(narrower))
+  concept.narrower = jskos.sortConcepts(saveConceptsWithOptions()(narrower))
   // Set ancestors of narrower concepts
   if (concept.ancestors && !concept.ancestors?.includes(null)) {
     concept.narrower.forEach(narrow => {
@@ -182,7 +182,7 @@ export async function loadAncestors(concept) {
   for (let i = 0; i < ancestors.length; i += 1) {
     ancestors[i].ancestors = ancestors.slice(i + 1)
   }
-  concept.ancestors = saveConceptsWithOptions({ returnIfExists: true })(ancestors)
+  concept.ancestors = saveConceptsWithOptions()(ancestors)
   // Set broader if necessary
   if (!concept.broader || concept.broader?.includes(null)) {
     concept.broader = [concept.ancestors[0]]
