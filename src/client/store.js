@@ -27,7 +27,7 @@ export function setLocale(value) {
     console.error("Error setting locale to", value)
     return
   }
-  i18n.global.locale = value
+  i18n.global.locale.value = value
   // Adjust state.languages inline so that jskos-tools "reacts"
   state.languages.splice(0, 0, state.languages.splice(index, 1)[0])
   try {
