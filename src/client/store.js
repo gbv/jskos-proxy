@@ -142,6 +142,10 @@ export async function loadTop(scheme) {
   })
   // TODO: Maybe use saveConcepts here (because they might have additional data)
   scheme.topConcepts = jskos.sortConcepts(saveConceptsWithOptions({ returnIfExists: true })(topConcepts))
+  // Set broader to empty for top concepts
+  scheme.topConcepts.forEach(top => {
+    top.broader = []
+  })
   console.timeEnd(`loadTop ${scheme.uri}`)
   return scheme.topConcepts
 }
