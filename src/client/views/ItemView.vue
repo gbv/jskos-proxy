@@ -128,6 +128,12 @@ const topConcepts = computed(() => {
                 </a>
               </div>
             </tab>
+            <tab 
+              v-if="config.env === 'development'"
+              title="JSKOS">
+              <pre><code>{{ JSON.stringify(jskos.deepCopy(concept || scheme, ["topConceptOf", "inScheme", "topConcepts"]), null, 2) }}
+              </code></pre>
+            </tab>
           </template>
         </item-details>
       </div>
