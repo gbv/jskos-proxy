@@ -31,7 +31,7 @@ export function setLocale(value) {
   // Adjust state.languages inline so that jskos-tools "reacts"
   state.languages.splice(0, 0, state.languages.splice(index, 1)[0])
   try {
-    localStorage.setItem("locale", value)
+    localStorage.setItem(config.localStorageKeys.locale, value)
   } catch (error) {
     console.error("Error storing locale in local storage", error)
   }

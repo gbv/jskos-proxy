@@ -1,11 +1,12 @@
 import { createI18n } from "vue-i18n"
 import messages from "#/locale.json"
+import config from "@/config.js"
 
 let locale
 
 // Try to ready locale from local storage
 try {
-  locale = localStorage.getItem("locale")
+  locale = localStorage.getItem(config.localStorageKeys.locale)
 } catch (error) {
   console.warn("Error reading locale from local storage.")
 }
