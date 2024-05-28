@@ -1,10 +1,10 @@
 <script setup>
-import { inject, ref, watch } from "vue"
+import { ref, watch } from "vue"
 import { useRouter, useRoute } from "vue-router"
 import { utils } from "jskos-vue"
 import { locale } from "@/store.js"
 
-const config = inject("config")
+import { routerBasePath } from "@/utils.js"
 const router = useRouter()
 const route = useRoute()
 
@@ -12,7 +12,7 @@ const route = useRoute()
 const search = ref(null)
 watch(search, utils.debounce((value) => {
   if (value != null) {
-    router.push(`${config.namespace.pathname}${value === "" ? "" : "?search="}${encodeURIComponent(value)}`)
+    router.push(`${routerBasePath}${value === "" ? "" : "?search="}${encodeURIComponent(value)}`)
   }
 }, 150))
 
@@ -29,7 +29,7 @@ import CustomHeader from "#/config/_current/Header.vue"
   <nav>
     <RouterLink 
       style="flex: 1;"
-      :to="`${config.namespace.pathname}`">
+      :to="routerBasePath">
       <img
         alt="Logo"
         class="logo"
@@ -51,7 +51,7 @@ import CustomHeader from "#/config/_current/Header.vue"
           @click.stop.prevent="locale = locale_">{{ locale_.toUpperCase() }}</a>
       </template>
       <br><br>
-      <RouterLink :to="`${config.namespace.pathname}about`">
+      <RouterLink :to="`${routerBasePath}about`">
         {{ $t("about") }}
       </RouterLink>
       <br>

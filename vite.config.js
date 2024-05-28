@@ -25,4 +25,5 @@ export default defineConfig({
   define: {
     __CONFIG__: config,
   },
+  base: config.base,
 })

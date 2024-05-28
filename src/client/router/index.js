@@ -2,21 +2,22 @@ import { createRouter, createWebHistory } from "vue-router"
 import HomeView from "../views/HomeView.vue"
 
 import config from "@/config.js"
+import { routerBasePath } from "@/utils.js"
 
 const routes = [
   {
-    path: config.namespace.pathname,
+    path: routerBasePath,
     name: "home",
     component: HomeView,
   },
   {
-    path: `${config.namespace.pathname}about`,
+    path: `${routerBasePath}about`,
     name: "about",
     component: () => import("../views/AboutView.vue"),
   },
 ]
 
-if (config.namespace.pathname !== "/") {
+if (routerBasePath !== "/") {
   routes.push({
     path: "/",
     name: "root",
@@ -26,7 +27,7 @@ if (config.namespace.pathname !== "/") {
 
 if (config.listing) {
   routes.push({
-    path: `${config.namespace.pathname}:voc/:id?`,
+    path: `${routerBasePath}:voc/:id?`,
     name: "item",
     component: () => import("../views/ItemView.vue"),
   })

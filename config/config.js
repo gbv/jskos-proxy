@@ -45,6 +45,7 @@ const config = {
   env: NODE_ENV,
   configDir,
   isProduction: NODE_ENV === "production",
+  base: env.BASE || "/",
   namespace: new URL(env.NAMESPACE || "http://example.org/"),
   port: env.PORT || 3555,
   backend: env.BACKEND || "test/items.ndjson",

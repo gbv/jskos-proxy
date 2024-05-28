@@ -36,6 +36,8 @@ Instances of jskos-proxy are configured with environment variables, in local fil
 
 - `PORT` - which port to run the service on (default: `3555`)
 - `NAMESPACE` - URI namespace of all objects served via this proxy. Must end with a slash (default: `http://example.org/`)
+- `BASE` - Path under which the application will be hosted on. Must end with a slash. (Default: `/`)
+  - If `NAMESPACE` is `http://example.org/some-path/`, but `http://example.org/` itself is not served by jskos-proxy, you need to set `BASE` to `/some-path/`.
 - `BACKEND` - JSKOS API base URL
 - `TITLE` - Title of the service (default `JSKOS Proxy`)
 <!-- - `LOGO` - optional logo image file, must be placed in `public` directory -->

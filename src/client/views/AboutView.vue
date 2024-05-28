@@ -1,6 +1,7 @@
 <script setup>
 import config from "@/config.js"
 import { locale } from "@/store.js"
+import { routerBasePath } from "@/utils.js"
 </script>
 
 <template>
@@ -11,7 +12,7 @@ import { locale } from "@/store.js"
     <h1>{{ $t("aboutTitle") }}</h1>
     <template v-if="locale === 'de'">
       <p>
-        Unter <a :href="config.namespace.pathname">{{ config.namespace }}</a>
+        Unter <a :href="routerBasePath">{{ config.namespace }}</a>
         können <b>kontrollierte Vokabulare</b> (Normdateien, Klassifikationen, Thesauri...)
         in einer Webansicht und als Linked Open Data abgerufen werden.
       </p>
@@ -23,7 +24,7 @@ import { locale } from "@/store.js"
     <template v-else>
       <!-- TODO -->
       <p>
-        <a :href="config.namespace.pathname">{{ config.namespace }}</a>
+        <a :href="routerBasePath">{{ config.namespace }}</a>
         allows <b>controlled vocabularies</b> (norm data, classifications, thesauri...)
         to be browsed in a web view and accessed as Linked Open Data.
       </p>

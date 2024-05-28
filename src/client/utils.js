@@ -1,17 +1,19 @@
 import config from "@/config.js"
 
+export const routerBasePath = "/" + config.namespace.pathname.replace(import.meta.env.BASE_URL, "")
+
 export function getRouterUrl({ scheme, concept }) {
   if (concept?.uri.startsWith(config.namespace)) {
-    return `${config.namespace.pathname}${concept.uri.replace(config.namespace, "")}`
+    return `${routerBasePath}${concept.uri.replace(config.namespace, "")}`
   }
   if (!scheme?.uri) {
-    return config.namespace.pathname
+    return routerBasePath
   }
   let url
   if (scheme.uri.startsWith(config.namespace)) {
-    url = `${config.namespace.pathname}${scheme.uri.replace(config.namespace, "")}`
+    url = `${routerBasePath}${scheme.uri.replace(config.namespace, "")}`
   } else {
-    url = `${config.namespace.pathname}${encodeURIComponent(scheme.uri)}/`
+    url = `${routerBasePath}${encodeURIComponent(scheme.uri)}/`
   }
 
   if (!concept?.uri) {
