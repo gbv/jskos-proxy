@@ -17,5 +17,6 @@ jobs:
       with:
         node-version: ${{ matrix.node-version }}
     - run: npm ci
+    - run: echo "CONFIG=uri.gbv.de > .env"
     - run: npm run build
     # - run: npm test
