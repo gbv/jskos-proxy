@@ -30,7 +30,7 @@ services:
 
 2. Build frontend:
 
-Only necessary if `CONFIG` is not `uri.gbv.de`.
+This is necessary if anything is configured differently from the default (in particular `CONFIG` and `BASE`). We will try to improve this so that this will be done automatically in the background.
 
 ```bash
 docker compose exec -it jskos-proxy npm run build
