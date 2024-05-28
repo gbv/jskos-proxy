@@ -9,6 +9,9 @@ RUN npm ci
 # Bundle app source
 COPY . .
 
+# Build uri.gbv.de by default
+ENV CONFIG=uri.gbv.de
+
 # Build Vue frontend
 RUN npm run build
 
