@@ -42,13 +42,13 @@ const filteredSchemes = computed(() => {
             // 1) notation, identifiers
             [].concat(scheme.notation, [scheme.uri], scheme.identifier || []),
             // 2) preferred label
-            Object.values(scheme.prefLabel),
+            Object.values(scheme.prefLabel || {}),
             // 3) definitions
-            Object.values(scheme.definition).reduce((prev, cur) => ([...prev, ...cur]), []),
+            Object.values(scheme.definition || {}).reduce((prev, cur) => ([...prev, ...cur]), []),
           ]) {
-            if (array.map(e => e.toUpperCase()).find(e => e.startsWith(route.query.search.toUpperCase()))) {
+            if (array.map(e => e?.toUpperCase() || "").find(e => e.startsWith(route.query.search.toUpperCase()))) {
               score += current
-            } else if (array.map(e => e.toUpperCase()).find(e => e.includes(route.query.search.toUpperCase()))) {
+            } else if (array.map(e => e?.toUpperCase() || "").find(e => e.includes(route.query.search.toUpperCase()))) {
               score += current / 2
             }
             if (current > 2) {
