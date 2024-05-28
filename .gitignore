@@ -31,3 +31,4 @@ dist
 config/*
 !config/config.js
 !config/uri.gbv.de
+!config/rvk
