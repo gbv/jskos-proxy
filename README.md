@@ -1,37 +1,105 @@
-# jskos-proxy-vue-router-express
+# jskos-proxy
 
-TODO
+<!-- [![Test](https://github.com/gbv/jskos-proxy/actions/workflows/test.yml/badge.svg)](https://github.com/gbv/jskos-proxy/actions/workflows/test.yml) -->
+[![License](https://img.shields.io/github/license/gbv/jskos-proxy.svg)](https://github.com/gbv/jskos-proxy/blob/master/LICENSE)
+[![standard-readme compliant](https://img.shields.io/badge/readme%20style-standard-brightgreen.svg)](https://github.com/RichardLitt/standard-readme)
 
-This template should help get you started developing with Vue 3 in Vite.
+> Serve [JSKOS] objects in multiple formats over HTTP, in particular HTML and RDF
 
-## Recommended IDE Setup
+This web service can be put in front of [JSKOS] data sources to provide RDF serializations and browseable HTML display of controlled vocabularies at a common base URL.
 
-[VSCode](https://code.visualstudio.com/) + [Volar](https://marketplace.visualstudio.com/items?itemName=Vue.volar) (and disable Vetur).
+[JSKOS]: https://gbv.github.io/jskos/jskos.html
 
-## Customize configuration
+## Table of Contents
 
-See [Vite Configuration Reference](https://vitejs.dev/config/).
+- [Install](#install)
+  - [Configuration](#configuration)
+  - [Running](#running)
+- [Usage](#usage)
+- [Related works](#related-works)
+- [Maintainers](#maintainers)
+- [License](#license)
 
-## Project Setup
+## Install
 
-```sh
-npm install
+Clone from git repository.
+
+```bash
+git clone https://github.com/gbv/jskos-proxy.git
+cd jskos-proxy
+npm ci
 ```
 
-### Compile and Hot-Reload for Development
+### Configuration
 
-```sh
+Instances of jskos-proxy are configured with environment variables, in local file `.env`, and files in an optional configuration directory. The following keys are supported:
+
+- `PORT` - which port to run the service on (default: `3555`)
+- `NAMESPACE` - URI namespace of all objects served via this proxy. Must end with a slash (default: `http://example.org/`)
+- `BACKEND` - JSKOS API base URL
+- `TITLE` - Title of the service (default `JSKOS Proxy`)
+<!-- - `LOGO` - optional logo image file, must be placed in `public` directory -->
+
+A **configuration directory** under `config/` can be provided with environment variable `CONFIG`. It **must** contain:
+
+- file `config.env` with configuration keys documented above
+- CSS file `style.css` (can be empty)
+- a Header Vue.js component in `Header.vue` (if not necessary, please provide an empty `<template />` tag); the content will be shown *below* the header
+- a Footer Vue.js component in `Footer.vue` (if not necessary, please provide an empty `<template />` tag); the content will be shown *next to* the logo in the footer (the footer is set to `display: flex;`)
+
+The `config/` directory already contains some examples for some known terminology services. To try out one of these examples, set nothing but `CONFIG`, e.g. `CONFIG=rvk`.
+
+### Running
+
+For development:
+
+```bash
 npm run dev
 ```
 
-### Compile and Minify for Production
+Most changes should cause either the back-end or the front-end to reload automatically if necessary, but sometimes it might be required to stop and restart the dev server for changes to apply.
 
-```sh
+For production (less verbose logging, no reload), first build the Vue front-end and then start the server:
+
+```bash
 npm run build
+npm run start
 ```
 
-### Lint with [ESLint](https://eslint.org/)
+The application should be put behind a reverse HTTP proxy to serve URLs starting with configured `NAMESPACE`, e.g.
 
-```sh
-npm run lint
-```
+    # Apache
+    ProxyPass /terminology/ http://localhost:3555/terminology/
+    ProxyPassReverse /terminology/ http://localhost:3555/terminology/
+
+    # Nginx
+    location /terminology/ {
+        proxy_pass http://localhost:3555/terminology/;
+    }
+
+See file `ecosystem.example.json` for deployment with [PM2](https://pm2.keymetrics.io/).
+
+## Usage
+
+The proxy translates HTTP requests to an URI query. The URI is determined from query path and configured `NAMESPACE` or given with optional query parameter `uri`.
+
+The URI is then looked up in the backend, and returned in a requested RDF serialization format or in HTML. The format is determined based on query parameter `format` (if given) or HTTP Accept header (otherwise). The following formats are supported:
+
+- HTML with embedded JSON-LD (default)
+- JSON-LD (format `json`, `jskos` or `jsonld`)
+- NTriples (format `nt` or `ntriples`)
+- Turtle (format `ttl` or `turtle`)
+- RDF/XML (format `rdfxml` or `xml`)
+
+## Related works
+
+See <https://bartoc.org/software> for a collection of software for knowledge organization systems (aka controlled vocabularies). Browsing interfaces similar to jskos-proxy are provided by [Skohub](https://github.com/skohub-io/skohub-vocabs) and [Skosmos](http://skosmos.org/), among other solutions.
+
+## Maintainers
+
+- [@nichtich](https://github.com/nichtich)
+- [@stefandesu](https://github.com/stefandesu)
+
+## License
+
+MIT © 2024- Verbundzentrale des GBV (VZG)
