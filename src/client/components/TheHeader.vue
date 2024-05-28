@@ -22,7 +22,7 @@ watch(() => route.query.search, (value) => {
   }
 }, { immediate: true })
 
-import CustomHeader from "#/config/current/Header.vue"
+import CustomHeader from "#/config/_current/Header.vue"
 </script>
 
 <template>

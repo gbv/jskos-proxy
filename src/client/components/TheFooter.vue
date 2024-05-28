@@ -1,5 +1,5 @@
 <script setup>
-import CustomFooter from "#/config/current/Footer.vue"
+import CustomFooter from "#/config/_current/Footer.vue"
 </script>
 
 <template>

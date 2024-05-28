@@ -3,7 +3,7 @@ import "./assets/main.css"
 import config from "@/config.js"
 
 // Import custom style
-import "#/config/current/style.css"
+import "#/config/_current/style.css"
 
 import { createApp, defineAsyncComponent } from "vue"
 import App from "./App.vue"
