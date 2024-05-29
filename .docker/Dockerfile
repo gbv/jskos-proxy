@@ -23,6 +23,6 @@ ENV NODE_ENV=production
 COPY .docker/*.sh .
 
 # Build Vue frontend for default configuration
-RUN build.sh
+RUN bash ./build.sh
 
 CMD ["bash", "entrypoint.sh"]
