@@ -88,7 +88,7 @@ watch(mode, () => {
         {{ $t("publisher") }}: {{ route.query.publisher }}
       </h2>
       <h2 v-else-if="mode === 'type'">
-        {{ $t("vocabularyType") }}: {{ route.query.type }}
+        {{ $t("vocabularyType") }}: {{ jskos.prefLabel(typeSelection.find(t => t.uri === route.query.type) || route.query.type) }}
       </h2>
       <h2 v-else-if="mode === 'search'">
         {{ $t("vocSearch") }} "{{ route.query.search }}"
