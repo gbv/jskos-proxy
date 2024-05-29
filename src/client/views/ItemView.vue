@@ -30,11 +30,12 @@ const concept = computed({
 })
 const conceptLoading = ref(false)
 const hierarchyLoading = ref(false)
+let topLoadingPromise = null
 
 // Load top concepts when scheme is ready
-watch(scheme, () => {
+watch(scheme, async () => {
   if (scheme.value && (!scheme.value?.topConcepts || scheme.value?.topConcepts?.includes(null))) {
-    loadTop(scheme.value)
+    topLoadingPromise = loadTop(scheme.value)
   }
 },{ immediate: true })
 
@@ -59,6 +60,7 @@ watch(uri, async (value, prevValue) => {
     }
     conceptLoading.value = false
     // Load concept ancestors/hierarchy
+    topLoadingPromise && await topLoadingPromise
     await Promise.all([loadAncestors(loadedConcept), loadNarrower(loadedConcept)])
     // Abort if concept has changed in the meantime
     if (value !== uri.value) {
@@ -70,7 +72,7 @@ watch(uri, async (value, prevValue) => {
     }
     // Scroll to concept in hierarchy
     setTimeout(() => {
-      conceptTreeRef.value.scrollToUri(value, true)
+      conceptTreeRef.value?.scrollToUri(value, true)
       hierarchyLoading.value = false
     }, 50)
   }
