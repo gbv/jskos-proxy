@@ -1,8 +1,8 @@
 <script setup>
 import { useRoute } from "vue-router"
 import * as jskos from "jskos-tools"
-import { schemes, quickSelection, publisherSelection, typeSelection } from "@/store.js"
-import { computed, watch } from "vue"
+import { schemes, quickSelection, publisherSelection, typeSelection, registry } from "@/store.js"
+import { ref, computed, watch } from "vue"
 import { getRouterUrl } from "@/utils.js"
 
 const route = useRoute()
@@ -22,6 +22,34 @@ const mode = computed(() => {
   }
   return "default"
 })
+
+const conceptSearchResults = ref([])
+watch(() => route.query?.conceptSearch, async (value) => {
+  if (!value) {
+    conceptSearchResults.value = []
+    return
+  }
+  console.time(`concept search ${value}`)
+  conceptSearchResults.value = [null]
+  const results = await registry.search({ search: value })
+  console.timeEnd(`concept search ${value}`)
+  if (value === route.query?.conceptSearch) {
+    const groupedResults = []
+    for (const result of results) {
+      const scheme = result.inScheme[0]
+      const existingGroup = groupedResults.find(g => jskos.compare(g.scheme, scheme))
+      if (existingGroup) {
+        existingGroup.results.push(result)
+      } else {
+        groupedResults.push({
+          scheme,
+          results: [result],
+        })
+      }
+    }
+    conceptSearchResults.value = groupedResults
+  }
+}, { immediate: true })
 
 const filteredSchemes = computed(() => {
   if (!schemes.value) {
@@ -106,6 +134,24 @@ watch(mode, () => {
           :to="getRouterUrl({ scheme })">
           {{ jskos.prefLabel(scheme) }}
         </RouterLink>
+      </div>
+      <div 
+        v-else-if="!conceptSearchResults.includes(null)"
+        style="max-width: 1200px; margin: 0 auto;">
+        <div
+          v-for="{ scheme, results } in conceptSearchResults"
+          :key="scheme.uri"
+          style="margin-top: 40px; margin-bottom: 30px;">
+          <h3><item-name :item="scheme" /></h3>
+          <div style="display: flex; flex-wrap: wrap; gap: 10px 20px;">
+            <RouterLink
+              v-for="concept in results"
+              :key="concept.uri"
+              :to="getRouterUrl({ scheme, concept })">
+              <item-name :item="concept" />
+            </RouterLink>
+          </div>
+        </div>
       </div>
     </div>
     <!-- Publisher selection section -->
