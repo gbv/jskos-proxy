@@ -6,6 +6,12 @@ on:
       - dev
     tags:
       - v*
+    paths-ignore:
+      - '**.md'
+      - '.github/**'
+      - jsconfig.json
+      - .gitignore
+      - '.eslint**'
 
 # Adapted from:
 # - https://github.com/docker/metadata-action#semver
