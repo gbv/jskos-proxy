@@ -20,9 +20,9 @@ ENV CONFIG=uri.gbv.de
 ENV NODE_ENV=production
 
 ## Make Docker-related scripts available in root folder
-COPY docker/*.sh .
+COPY .docker/*.sh .
 
 # Build Vue frontend for default configuration
-RUN .docker/build.sh
+RUN build.sh
 
 CMD ["bash", "entrypoint.sh"]
