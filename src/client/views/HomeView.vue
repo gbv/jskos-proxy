@@ -124,6 +124,13 @@ watch(mode, () => {
       <h2 v-else-if="mode === 'conceptSearch'">
         {{ $t("conceptSearch") }} "{{ route.query.conceptSearch }}" TODO
       </h2>
+      <p 
+        v-if="mode === 'search'"
+        style="text-align: center;">
+        <RouterLink :to="`?conceptSearch=${route.query.search}`">
+          search for concepts instead
+        </RouterLink>
+      </p>
       <div 
         v-if="mode !== 'conceptSearch'"
         class="selection">
@@ -152,6 +159,11 @@ watch(mode, () => {
             </RouterLink>
           </div>
         </div>
+      </div>
+      <div
+        v-else
+        class="selection">
+        <loading-indicator size="xl" />
       </div>
     </div>
     <!-- Publisher selection section -->
