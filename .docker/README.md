@@ -28,15 +28,7 @@ services:
     restart: unless-stopped
 ```
 
-2. Build frontend:
-
-This is necessary if anything is configured differently from the default (in particular `CONFIG` and `BASE`). We will try to improve this so that this will be done automatically in the background.
-
-```bash
-docker compose exec -it jskos-proxy npm run build
-```
-
-3. Start the application:
+2. Start the application:
 
 ```bash
 docker compose up -d
