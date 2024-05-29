@@ -2,6 +2,8 @@ FROM node:20-alpine
 
 WORKDIR /usr/src/app
 
+RUN apk add --no-cache bash
+
 # Copy and install dependencies
 COPY package*.json ./
 RUN npm ci
@@ -9,15 +11,18 @@ RUN npm ci
 # Bundle app source
 COPY . .
 
-# Build uri.gbv.de by default
-ENV CONFIG=uri.gbv.de
-
-# Build Vue frontend
-RUN npm run build
-
 # Use pm2 to run app
 RUN npm i -g pm2
 
+# Build uri.gbv.de by default
+ENV CONFIG=uri.gbv.de
+
 ENV NODE_ENV=production
 
-CMD pm2-runtime src/server/server.js
+## Make Docker-related scripts available in root folder
+COPY docker/*.sh .
+
+# Build Vue frontend for default configuration
+RUN .docker/build.sh
+
+CMD ["bash", "entrypoint.sh"]
