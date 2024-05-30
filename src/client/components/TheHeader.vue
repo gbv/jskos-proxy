@@ -26,39 +26,38 @@ import CustomHeader from "#/config/_current/Header.vue"
 </script>
 
 <template>
-  <nav>
-    <RouterLink 
-      style="flex: 1;"
-      :to="routerBasePath">
-      <img
-        alt="Logo"
-        class="logo"
-        src="@/assets/logo.svg">
-    </RouterLink>
+  <RouterLink 
+    id="header_logo"
+    style="flex: 1;"
+    :to="routerBasePath">
+    <img
+      alt="Logo"
+      src="@/assets/logo.svg">
+  </RouterLink>
 
-    <div style="text-align: right;">
-      <template
-        v-for="(locale_, index) in $i18n.availableLocales"
-        :key="locale_">
-        <template v-if="index > 0">
-          |
-        </template>
-        <a
-          href=""
-          :style="{
-            fontWeight: locale === locale_ ? 'bold' : 'normal',
-          }"
-          @click.stop.prevent="locale = locale_">{{ locale_.toUpperCase() }}</a>
+  <div id="header_menu">
+    <RouterLink :to="`${routerBasePath}about`">
+      {{ $t("about") }}
+    </RouterLink> ·
+    <template
+      v-for="(locale_, index) in $i18n.availableLocales"
+      :key="locale_">
+      <template v-if="index > 0">
+        |
       </template>
-      <br><br>
-      <RouterLink :to="`${routerBasePath}about`">
-        {{ $t("about") }}
-      </RouterLink>
-      <br>
-      <input 
-        v-model="search"
-        type="text">
-    </div>
-  </nav>
+      <a
+        href=""
+        :style="{
+          fontWeight: locale === locale_ ? 'bold' : 'normal',
+        }"
+        @click.stop.prevent="locale = locale_">{{ locale_.toUpperCase() }}</a>
+    </template>
+  </div>
+  <div id="header_search">
+    <input 
+      v-model="search"
+      type="text">
+  </div>
+  <!-- TODO: How to position? (CSS) -->
   <CustomHeader />
 </template>

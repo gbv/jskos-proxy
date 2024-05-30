@@ -106,7 +106,7 @@ watch(mode, () => {
 </script>
 
 <template>
-  <template v-if="schemes">
+  <main v-if="schemes">
     <!-- Default section -->
     <div class="section">
       <h2 v-if="mode === 'default'">
@@ -196,10 +196,10 @@ watch(mode, () => {
         </RouterLink>
       </div>
     </div>
-  </template>
-  <div v-else>
+  </main>
+  <main v-else>
     <LoadingIndicator />
-  </div>
+  </main>
 </template>
 
 <style scoped>

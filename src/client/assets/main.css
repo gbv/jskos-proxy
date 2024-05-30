@@ -15,56 +15,103 @@
 }
 
 html, body, #app {
-  height: 100vh;
   margin: 0;
   color: var(--color-text);
   background-color: var(--color-section-background-primary);
 }
 
 #app {
-  display: flex;
-  flex-direction: column;
+  height: 100vh;
+  margin: 0;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-template-rows: repeat(4, auto) 1fr auto;
+  grid-template-areas: 
+    "header header"
+    "main main"
+    "main main"
+    "main main"
+    "main main"
+    "footer footer";
 }
-
-main {
-  flex: 1 1 auto;
-  width: 100%;
-}
+/* Stretch site to fill full height */
+/* @media only screen and (max-height: 99vh) {
+  #app {
+    grid-template-rows: auto repeat(4, 1fr) auto;
+  }
+} */
 
 header, footer {
   background-color: var(--color-background);
   color: var(--color-text-on-dark);
-  flex: 0 1 auto;
-}
-header > nav {
-  display: flex;
-  align-items: center;
 }
 
-header .logo {
-  width: 40%;
-  min-width: 200px;
-  max-width: 350px;
-}
 header {
-  height: 15vh;
+  grid-area: header;
+  height: 12vh;
+  min-height: 100px;
   max-height: 200px;
-  padding: 10px 5vw
+  padding: 2vh 5vw;
+  /* Subgrid */
+  display: grid;
+  grid-template-columns: 1fr auto;
+  grid-template-rows: 1fr auto;
+  grid-template-areas: 
+    "header_logo header_menu"
+    "header_logo header_search";
 }
-footer {
-  height: 10vh;
+@media only screen and (max-width: 550px) {
+  header {
+    grid-template-areas: 
+      "header_logo header_menu"
+      "header_search header_search";
+  }
+}
+#header_logo {
+  grid-area: header_logo;
+}
+#header_logo > img {
+  height: 100%;
   max-height: 120px;
-  padding: 5px 5vw;
+}
+#header_menu {
+  grid-area: header_menu;
+  justify-self: end;
+}
+#header_search {
+  grid-area: header_search;
+  justify-self: stretch;
+  padding-top: 5px
+}
+#header_search > input {
+  width: 100%;
+}
+
+footer {
+  grid-area: footer;
+  height: 8vh;
+  min-height: 65px;
+  max-height: 120px;
   font-size: small;
   line-height: 1.1;
+  padding: 1vh 5vw;
+  /* TODO: Change from flexbox? */
   display: flex;
   align-items: center;
 }
+/* TODO */
 footer .logo {
   flex: 0 1 20%;
   min-width: 100px;
   max-height: 50px;
   margin-right: 30px;
+}
+
+main {
+  /* This is kind of a hack. If grid-area is defined, the "main" part is overflowing over the footer. */
+  /* For some reason, this does not happen in ItemView. */
+  /* grid-area: 2 / 1 / 6 / 3; */
+  width: 100vw;
 }
 
 /* TODO */
@@ -91,7 +138,7 @@ header a:hover, footer a:hover {
 }
 
 h1, h2, h3, h4, h5, h6 {
-  color: var(--color-primary);
+  color: var(--color-text);
 }
 h1 {
   font-size: 32px;

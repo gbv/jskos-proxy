@@ -41,6 +41,7 @@ watch(scheme, async () => {
 
 watch(uri, async (value, prevValue) => {
   if (value && value !== prevValue) {
+    window.scrollTo(0, 0)
     // Debounce loading values so that we prevent "flashing" loading overlays
     conceptLoading.value = null
     hierarchyLoading.value = null
@@ -85,93 +86,109 @@ const topConcepts = computed(() => {
 </script>
 
 <template>
-  <div class="itemView">
-    <h2>
-      <router-link :to="getRouterUrl({ scheme })">
-        {{ jskos.prefLabel(scheme) }}
-      </router-link>
-    </h2>
-    <item-suggest
-      v-if="scheme"
-      class="conceptSuggest"
-      :search="utils.cdkRegistryToSuggestFunction(registry, { scheme })"
-      @select="concept = { uri: $event.uri }" />
-    <div class="itemView-split">
-      <div class="conceptHierarchy">
-        <concept-tree
-          v-if="topConcepts"
-          ref="conceptTreeRef"
-          v-model="concept"
-          :concepts="topConcepts"
-          @open="loadNarrower($event)" />
-        <div
-          v-if="!topConcepts || hierarchyLoading"
-          class="loading">
-          <loading-indicator size="xl" />
-        </div>
+  <h2 id="schemeHeader">
+    <router-link :to="getRouterUrl({ scheme })">
+      {{ jskos.prefLabel(scheme) }}
+    </router-link>
+  </h2>
+  <item-suggest
+    v-if="scheme"
+    id="searchInScheme"
+    :search="utils.cdkRegistryToSuggestFunction(registry, { scheme })"
+    @select="concept = { uri: $event.uri }" />
+  <!-- ConceptTree has to be on the top level in order for "scrollToUri" to work -->
+  <concept-tree
+    id="conceptHierarchy"
+    ref="conceptTreeRef"
+    v-model="concept"
+    :concepts="topConcepts || []"
+    @open="loadNarrower($event)">
+    <template #beforeList>
+      <div
+        v-if="!topConcepts || hierarchyLoading"
+        class="loading">
+        <loading-indicator size="xl" />
       </div>
-      <div class="conceptDetails">
-        <div
-          v-if="!scheme || conceptLoading"
-          class="loading">
-          <loading-indicator size="xl" />
-        </div>
-        <item-details 
-          v-else
-          :item="concept || scheme"
-          @select="concept = { uri: $event.item.uri }">
-          <template #additionalTabs>
-            <tab title="Linked Data">
-              <div
-                v-for="format in ['jskos', 'turtle', 'rdfxml', 'ntriples']"
-                :key="format">
-                <a :href="`?format=${format}`">
-                  {{ format }}
-                </a>
-              </div>
-            </tab>
-            <tab 
-              v-if="config.env === 'development'"
-              title="JSKOS">
-              <pre><code>{{ JSON.stringify(jskos.deepCopy(concept || scheme, ["topConceptOf", "inScheme", "topConcepts"]), null, 2) }}
-              </code></pre>
-            </tab>
-          </template>
-        </item-details>
-      </div>
+    </template>
+  </concept-tree>
+  <div 
+    id="conceptDetails">
+    <div
+      v-if="!scheme || conceptLoading"
+      class="loading">
+      <loading-indicator size="xl" />
     </div>
+    <item-details 
+      v-else
+      :item="concept || scheme"
+      @select="concept = { uri: $event.item.uri }">
+      <template #additionalTabs>
+        <tab title="Linked Data">
+          <div
+            v-for="format in ['jskos', 'turtle', 'rdfxml', 'ntriples']"
+            :key="format">
+            <a :href="`?format=${format}`">
+              {{ format }}
+            </a>
+          </div>
+        </tab>
+        <tab 
+          v-if="config.env === 'development'"
+          title="JSKOS">
+          <pre><code>{{ JSON.stringify(jskos.deepCopy(concept || scheme, ["topConceptOf", "inScheme", "topConcepts"]), null, 2) }}
+            </code></pre>
+        </tab>
+      </template>
+    </item-details>
   </div>
 </template>
 
 <style scoped>
-.itemView {
+#schemeHeader {
+  grid-area: 2 / 1 / 3 / 3;
+  margin-bottom: 5px;
   width: 100%;
-  max-width: 1400px;
-  margin: 0 auto;
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  padding: 10px;
+  max-width: 1200px;
+  place-self: center;
 }
-.conceptSuggest {
-  max-width: 50%;
-  margin-top: -10px;
-  margin-bottom: 15px;
-}
-.itemView-split {
-  flex: 1;
-  display: flex;
-  padding-bottom: 20px;
-}
-.itemView-split > * {
-  flex: 1;
-  padding: 10px;
-}
-.conceptHierarchy, .conceptDetails {
+#schemeHeader, #searchInScheme, #conceptHierarchy, #conceptDetails {
+  padding: 0 5vw;
   position: relative;
 }
-.conceptDetails {
-  padding-left: 25px;
+#searchInScheme {
+  grid-area: 3 / 1 / 4 / 3;
+  margin-bottom: 15px;
+}
+#conceptHierarchy {
+  grid-area: 5 / 1 / 6 / 3;
+  margin-bottom: 35px;
+}
+#conceptDetails {
+  grid-area: 4 / 1 / 5 / 3;
+  margin-bottom: 20px;
+}
+@media only screen and (min-width: 800px) {
+  #searchInScheme {
+    grid-area: 3 / 1 / 4 / 2;
+  }
+  #conceptHierarchy {
+    grid-area: 4 / 1 / 6 / 2;
+  }
+  #conceptDetails {
+    grid-area: 3 / 2 / 6 / 3;
+  }
+  #schemeHeader, #searchInScheme, #conceptHierarchy, #conceptDetails {
+    padding: 0 2vw;
+  }
+  #conceptHierarchy, #conceptDetails {
+    overflow-y: auto;
+    margin-bottom: 20px;
+  }
+  #searchInScheme, #conceptHierarchy {
+    max-width: 600px;
+    justify-self: end;
+    width: 100%;
+  }
 }
 .loading {
   position: absolute;
@@ -185,18 +202,5 @@ const topConcepts = computed(() => {
   display: flex;
   align-items: center;
   justify-content: center;
-}
-/* TODO: Fix this? */
-.jskos-vue-conceptTree, .jskos-vue-itemDetails {
-  position: absolute;
-  top: 0; bottom: 20px; left: 10px; right: 10px;
-  overflow-y: auto;
-}
-</style>
-
-<style>
-main {
-  display: flex;
-  flex-direction: column;
 }
 </style>
