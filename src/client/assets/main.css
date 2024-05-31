@@ -85,6 +85,7 @@ header {
 }
 #header_search > input {
   width: 100%;
+  padding: 4px 8px;
 }
 
 footer {
