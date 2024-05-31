@@ -8,6 +8,7 @@
     "dev": "nodemon --watch .env --watch 'src/server/*.js' --watch config/ src/server/server.js",
     "build": "vite build",
     "start": "NODE_ENV=production node src/server/server.js",
+    "test": "echo 'Tests not yet implemented' && npm run lint",
     "lint": "eslint . --ext .vue,.js,.jsx,.cjs,.mjs --ignore-path .gitignore",
     "fix": "npm run lint -- --fix",
     "release": "git checkout dev && git pull && npm test && npm version $SEMVER && git push && git checkout main && git merge dev && git push --follow-tags && git checkout dev",
