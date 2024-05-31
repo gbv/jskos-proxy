@@ -126,7 +126,7 @@ header a:hover, footer a:hover {
 
 /* TODO: Fix section backgrounds */
 .section {
-  padding: 80px 20px;
+  padding: min(calc(3vh + 2vw), 80px) max(8vw, 20px);
   background-color: var(--color-section-background-primary);
 }
 .section:nth-child(2n) {
