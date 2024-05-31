@@ -23,6 +23,8 @@ const mode = computed(() => {
   return "default"
 })
 
+const selectedPublisher = computed(() => route.query?.publisher ? publisherSelection.value.find(p => p.id === route.query?.publisher) : null)
+
 const conceptSearchResults = ref([])
 watch(() => route.query?.conceptSearch, async (value) => {
   if (!value) {
@@ -57,7 +59,7 @@ const filteredSchemes = computed(() => {
   }
   switch (mode.value) {
     case "publisher":
-      return schemes.value.filter(s => s.publisher?.find(p => p.uri === route.query.publisher || jskos.prefLabel(p) === route.query.publisher))
+      return selectedPublisher.value?.schemes || []
     case "type":
       return schemes.value.filter(s => s.type?.includes(route.query.type))
     case "search":
@@ -113,7 +115,7 @@ watch(mode, () => {
         {{ $t("quickSelection") }}
       </h2>
       <h2 v-else-if="mode === 'publisher'">
-        {{ $t("publisher") }}: {{ route.query.publisher }}
+        {{ $t("publisher") }}: {{ selectedPublisher?.name }}
       </h2>
       <h2 v-else-if="mode === 'type'">
         {{ $t("vocabularyType") }}: {{ jskos.prefLabel(typeSelection.find(t => t.uri === route.query.type) || route.query.type) }}
@@ -173,11 +175,11 @@ watch(mode, () => {
       <h2>{{ $t("publisher") }}</h2>
       <div class="selection">
         <RouterLink
-          v-for="publisher in publisherSelection"
-          :key="publisher"
+          v-for="{ id, name } in publisherSelection"
+          :key="id"
           class="category-selection"
-          :to="`?publisher=${encodeURIComponent(publisher)}`">
-          {{ publisher }}
+          :to="`?publisher=${encodeURIComponent(id)}`">
+          {{ name }}
         </RouterLink>
       </div>
     </div>

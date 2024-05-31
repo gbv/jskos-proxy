@@ -219,13 +219,34 @@ import nkostypeConcepts from "@/nkostype-concepts.json"
 export const quickSelection = computed(() => config.quickSelection.map(scheme => schemes.value?.find(s => jskos.compare(s, scheme))).filter(Boolean))
 
 export const publisherSelection = computed(() => {
-  const publishers = new Set()
+  let publishers = []
   schemes.value?.forEach(scheme => {
     scheme.publisher?.forEach(publisher => {
-      publishers.add(publisher.uri || jskos.prefLabel(publisher))
+      const id = publisher.uri || jskos.prefLabel(publisher)
+      const name = jskos.prefLabel(publisher) || publisher.uri
+      const entry = publishers.find(p => p.id === id)
+      if (entry) {
+        entry.schemes.push(scheme)
+      } else {
+        publishers.push({
+          id, name, schemes: [scheme],
+        })
+      }
     })
   })
-  return [...publishers].sort()
+  publishers.sort((a, b) => b.name > a.name)
+  // Put all publishers with only one scheme (+ schemes without publisher) into "others"
+  const otherLimit = 3
+  const otherSchemes = publishers.filter(p => p.schemes.length < otherLimit).reduce((p, c) => p.concat(c.schemes), []).concat(schemes.value?.filter(s => !s.publisher?.length) || [])
+  if (otherSchemes.length) {
+    publishers = publishers.filter(p => p.schemes.length >= otherLimit)
+    publishers.push({
+      id: "__others__",
+      name: i18n.global.t("publisherOthers"),
+      schemes: otherSchemes,
+    })
+  }
+  return publishers
 })
 
 export const typeSelection = computed(() => {

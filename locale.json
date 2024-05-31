@@ -4,6 +4,7 @@
     "aboutTitle": "Über diesen Dienst",
     "quickSelection": "Schnellzugriff",
     "publisher": "Herausgeber",
+    "publisherOthers": "Sonstige",
     "vocabularyType": "Vokabulartyp",
     "vocSearch": "Suche nach Vokabular",
     "conceptSearch": "Suche nach Konzept"
@@ -13,6 +14,7 @@
     "aboutTitle": "About This Service",
     "quickSelection": "Quick Selection",
     "publisher": "Publisher",
+    "publisherOthers": "Others",
     "vocabularyType": "Vocabulary Type",
     "vocSearch": "Searching for vocabulary",
     "conceptSearch": "Searching for concept"
