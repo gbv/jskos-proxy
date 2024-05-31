@@ -97,20 +97,20 @@ const topConcepts = computed(() => {
     :search="utils.cdkRegistryToSuggestFunction(registry, { scheme })"
     @select="concept = { uri: $event.uri }" />
   <!-- ConceptTree has to be on the top level in order for "scrollToUri" to work -->
-  <concept-tree
-    id="conceptHierarchy"
-    ref="conceptTreeRef"
-    v-model="concept"
-    :concepts="topConcepts || []"
-    @open="loadNarrower($event)">
-    <template #beforeList>
-      <div
-        v-if="!topConcepts || hierarchyLoading"
-        class="loading">
-        <loading-indicator size="xl" />
-      </div>
-    </template>
-  </concept-tree>
+  <div id="conceptHierarchy">
+    <concept-tree
+      v-if="topConcepts"
+      id="conceptTree"
+      ref="conceptTreeRef"
+      v-model="concept"
+      :concepts="topConcepts"
+      @open="loadNarrower($event)" />
+    <div
+      v-if="!topConcepts || hierarchyLoading"
+      class="loading">
+      <loading-indicator size="xl" />
+    </div>
+  </div>
   <div 
     id="conceptDetails">
     <div
@@ -147,12 +147,13 @@ const topConcepts = computed(() => {
 #schemeHeader {
   grid-area: 2 / 1 / 3 / 3;
   margin-bottom: 5px;
-  width: 100%;
+  width: calc(100% - 10vw);
   max-width: 1200px;
   place-self: center;
 }
 #schemeHeader, #searchInScheme, #conceptHierarchy, #conceptDetails {
-  padding: 0 5vw;
+  margin-left: 5vw;
+  margin-right: 5vw;
   position: relative;
 }
 #searchInScheme {
@@ -168,6 +169,9 @@ const topConcepts = computed(() => {
   margin-bottom: 20px;
 }
 @media only screen and (min-width: 800px) {
+  #schemeHeader {
+    width: calc(100% - 4vw);
+  }
   #searchInScheme {
     grid-area: 3 / 1 / 4 / 2;
   }
@@ -176,18 +180,27 @@ const topConcepts = computed(() => {
   }
   #conceptDetails {
     grid-area: 3 / 2 / 6 / 3;
+    overflow-y: auto;
   }
   #schemeHeader, #searchInScheme, #conceptHierarchy, #conceptDetails {
-    padding: 0 2vw;
+    margin-left: 2vw;
+    margin-right: 2vw;
   }
   #conceptHierarchy, #conceptDetails {
-    overflow-y: auto;
     margin-bottom: 20px;
   }
   #searchInScheme, #conceptHierarchy {
     max-width: 600px;
     justify-self: end;
-    width: 100%;
+    width: calc(100% - 4vw);
+  }
+  #conceptTree {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    overflow-y: auto;
   }
 }
 .loading {
