@@ -51,7 +51,7 @@ header {
   height: 12vh;
   min-height: 100px;
   max-height: 200px;
-  padding: 2vh 5vw;
+  padding: max(2vh, 17px) 5vw;
   /* Subgrid */
   display: grid;
   grid-template-columns: 1fr auto;
