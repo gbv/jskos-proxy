@@ -5,7 +5,7 @@
     "quickSelection": "Schnellzugriff",
     "publisher": "Herausgeber",
     "vocabularyType": "Vokabulartyp",
-    "vocSearch": "Suche nach",
+    "vocSearch": "Suche nach Vokabular",
     "conceptSearch": "Suche nach Konzept"
   },
   "en": {
@@ -14,7 +14,7 @@
     "quickSelection": "Quick Selection",
     "publisher": "Publisher",
     "vocabularyType": "Vocabulary Type",
-    "vocSearch": "Searching for",
+    "vocSearch": "Searching for vocabulary",
     "conceptSearch": "Searching for concept"
   }
 }

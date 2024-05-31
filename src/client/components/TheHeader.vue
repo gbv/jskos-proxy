@@ -56,6 +56,7 @@ import CustomHeader from "#/config/_current/Header.vue"
   <div id="header_search">
     <input 
       v-model="search"
+      :placeholder="$t('vocSearch')"
       type="text">
   </div>
   <!-- TODO: How to position? (CSS) -->

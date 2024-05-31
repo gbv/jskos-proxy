@@ -122,7 +122,7 @@ watch(mode, () => {
         {{ $t("vocSearch") }} "{{ route.query.search }}"
       </h2>
       <h2 v-else-if="mode === 'conceptSearch'">
-        {{ $t("conceptSearch") }} "{{ route.query.conceptSearch }}" TODO
+        {{ $t("conceptSearch") }} "{{ route.query.conceptSearch }}"
       </h2>
       <p 
         v-if="mode === 'search'"
