@@ -13,7 +13,9 @@ import { routerBasePath } from "@/utils.js"
       <h1>{{ $t("aboutTitle") }}</h1>
       <template v-if="locale === 'de'">
         <p>
-          Unter <a :href="routerBasePath">{{ config.namespace }}</a>
+          Unter <RouterLink :to="routerBasePath">
+            {{ config.namespace }}
+          </RouterLink>
           können <b>kontrollierte Vokabulare</b> (Normdateien, Klassifikationen, Thesauri...)
           in einer Webansicht und als Linked Open Data abgerufen werden.
         </p>
@@ -25,7 +27,9 @@ import { routerBasePath } from "@/utils.js"
       <template v-else>
         <!-- TODO -->
         <p>
-          <a :href="routerBasePath">{{ config.namespace }}</a>
+          <RouterLink :to="routerBasePath">
+            {{ config.namespace }}
+          </RouterLink>
           allows <b>controlled vocabularies</b> (norm data, classifications, thesauri...)
           to be browsed in a web view and accessed as Linked Open Data.
         </p>
