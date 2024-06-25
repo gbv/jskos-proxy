@@ -234,7 +234,7 @@ export const publisherSelection = computed(() => {
       }
     })
   })
-  publishers.sort((a, b) => b.name > a.name)
+  publishers.sort((a, b) => b.name < a.name)
   // Put all publishers with only one scheme (+ schemes without publisher) into "others"
   const otherLimit = 3
   const otherSchemes = publishers.filter(p => p.schemes.length < otherLimit).reduce((p, c) => p.concat(c.schemes), []).concat(schemes.value?.filter(s => !s.publisher?.length) || [])
