@@ -171,6 +171,8 @@ const topConcepts = computed(() => {
 @media only screen and (min-width: 800px) {
   #schemeHeader {
     width: calc(100% - 4vw);
+    /* Add margins of conceptHierarchy and conceptDetails to max-width */
+    max-width: calc(1200px + 4vw);
   }
   #searchInScheme {
     grid-area: 3 / 1 / 4 / 2;
@@ -189,10 +191,12 @@ const topConcepts = computed(() => {
   #conceptHierarchy, #conceptDetails {
     margin-bottom: 20px;
   }
-  #searchInScheme, #conceptHierarchy {
+  #searchInScheme, #conceptHierarchy, #conceptDetails {
     max-width: 600px;
-    justify-self: end;
     width: calc(100% - 4vw);
+  }
+  #searchInScheme, #conceptHierarchy {
+    justify-self: end;
   }
   #conceptTree {
     position: absolute;
