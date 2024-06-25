@@ -24,6 +24,29 @@ const mode = computed(() => {
   return "default"
 })
 
+const publisherGroups = computed(() => {
+  const groups = []
+  publisherSelection.value.filter(p => p.id !== "__others__").forEach(publisher => {
+    const group = groups.find(g => g.name === publisher.name[0])
+    if (!group) {
+      groups.push({
+        name: publisher.name[0],
+        publishers: [publisher],
+      })
+    } else {
+      group.publishers.push(publisher)
+    }
+  })
+  const otherPublisher = publisherSelection.value.find(p => p.id === "__others__")
+  if (otherPublisher) {
+    groups.push({
+      name: "",
+      publishers: [otherPublisher],
+    })
+  }
+  return groups
+})
+
 const selectedPublisher = computed(() => route.query?.publisher ? publisherSelection.value.find(p => p.id === route.query?.publisher) : null)
 
 const conceptSearchResults = ref([])
@@ -171,16 +194,25 @@ watch(mode, () => {
     </div>
     <!-- Publisher selection section -->
     <div
-      v-if="mode === 'default' && publisherSelection.length"
+      v-if="mode === 'default' && publisherGroups.length"
       class="section">
-      <h2>{{ $t("publisher") }}</h2>
-      <div class="selection">
-        <SchemeGroup
-          v-for="p in publisherSelection"
-          :key="p.id"
-          :name="p.name"
-          :count="p.schemes.length"
-          :to="`?publisher=${encodeURIComponent(p.id)}`" />
+      <h2>
+        {{ $t("publisher") }}
+      </h2>
+      <div 
+        v-for="pg in publisherGroups"
+        :key="pg.name || '_'">
+        <h3>
+          ⎯⎯⎯⎯⎯⎯ &nbsp;&nbsp;{{ pg.name }}&nbsp;&nbsp; ⎯⎯⎯⎯⎯⎯
+        </h3>
+        <div class="selection">
+          <SchemeGroup
+            v-for="p in pg.publishers"
+            :key="p.id"
+            :name="p.name"
+            :count="p.schemes.length"
+            :to="`?publisher=${encodeURIComponent(p.id)}`" />
+        </div>
       </div>
     </div>
     <!-- Type selection section -->
