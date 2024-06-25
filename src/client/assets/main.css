@@ -127,15 +127,19 @@ header a:hover, footer a:hover {
 
 /* TODO: Fix section backgrounds */
 .section {
-  padding: min(calc(3vh + 2vw), 80px) max(8vw, 20px);
+  padding: min(calc(4vh + 2vw), 90px) max(8vw, 20px);
   background-color: var(--color-section-background-primary);
 }
 .section:nth-child(2n) {
   background-color: var(--color-section-background-secondary);
 }
 
-.section > h1, .section > h2 {
+.section > h1, .section > h2, .section h3 {
   text-align: center;
+}
+.section > h2 {
+  margin-top: 0px;
+  margin-bottom: min(50px, 3vw); 
 }
 
 h1, h2, h3, h4, h5, h6 {
