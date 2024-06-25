@@ -4,6 +4,7 @@ import * as jskos from "jskos-tools"
 import { schemes, quickSelection, publisherSelection, typeSelection, registry } from "@/store.js"
 import { ref, computed, watch } from "vue"
 import { getRouterUrl } from "@/utils.js"
+import SchemeGroup from "@/components/SchemeGroup.vue"
 
 const route = useRoute()
 
@@ -174,13 +175,12 @@ watch(mode, () => {
       class="section">
       <h2>{{ $t("publisher") }}</h2>
       <div class="selection">
-        <RouterLink
-          v-for="{ id, name } in publisherSelection"
-          :key="id"
-          class="category-selection"
-          :to="`?publisher=${encodeURIComponent(id)}`">
-          {{ name }}
-        </RouterLink>
+        <SchemeGroup
+          v-for="p in publisherSelection"
+          :key="p.id"
+          :name="p.name"
+          :count="p.schemes.length"
+          :to="`?publisher=${encodeURIComponent(p.id)}`" />
       </div>
     </div>
     <!-- Type selection section -->
@@ -189,13 +189,12 @@ watch(mode, () => {
       class="section">
       <h2>{{ $t("vocabularyType") }}</h2>
       <div class="selection">
-        <RouterLink
+        <SchemeGroup
           v-for="t in typeSelection"
           :key="t"
-          class="category-selection"
-          :to="`?type=${encodeURIComponent(t.uri)}`">
-          {{ jskos.prefLabel(t) }}
-        </RouterLink>
+          :name="jskos.prefLabel(t)"
+          :count="t.schemes.length"
+          :to="`?type=${encodeURIComponent(t.uri)}`" />
       </div>
     </div>
   </main>

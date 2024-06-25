@@ -250,15 +250,31 @@ export const publisherSelection = computed(() => {
 })
 
 export const typeSelection = computed(() => {
-  const types = new Set()
+  const types = []
   schemes.value?.forEach(scheme => {
     scheme.type
       .filter(t => t !== "http://www.w3.org/2004/02/skos/core#ConceptScheme")
       .map(t => nkostypeConcepts.find(c => jskos.compare(c, { uri: t })))
       .filter(Boolean)
       .forEach(type => {
-        types.add(type)
+        const entry = types.find(t => t.uri === type.uri)
+        if (entry) {
+          entry.schemes.push(scheme)
+        } else {
+          types.push({
+            ...type,
+            schemes: [scheme],
+          })
+        }
       })
   })
-  return [...types]
+  return types.sort((a, b) => {
+    if (a.schemes.length > b.schemes.length) {
+      return -1
+    }
+    if (a.schemes.length < b.schemes.length) {
+      return 1
+    }
+    return 0
+  })
 })
