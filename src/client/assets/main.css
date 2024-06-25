@@ -186,6 +186,7 @@ a:hover {
   border-radius: 3px;
   transition: 
     background-color 0.1s;
+  display: flex;
 }
 .category-selection:hover {
   background-color: var(--color-button-background);
