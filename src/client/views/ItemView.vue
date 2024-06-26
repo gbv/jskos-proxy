@@ -196,6 +196,12 @@ const topConcepts = computed(() => {
   #conceptDetails {
     grid-area: 3 / 2 / 6 / 3;
     overflow-y: auto;
+    /* TODO: This is very hacky */
+    margin-left: 0;
+    padding-left: 2vw;
+    max-width: calc(600px + 2vw);
+    width: calc(100% - 2vw);
+    border-left: 1px solid var(--color-primary);
   }
   #schemeHeader, #searchInScheme, #conceptHierarchy, #conceptDetails {
     margin-left: 2vw;
@@ -204,7 +210,7 @@ const topConcepts = computed(() => {
   #conceptHierarchy, #conceptDetails {
     margin-bottom: 20px;
   }
-  #searchInScheme, #conceptHierarchy, #conceptDetails {
+  #searchInScheme, #conceptHierarchy {
     max-width: 600px;
     width: calc(100% - 4vw);
   }
