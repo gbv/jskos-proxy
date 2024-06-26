@@ -55,6 +55,10 @@ watch(uri, async (value, prevValue) => {
         hierarchyLoading.value = true
       }
     }, 100)()
+    // Reset ItemDetails tab
+    // TODO: This is a hacky workaround. Should be possible natively in jskos-vue.
+    const tabsVueComponent = document.getElementsByClassName("jskos-vue-tabs")[0]?.__vueParentComponent
+    tabsVueComponent?.proxy?.activateTab(0)
     // Load concept data
     const loadedConcept = await loadConcept(value, scheme.value)
     // Abort if concept has changed in the meantime
