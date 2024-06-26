@@ -6,6 +6,8 @@ import { schemes, registry, loadTop, loadNarrower, loadConcept, loadAncestors, s
 import { computed, ref, watch } from "vue"
 import { useRoute, useRouter } from "vue-router"
 import { utils } from "jskos-vue"
+import MapView from "@/components/MapView.vue"
+
 import { getRouterUrl } from "@/utils.js"
 const route = useRoute()
 const router = useRouter()
@@ -137,6 +139,13 @@ const topConcepts = computed(() => {
           title="JSKOS">
           <pre><code>{{ JSON.stringify(jskos.deepCopy(concept || scheme, ["topConceptOf", "inScheme", "topConcepts"]), null, 2) }}
             </code></pre>
+        </tab>
+        <tab
+          v-if="concept?.location?.coordinates?.length"
+          title="Map">
+          <MapView
+            :longitude="concept.location.coordinates[0]"
+            :latitude="concept.location.coordinates[1]" />
         </tab>
       </template>
     </item-details>
