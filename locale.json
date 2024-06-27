@@ -7,7 +7,8 @@
     "publisherOthers": "Sonstige",
     "vocabularyType": "Vokabulartyp",
     "vocSearch": "Suche nach Vokabular",
-    "conceptSearch": "Suche nach Konzept"
+    "conceptSearch": "Suche nach Konzept",
+    "searchInVocabulary": "in {voc} suchen"
   },
   "en": {
     "about": "About",
@@ -17,6 +18,7 @@
     "publisherOthers": "Others",
     "vocabularyType": "Vocabulary Type",
     "vocSearch": "Searching for vocabulary",
-    "conceptSearch": "Searching for concept"
+    "conceptSearch": "Searching for concept",
+    "searchInVocabulary": "search in {voc}"
   }
 }

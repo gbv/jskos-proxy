@@ -101,6 +101,7 @@ const topConcepts = computed(() => {
     v-if="scheme"
     id="searchInScheme"
     :search="utils.cdkRegistryToSuggestFunction(registry, { scheme })"
+    :placeholder="jskos.notation(scheme) ? $t('searchInVocabulary', { voc: jskos.notation(scheme) }) : null"
     @select="concept = { uri: $event.uri }" />
   <!-- ConceptTree has to be on the top level in order for "scrollToUri" to work -->
   <div id="conceptHierarchy">
