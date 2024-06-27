@@ -202,9 +202,6 @@ watch(mode, () => {
       <div 
         v-for="pg in publisherGroups"
         :key="pg.name || '_'">
-        <h3>
-          ⎯⎯⎯⎯⎯⎯ &nbsp;&nbsp;{{ pg.name }}&nbsp;&nbsp; ⎯⎯⎯⎯⎯⎯
-        </h3>
         <div class="selection">
           <SchemeGroup
             v-for="p in pg.publishers"
