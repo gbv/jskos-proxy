@@ -156,7 +156,7 @@ const topConcepts = computed(() => {
   </div>
 </template>
 
-<style scoped>
+<style>
 #schemeHeader {
   grid-area: 2 / 1 / 3 / 3;
   margin-bottom: 5px;
@@ -182,20 +182,38 @@ const topConcepts = computed(() => {
   margin-bottom: 20px;
 }
 @media only screen and (min-width: 800px) {
-  #schemeHeader {
+  #searchInScheme, #schemeHeader {
     width: calc(100% - 4vw);
     /* Add margins of conceptHierarchy and conceptDetails to max-width */
     max-width: calc(1200px + 4vw);
+    place-self: center;
   }
   #searchInScheme {
-    grid-area: 3 / 1 / 4 / 2;
+    grid-area: 3 / 1 / 4 / 3;
   }
   #conceptHierarchy {
     grid-area: 4 / 1 / 6 / 2;
   }
   #conceptDetails {
-    grid-area: 3 / 2 / 6 / 3;
+    grid-area: 4 / 2 / 6 / 3;
     overflow-y: auto;
+  }
+  #searchInScheme {
+    border-top: 1px solid var(--color-primary);
+    margin-bottom: 25px;
+  }
+  #searchInScheme > input {
+    width: 50%;
+    padding: 8px 10px;
+    border: 1px solid var(--color-primary);
+    border-top: none;
+  }
+  #searchInScheme > input:focus {
+    outline: none;
+    box-shadow: 2px 2px 5px -2px var(--color-primary);
+  }
+  #searchInScheme > .jskos-vue-itemSuggest-results {
+    width: 50%;
   }
   #schemeHeader, #searchInScheme, #conceptHierarchy, #conceptDetails {
     margin-left: 2vw;
@@ -204,11 +222,11 @@ const topConcepts = computed(() => {
   #conceptHierarchy, #conceptDetails {
     margin-bottom: 20px;
   }
-  #searchInScheme, #conceptHierarchy, #conceptDetails {
+  #conceptHierarchy, #conceptDetails {
     max-width: 600px;
     width: calc(100% - 4vw);
   }
-  #searchInScheme, #conceptHierarchy {
+  #conceptHierarchy {
     justify-self: end;
   }
   #conceptTree {
