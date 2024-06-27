@@ -157,6 +157,7 @@ const topConcepts = computed(() => {
   </div>
 </template>
 
+<!-- Note that we need unscoped rules for some of the selectors (particularly for "input") -->
 <style>
 #schemeHeader {
   grid-area: 2 / 1 / 3 / 3;
@@ -205,13 +206,7 @@ const topConcepts = computed(() => {
   }
   #searchInScheme > input {
     width: 50%;
-    padding: 8px 10px;
-    border: 1px solid var(--color-primary);
     border-top: none;
-  }
-  #searchInScheme > input:focus {
-    outline: none;
-    box-shadow: 2px 2px 5px -2px var(--color-primary);
   }
   #searchInScheme > .jskos-vue-itemSuggest-results {
     width: 50%;
