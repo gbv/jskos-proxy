@@ -36,22 +36,22 @@
     "dotenv": "^16.4.5",
     "express": "^4.19.2",
     "jskos-tools": "^1.0.37",
-    "jskos-vue": "^0.3.5",
+    "jskos-vue": "^0.3.6",
     "jsonld": "^8.3.2",
     "leaflet": "^1.9.4",
     "portfinder": "^1.0.32",
     "rdflib": "^2.2.35",
-    "vite-express": "^0.16.0",
-    "vue": "^3.4.27",
+    "vite-express": "^0.17.0",
+    "vue": "^3.4.30",
     "vue-i18n": "^9.13.1",
-    "vue-router": "^4.3.2"
+    "vue-router": "^4.4.0"
   },
   "devDependencies": {
-    "@vitejs/plugin-vue": "^5.0.4",
+    "@vitejs/plugin-vue": "^5.0.5",
     "eslint": "^8.57.0",
     "eslint-config-gbv": "^1.1.0",
     "eslint-plugin-vue": "^9.26.0",
-    "nodemon": "^3.1.2",
-    "vite": "^5.2.12"
+    "nodemon": "^3.1.4",
+    "vite": "^5.3.1"
   }
 }
