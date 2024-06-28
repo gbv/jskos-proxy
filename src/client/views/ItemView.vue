@@ -2,7 +2,6 @@
 import config from "@/config.js"
 import * as jskos from "jskos-tools"
 import { AutoLink } from "jskos-vue"
-import { Tab } from "jskos-vue-tabs"
 import { schemes, registry, loadTop, loadNarrower, loadConcept, loadAncestors, saveConcept } from "@/store.js"
 import { computed, ref, watch } from "vue"
 import { useRoute, useRouter } from "vue-router"
