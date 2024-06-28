@@ -265,4 +265,8 @@ const topConcepts = computed(() => {
 .jskos-vue-itemDetails-tabs {
   margin: 15px 0;
 }
+.jskos-vue-itemDetails-name {
+  font-weight: 700;
+  margin-bottom: 20px;
+}
 </style>
