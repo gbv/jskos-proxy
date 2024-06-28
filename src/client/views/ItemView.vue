@@ -129,43 +129,42 @@ const topConcepts = computed(() => {
     <item-details 
       v-else
       :item="concept || scheme"
+      :flat="true"
       @select="concept = { uri: $event.item.uri }">
       <template #additionalTabs>
-        <tab title="Linked Data">
-          <div
-            v-for="format in ['jskos', 'turtle', 'rdfxml', 'ntriples']"
-            :key="format">
-            <a :href="getRouterUrl({ scheme, concept, params: { format }})">
-              {{ format }}
-            </a>
-          </div>
-        </tab>
-        <tab
+        <div
+          v-if="concept?.mappings?.length">
+          <ul class="jskos-vue-itemDetails-list">
+            <li><b>Mappings:</b></li>
+            <li 
+              v-for="(mapping, index) in concept.mappings"
+              :key="index">
+              {{ (jskos.mappingTypeByType(mapping.type) || jskos.defaultMappingType).notation[0] }}
+              <auto-link
+                v-for="c in jskos.conceptsOfMapping(mapping)"
+                :key="c?.uri"
+                :href="c?.uri" />
+            </li>
+          </ul>
+        </div>
+        <div
           v-if="concept?.location?.coordinates?.length"
           title="Map">
           <MapView
             :longitude="concept.location.coordinates[0]"
             :latitude="concept.location.coordinates[1]" />
-        </tab>
-        <tab
-          v-if="concept?.mappings?.length"
-          title="Mappings">
-          <p 
-            v-for="(mapping, index) in concept.mappings"
-            :key="index">
-            {{ (jskos.mappingTypeByType(mapping.type) || jskos.defaultMappingType).notation[0] }}
-            <auto-link
-              v-for="c in jskos.conceptsOfMapping(mapping)"
-              :key="c?.uri"
-              :href="c?.uri" />
-          </p>
-        </tab>
-        <tab 
-          v-if="config.env === 'development'"
-          title="JSKOS">
-          <pre><code>{{ JSON.stringify(jskos.deepCopy(concept || scheme, ["topConceptOf", "inScheme", "topConcepts"]), null, 2) }}
-            </code></pre>
-        </tab>
+        </div>
+        <div>
+          <b>Linked Data:</b>
+          <span
+            v-for="format in ['jskos', 'turtle', 'rdfxml', 'ntriples']"
+            :key="format">&nbsp;
+            <a 
+              :href="getRouterUrl({ scheme, concept, params: { format }})">
+              {{ format }}
+            </a>
+          </span>
+        </div>
       </template>
     </item-details>
   </div>
@@ -260,5 +259,9 @@ const topConcepts = computed(() => {
   display: flex;
   align-items: center;
   justify-content: center;
+}
+/* Override jskos-vue styles */
+.jskos-vue-itemDetails-tabs {
+  margin: 15px 0;
 }
 </style>
