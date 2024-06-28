@@ -139,18 +139,18 @@ const topConcepts = computed(() => {
             </a>
           </div>
         </tab>
-        <tab 
-          v-if="config.env === 'development'"
-          title="JSKOS">
-          <pre><code>{{ JSON.stringify(jskos.deepCopy(concept || scheme, ["topConceptOf", "inScheme", "topConcepts"]), null, 2) }}
-            </code></pre>
-        </tab>
         <tab
           v-if="concept?.location?.coordinates?.length"
           title="Map">
           <MapView
             :longitude="concept.location.coordinates[0]"
             :latitude="concept.location.coordinates[1]" />
+        </tab>
+        <tab 
+          v-if="config.env === 'development'"
+          title="JSKOS">
+          <pre><code>{{ JSON.stringify(jskos.deepCopy(concept || scheme, ["topConceptOf", "inScheme", "topConcepts"]), null, 2) }}
+            </code></pre>
         </tab>
       </template>
     </item-details>
