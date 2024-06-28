@@ -1,6 +1,7 @@
 <script setup>
 import config from "@/config.js"
 import * as jskos from "jskos-tools"
+import { AutoLink } from "jskos-vue"
 import { Tab } from "jskos-vue-tabs"
 import { schemes, registry, loadTop, loadNarrower, loadConcept, loadAncestors, saveConcept } from "@/store.js"
 import { computed, ref, watch } from "vue"
@@ -145,6 +146,19 @@ const topConcepts = computed(() => {
           <MapView
             :longitude="concept.location.coordinates[0]"
             :latitude="concept.location.coordinates[1]" />
+        </tab>
+        <tab
+          v-if="concept?.mappings?.length"
+          title="Mappings">
+          <p 
+            v-for="(mapping, index) in concept.mappings"
+            :key="index">
+            {{ (jskos.mappingTypeByType(mapping.type) || jskos.defaultMappingType).notation[0] }}
+            <auto-link
+              v-for="c in jskos.conceptsOfMapping(mapping)"
+              :key="c?.uri"
+              :href="c?.uri" />
+          </p>
         </tab>
         <tab 
           v-if="config.env === 'development'"
