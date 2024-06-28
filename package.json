@@ -32,7 +32,7 @@
     "@intlify/unplugin-vue-i18n": "^4.0.0",
     "@vue-leaflet/vue-leaflet": "^0.10.1",
     "axios": "^1.7.2",
-    "cocoda-sdk": "^3.4.8",
+    "cocoda-sdk": "^3.4.9",
     "dotenv": "^16.4.5",
     "express": "^4.19.2",
     "jskos-tools": "^1.0.37",
