@@ -30,16 +30,25 @@ app.get(`${config.namespace.pathname}:voc?/:id?`, async (req, res, next) => {
       req.params.id = req.params.voc
       delete req.params.voc
     }
-    // TODO: Do we need support for `uri` query param?
-    const uri = config.namespace + (req.params.voc ? `${req.params.voc}/` : "") + (req.params.id ?? "")
+
+    const uri = (() => {
+      if (req.query.uri) {
+        return req.query.uri
+      }
+      // URI in "voc" param (part of URL)
+      if (req.params.voc && jskos.isValidUri(req.params.voc)) {
+        return req.params.voc
+      }
+      return config.namespace + (req.params.voc ? `${req.params.voc}/` : "") + (req.params.id ?? "")
+    })()
 
     config.info(`get ${uri}`)
 
     let item
-    if (req.params.id) {
+    if (req.params.id || (req.params.voc && req.query.uri)) {
       // uri is a concept
       item = await backend.getConcept(uri)
-    } else if (req.params.voc || !config.listing) {
+    } else if (req.params.voc || req.query.uri || !config.listing) {
       // uri is a scheme
       item = await backend.getScheme(uri)
     } else {
@@ -50,10 +59,14 @@ app.get(`${config.namespace.pathname}:voc?/:id?`, async (req, res, next) => {
     // TODO: Handle this better
     res.status(item ? 200 : 404)
 
-    if (Array.isArray(item)) {
-      item = item.map(i => jskos.copyDeep(i))
-    } else {
-      item = jskos.copyDeep(item)
+    // Clean data
+    for (const _item of Array.isArray(item) ? item : [item]) {
+      // Remove keys started with _
+      Object.keys(_item).filter(key => key.startsWith("_")).forEach(key => delete _item[key])
+      // Replace certain subsets with URI only objects
+      ;["ancestors", "broader", "narrower", "inScheme", "topConcepts", "concepts", "topConceptOf"].filter(prop => _item[prop]?.length).forEach(prop => {
+        _item[prop] = _item[prop].map(subItem => subItem?.uri ? ({ uri: subItem.uri }) : subItem)
+      })
     }
 
     const contentType = rdf.contentTypes[format]
