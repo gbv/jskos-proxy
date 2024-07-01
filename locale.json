@@ -8,6 +8,7 @@
     "vocabularyType": "Vokabulartyp",
     "vocSearch": "Suche nach Vokabular",
     "conceptSearch": "Suche nach Konzept",
+    "license": "Lizenz",
     "searchInVocabulary": "in {voc} suchen"
   },
   "en": {
@@ -19,6 +20,7 @@
     "vocabularyType": "Vocabulary Type",
     "vocSearch": "Searching for vocabulary",
     "conceptSearch": "Searching for concept",
+    "license": "License",
     "searchInVocabulary": "search in {voc}"
   }
 }

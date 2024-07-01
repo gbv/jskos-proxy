@@ -1,7 +1,7 @@
 <script setup>
 import config from "@/config.js"
 import * as jskos from "jskos-tools"
-import { AutoLink } from "jskos-vue"
+import { AutoLink, LicenseInfo } from "jskos-vue"
 import { schemes, registry, loadTop, loadNarrower, loadConcept, loadAncestors, getConceptByUri } from "@/store.js"
 import { computed, ref, watch } from "vue"
 import { useRoute, useRouter } from "vue-router"
@@ -106,6 +106,12 @@ const topConcepts = computed(() => {
     <router-link :to="getRouterUrl({ scheme })">
       {{ jskos.prefLabel(scheme) }}
     </router-link>
+    <div
+      v-if="scheme?.license?.length"
+      id="licenseInfo">
+      {{ $t("license") }}:
+      <license-info :item="scheme" />
+    </div>
   </h2>
   <item-suggest
     v-if="scheme"
@@ -256,6 +262,13 @@ const topConcepts = computed(() => {
     bottom: 0;
     overflow-y: auto;
   }
+}
+#licenseInfo {
+  position: absolute;
+  top: 0;
+  right: 0;
+  font-weight: normal;
+  font-size: 18px;
 }
 .loading {
   position: absolute;
