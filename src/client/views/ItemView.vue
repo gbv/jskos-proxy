@@ -30,8 +30,8 @@ const concept = computed({
     router.push(getRouterUrl({ scheme: scheme.value, concept: value }))
   },
 })
-const conceptLoading = ref(false)
-const hierarchyLoading = ref(false)
+const conceptLoading = ref(true)
+const hierarchyLoading = ref(true)
 let topLoadingPromise = null
 
 // Load top concepts when scheme is ready
@@ -46,7 +46,13 @@ watch(uri, async (value, prevValue) => {
     window.scrollTo(0, 0)
     // Debounce loading values so that we prevent "flashing" loading overlays
     conceptLoading.value = null
-    hierarchyLoading.value = null
+    // Only show hierarchy loading if anything needs to be opened
+    if (!document.querySelectorAll(`[data-uri='${value}']`).length) {
+      hierarchyLoading.value = null
+    } else {
+      // If element is already there, scroll there immediately before other things are loaded
+      conceptTreeRef.value?.scrollToUri(value, true)
+    }
     utils.debounce(() => {
       if (conceptLoading.value === null) {
         conceptLoading.value = true
@@ -54,11 +60,13 @@ watch(uri, async (value, prevValue) => {
       if (hierarchyLoading.value === null) {
         hierarchyLoading.value = true
       }
-    }, 100)()
+    }, 150)()
     // Reset ItemDetails tab
     // TODO: This is a hacky workaround. Should be possible natively in jskos-vue.
     const tabsVueComponent = document.getElementsByClassName("jskos-vue-tabs")[0]?.__vueParentComponent
     tabsVueComponent?.proxy?.activateTab(0)
+    // Wait for top concepts before doing anything else
+    topLoadingPromise && await topLoadingPromise
     // Load concept data
     const loadedConcept = await loadConcept(value, scheme.value)
     // Abort if concept has changed in the meantime
@@ -67,7 +75,6 @@ watch(uri, async (value, prevValue) => {
     }
     conceptLoading.value = false
     // Load concept ancestors/hierarchy
-    topLoadingPromise && await topLoadingPromise
     await Promise.all([loadAncestors(loadedConcept), loadNarrower(loadedConcept)])
     // Abort if concept has changed in the meantime
     if (value !== uri.value) {
@@ -82,6 +89,9 @@ watch(uri, async (value, prevValue) => {
       conceptTreeRef.value?.scrollToUri(value, true)
       hierarchyLoading.value = false
     }, 50)
+  } else {
+    conceptLoading.value = false
+    hierarchyLoading.value = false
   }
 },{ immediate: true })
 
@@ -126,7 +136,7 @@ const topConcepts = computed(() => {
       <loading-indicator size="xl" />
     </div>
     <item-details 
-      v-else
+      v-if="concept || scheme"
       :item="concept || scheme"
       :flat="true"
       @select="concept = { uri: $event.item.uri }">
@@ -255,7 +265,8 @@ const topConcepts = computed(() => {
   bottom: 0;
   z-index: 1;
   /* TODO */
-  background-color: #f4f4f476;
+  background-color: #f4f4f453;
+  backdrop-filter: blur(1px);
   display: flex;
   align-items: center;
   justify-content: center;
