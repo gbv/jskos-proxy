@@ -232,15 +232,16 @@ const topConcepts = computed(() => {
   #searchInScheme {
     border-top: 1px solid var(--color-primary);
     margin-bottom: 25px;
+    margin-right: 4vw;
   }
   #searchInScheme > input {
-    width: 50%;
+    width: calc(50% - 3vw);
     border-top: none;
   }
   #searchInScheme > .jskos-vue-itemSuggest-results {
     width: 50%;
   }
-  #schemeHeader, #searchInScheme, #conceptHierarchy, #conceptDetails {
+  #schemeHeader, #conceptHierarchy, #conceptDetails {
     margin-left: 2vw;
     margin-right: 2vw;
   }
