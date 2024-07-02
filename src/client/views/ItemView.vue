@@ -264,12 +264,22 @@ const topConcepts = computed(() => {
     overflow-y: auto;
   }
 }
+#schemeHeader {
+  display: flex;
+}
+#schemeHeader > *:first-child {
+  flex: 1;
+  padding-right: 15px;
+}
 #licenseInfo {
-  position: absolute;
-  top: 0;
-  right: 0;
   font-weight: normal;
-  font-size: 18px;
+  font-size: 15px;
+  margin-top: 5px;
+}
+#licenseInfo > .jskos-vue-itemDetails-licenseInfo {
+  display: block;
+  margin-top: -5px;
+  margin-left: -4px;
 }
 .loading {
   position: absolute;
