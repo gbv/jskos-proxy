@@ -176,7 +176,8 @@ const topConcepts = computed(() => {
             v-for="format in ['jskos', 'turtle', 'rdfxml', 'ntriples']"
             :key="format">&nbsp;
             <a 
-              :href="getRouterUrl({ scheme, concept, params: { format }})">
+              :href="getRouterUrl({ scheme, concept, params: { format }})"
+              target="_blank">
               {{ format }}
             </a>
           </span>
