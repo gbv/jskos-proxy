@@ -57,7 +57,7 @@ watch(() => route.query?.conceptSearch, async (value) => {
   }
   console.time(`concept search ${value}`)
   conceptSearchResults.value = [null]
-  const results = await registry.search({ search: value })
+  const results = await registry.search({ search: value.trim() })
   console.timeEnd(`concept search ${value}`)
   if (value === route.query?.conceptSearch) {
     const groupedResults = []
@@ -100,9 +100,9 @@ const filteredSchemes = computed(() => {
             // 3) definitions
             Object.values(scheme.definition || {}).reduce((prev, cur) => ([...prev, ...cur]), []),
           ]) {
-            if (array.map(e => e?.toUpperCase() || "").find(e => e.startsWith(route.query.search.toUpperCase()))) {
+            if (array.map(e => e?.toUpperCase() || "").find(e => e.startsWith(route.query.search.trim().toUpperCase()))) {
               score += current
-            } else if (array.map(e => e?.toUpperCase() || "").find(e => e.includes(route.query.search.toUpperCase()))) {
+            } else if (array.map(e => e?.toUpperCase() || "").find(e => e.includes(route.query.search.trim().toUpperCase()))) {
               score += current / 2
             }
             if (current > 2) {
