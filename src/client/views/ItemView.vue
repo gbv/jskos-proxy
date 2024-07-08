@@ -149,8 +149,9 @@ const topConcepts = computed(() => {
       class="loading">
       <loading-indicator size="xl" />
     </div>
-    <item-details 
+    <item-details
       v-if="concept || scheme"
+      id="itemDetails"
       :item="concept || scheme"
       :flat="true"
       @select="concept = { uri: $event.item.uri }">
@@ -236,7 +237,6 @@ const topConcepts = computed(() => {
   }
   #conceptDetails {
     grid-area: 4 / 2 / 6 / 3;
-    overflow-y: auto;
   }
   #searchInScheme {
     border-top: 1px solid var(--color-primary);
@@ -264,7 +264,7 @@ const topConcepts = computed(() => {
   #conceptHierarchy {
     justify-self: end;
   }
-  #conceptTree {
+  #conceptTree, #itemDetails {
     position: absolute;
     top: 0;
     left: 0;
