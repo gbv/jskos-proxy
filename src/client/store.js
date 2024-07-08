@@ -107,7 +107,7 @@ export function saveConcept(concept, { returnIfExists = false, returnNullOnError
         concept[prop] = saveConceptsWithOptions({ returnIfExists: true, returnNullOnError: true })(concept[prop])
       }
     }
-    return concept
+    return state.concepts[concept.uri]
   }
 }
 
