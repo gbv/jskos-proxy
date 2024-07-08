@@ -243,12 +243,9 @@ const topConcepts = computed(() => {
     margin-bottom: 25px;
     margin-right: 4vw;
   }
-  #searchInScheme > input {
+  #searchInScheme > input, #searchInScheme > .jskos-vue-itemSuggest-results {
     width: calc(50% - 3vw);
     border-top: none;
-  }
-  #searchInScheme > .jskos-vue-itemSuggest-results {
-    width: 50%;
   }
   #schemeHeader, #conceptHierarchy, #conceptDetails {
     margin-left: 2vw;
