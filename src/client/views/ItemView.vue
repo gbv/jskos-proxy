@@ -43,15 +43,31 @@ watch(scheme, async () => {
 
 watch(uri, async (value, prevValue) => {
   if (value && value !== prevValue) {
+    let shouldScroll = true
+    const openAndScroll = () => {
+      if (!shouldScroll) {
+        return
+      }
+      shouldScroll = false
+      // Open all ancestors in hierarchy
+      for (const ancestor of concept.value?.ancestors || []) {
+        conceptTreeRef.value?.open(ancestor)
+      }
+      // Scroll to concept in hierarchy
+      setTimeout(() => {
+        conceptTreeRef.value?.scrollToUri(value, true)
+        hierarchyLoading.value = false
+      }, 50)
+    }
     window.scrollTo(0, 0)
     // Debounce loading values so that we prevent "flashing" loading overlays
     conceptLoading.value = null
     // Only show hierarchy loading if anything needs to be opened
-    if (!document.querySelectorAll(`[data-uri='${value}']`).length) {
-      hierarchyLoading.value = null
-    } else {
+    if (document.querySelectorAll(`[data-uri='${value}']`).length && concept.value?.ancestors?.length && !concept.value?.ancestors?.includes(null)) {
       // If element is already there, scroll there immediately before other things are loaded
-      conceptTreeRef.value?.scrollToUri(value, true)
+      openAndScroll()
+    } else {
+      hierarchyLoading.value = null
     }
     utils.debounce(() => {
       if (conceptLoading.value === null) {
@@ -80,15 +96,7 @@ watch(uri, async (value, prevValue) => {
     if (value !== uri.value) {
       return
     }
-    // Open all ancestors in hierarchy
-    for (const ancestor of loadedConcept.ancestors) {
-      conceptTreeRef.value?.open(ancestor)
-    }
-    // Scroll to concept in hierarchy
-    setTimeout(() => {
-      conceptTreeRef.value?.scrollToUri(value, true)
-      hierarchyLoading.value = false
-    }, 50)
+    openAndScroll()
   } else {
     conceptLoading.value = false
     hierarchyLoading.value = false
