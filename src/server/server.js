@@ -45,19 +45,35 @@ app.get(`${config.namespace.pathname}:voc?/:id?`, async (req, res, next) => {
     config.info(`get ${uri}`)
 
     let item
-    if (req.params.id || (req.params.voc && req.query.uri)) {
-      // uri is a concept
-      item = await backend.getConcept(uri)
-    } else if (req.params.voc || req.query.uri || !config.listing) {
-      // uri is a scheme
-      item = await backend.getScheme(uri)
-    } else {
-      // uri is the base -> return all schemes
-      item = await backend.getSchemes()
+    try {
+      if (req.params.id || (req.params.voc && req.query.uri)) {
+        // uri is a concept
+        item = await backend.getConcept(uri)
+      } else if (req.params.voc || req.query.uri || !config.listing) {
+        // uri is a scheme
+        item = await backend.getScheme(uri)
+      } else {
+        // uri is the base -> return all schemes
+        item = await backend.getSchemes()
+      }
+    } catch (error) {
+      console.error(`Error loading ${uri}`, error)
+      // TODO: Send different error messages depending on specific error (https://github.com/gbv/jskos-proxy/issues/40)
+      res.status(500).send({
+        message: `Error loading data from backend: ${error.message}`,
+      })
+      return
     }
 
-    // TODO: Handle this better
-    res.status(item ? 200 : 404)
+    if (!item) {
+      console.error(`${uri} not found.`)
+      res.status(404).send({
+        message: `Entity with URI ${uri} not found.`,
+      })
+      return
+    }
+
+    res.status(200)
 
     // Clean data
     for (const _item of Array.isArray(item) ? item : [item]) {
