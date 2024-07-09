@@ -2,7 +2,7 @@
 import config from "@/config.js"
 import * as jskos from "jskos-tools"
 import { AutoLink, LicenseInfo } from "jskos-vue"
-import { schemes, registry, loadTop, loadNarrower, loadConcept, loadAncestors, getConceptByUri, formats } from "@/store.js"
+import { schemes, registry, loadTop, loadNarrower, loadConcept, loadAncestors, saveConcept, formats } from "@/store.js"
 import { computed, ref, watch } from "vue"
 import { useRoute, useRouter } from "vue-router"
 import { utils } from "jskos-vue"
@@ -24,7 +24,7 @@ const concept = computed({
     if (!uri.value) {
       return null
     }
-    return getConceptByUri(uri.value)
+    return saveConcept({ uri: uri.value }, { returnIfExists: true, returnNullOnError: true })
   },
   set(value) {
     router.push(getRouterUrl({ scheme: scheme.value, concept: value }))
