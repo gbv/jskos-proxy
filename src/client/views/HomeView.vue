@@ -228,7 +228,9 @@ watch(mode, () => {
     </div>
   </main>
   <main v-else>
-    <LoadingIndicator />
+    <div class="section">
+      <loading-indicator size="xl" />
+    </div>
   </main>
 </template>
 
