@@ -179,7 +179,7 @@ const topConcepts = computed(() => {
             :longitude="concept.location.coordinates[0]"
             :latitude="concept.location.coordinates[1]" />
         </div>
-        <div>
+        <div style="margin: 0 0 10px;">
           <b>Linked Data:</b>
           <span
             v-for="format in ['jskos', 'turtle', 'rdfxml', 'ntriples']"
