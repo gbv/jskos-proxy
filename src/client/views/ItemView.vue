@@ -3,7 +3,7 @@ import config from "@/config.js"
 import * as jskos from "jskos-tools"
 import { AutoLink, LicenseInfo } from "jskos-vue"
 import { schemes, registry, loadTop, loadNarrower, loadConcept, loadAncestors, saveConcept, formats } from "@/store.js"
-import { computed, ref, watch } from "vue"
+import { computed, ref, reactive, watch } from "vue"
 import { useRoute, useRouter } from "vue-router"
 import { utils } from "jskos-vue"
 import MapView from "@/components/MapView.vue"
@@ -14,8 +14,15 @@ const router = useRouter()
 
 const conceptTreeRef = ref(null)
 
+const errors = reactive({
+  schemeError: false,
+  loadConceptError: false,
+  loadTopError: false,
+})
+
+const schemeUri = computed(() => route.params.voc.match(/^https?:\/\//) ? route.params.voc : `${config.namespace}${route.params.voc}/`)
 const scheme = computed(() => {
-  return schemes.value?.find(s => jskos.compare(s, { uri: route.params.voc.match(/^https?:\/\//) ? route.params.voc : `${config.namespace}${route.params.voc}/` }))
+  return schemes.value?.find(s => jskos.compare(s, { uri: schemeUri.value }))
 })
 
 const uri = computed(() => scheme.value && (route.params.id && `${config.namespace}${route.params.voc}/${route.params.id}` || route.query.uri))
@@ -35,13 +42,21 @@ const hierarchyLoading = ref(true)
 let topLoadingPromise = null
 
 // Load top concepts when scheme is ready
-watch(scheme, async () => {
+watch([schemes, scheme], async () => {
+  errors.loadTopError = false
   if (scheme.value && (!scheme.value?.topConcepts || scheme.value?.topConcepts?.includes(null))) {
     topLoadingPromise = loadTop(scheme.value)
+  }
+  if (scheme.value) {
+    errors.schemeError = false
+  } else if (schemes.value?.length) {
+    console.error(`Scheme ${schemeUri.value} could not be found.`)
+    errors.schemeError = true
   }
 },{ immediate: true })
 
 watch(uri, async (value, prevValue) => {
+  errors.loadConceptError = false
   if (value && value !== prevValue) {
     let shouldScroll = true
     const openAndScroll = () => {
@@ -82,9 +97,23 @@ watch(uri, async (value, prevValue) => {
     const tabsVueComponent = document.getElementsByClassName("jskos-vue-tabs")[0]?.__vueParentComponent
     tabsVueComponent?.proxy?.activateTab(0)
     // Wait for top concepts before doing anything else
-    topLoadingPromise && await topLoadingPromise
+    try {
+      topLoadingPromise && await topLoadingPromise
+    } catch (error) {
+      console.error(`Error loading top concepts for ${scheme.value?.uri}:`, error)
+      errors.loadTopError = true
+    }
     // Load concept data
-    const loadedConcept = await loadConcept(value, scheme.value)
+    let loadedConcept
+    try {
+      loadedConcept = await loadConcept(value, scheme.value)
+    } catch (error) {
+      console.error(`Error loading concept ${value}:`, error)
+      errors.loadConceptError = true
+      conceptLoading.value = false
+      hierarchyLoading.value = false
+      return
+    }
     // Abort if concept has changed in the meantime
     if (value !== uri.value) {
       return
@@ -111,9 +140,14 @@ const topConcepts = computed(() => {
 
 <template>
   <h2 id="schemeHeader">
-    <router-link :to="getRouterUrl({ scheme })">
+    <router-link 
+      v-if="scheme && !errors.schemeError"
+      :to="getRouterUrl({ scheme })">
       {{ jskos.prefLabel(scheme) }}
     </router-link>
+    <span v-else>
+      {{ $t("error") }}: {{ schemeUri }}
+    </span>
     <div
       v-if="scheme?.license?.length"
       id="licenseInfo">
@@ -128,7 +162,9 @@ const topConcepts = computed(() => {
     :placeholder="jskos.notation(scheme) ? $t('searchInVocabulary', { voc: jskos.notation(scheme) }) : null"
     @select="concept = { uri: $event.uri }" />
   <!-- ConceptTree has to be on the top level in order for "scrollToUri" to work -->
-  <div id="conceptHierarchy">
+  <div 
+    v-if="!errors.schemeError && !errors.loadTopError"
+    id="conceptHierarchy">
     <concept-tree
       v-if="topConcepts"
       id="conceptTree"
@@ -143,6 +179,12 @@ const topConcepts = computed(() => {
     </div>
   </div>
   <div 
+    v-else
+    id="conceptHierarchy">
+    {{ errors.schemeError ? $t("schemeError") : $t("loadTopError") }}
+  </div>
+  <div 
+    v-if="scheme"
     id="conceptDetails">
     <div
       v-if="!scheme || conceptLoading"
@@ -150,7 +192,7 @@ const topConcepts = computed(() => {
       <loading-indicator size="xl" />
     </div>
     <item-details
-      v-if="concept || scheme"
+      v-if="(concept || scheme) && !errors.loadConceptError"
       id="itemDetails"
       :item="concept || scheme"
       :flat="true"
@@ -213,6 +255,14 @@ const topConcepts = computed(() => {
         </ul>
       </template>
     </item-details>
+    <div
+      v-else
+      id="itemDetails">
+      <div class="jskos-vue-itemDetails-name">
+        {{ $t("error") }}: {{ uri }}
+      </div>
+      {{ $t("loadConceptError") }}
+    </div>
   </div>
 </template>
 

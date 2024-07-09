@@ -10,6 +10,10 @@
     "conceptSearch": "Suche nach Konzept",
     "license": "Lizenz",
     "distributions": "Distributionen",
+    "error": "Fehler",
+    "schemeError": "Vokabular konnte nicht gefunden werden.",
+    "loadTopError": "@:error{':'} Oberkonzepte konnten nicht geladen werden.",
+    "loadConceptError": "Konzeptdetails konnten nicht geladen werden. Entweder existiert das Konzept nicht oder es gibt Probleme beim Zugriff auf das Backend.",
     "searchInVocabulary": "in {voc} suchen"
   },
   "en": {
@@ -23,6 +27,10 @@
     "conceptSearch": "Searching for concept",
     "license": "License",
     "distributions": "Distributions",
+    "error": "Error",
+    "schemeError": "Vocabulary could not be found.",
+    "loadTopError": "@:error{':'} Top concepts could not be loaded.",
+    "loadConceptError": "Concept details could not be loaded. Either the concept does not exist, or there are issues with the backend.",
     "searchInVocabulary": "search in {voc}"
   }
 }
