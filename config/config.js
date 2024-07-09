@@ -32,7 +32,15 @@ if (await exists(configFile)) {
     // ignore
   }
   await fs.symlink(configDir, "config/_current")
+} else {
+  console.error(`Configuration "${configDir}" not found. Please make sure to define an existing configuration in "CONFIG".`)
+  process.exit(1)
 }
+
+// Symlink favicon
+const faviconFile = await exists("config/_current/favicon.ico") ? "../config/_current/favicon.ico" : "favicon-default.ico"
+await fs.rm("public/favicon.ico")
+await fs.symlink(faviconFile, "public/favicon.ico")
 
 import { readFile } from "node:fs/promises"
 const fileUrl = new URL("../package.json", import.meta.url)

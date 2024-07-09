@@ -32,3 +32,6 @@ config/*
 !config/config.js
 !config/uri.gbv.de
 !config/rvk
+
+# Will be symlinked dynamically
+public/favicon.ico
