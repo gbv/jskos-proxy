@@ -289,6 +289,9 @@ const topConcepts = computed(() => {
     bottom: 0;
     overflow-y: auto;
   }
+  #itemDetails {
+    top: -58px;
+  }
 }
 #schemeHeader {
   display: flex;
@@ -327,6 +330,11 @@ const topConcepts = computed(() => {
 }
 .jskos-vue-itemDetails-name {
   font-weight: 700;
-  margin-bottom: 20px;
+  padding: 18px 0;
+  position: sticky;
+  top: 0;
+  background-color: var(--color-section-background-primary);
+  /* Without this, some elements with position: relative; will still overlap */
+  z-index: 1;
 }
 </style>
