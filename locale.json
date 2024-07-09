@@ -9,6 +9,7 @@
     "vocSearch": "Suche nach Vokabular",
     "conceptSearch": "Suche nach Konzept",
     "license": "Lizenz",
+    "distributions": "Distributionen",
     "searchInVocabulary": "in {voc} suchen"
   },
   "en": {
@@ -21,6 +22,7 @@
     "vocSearch": "Searching for vocabulary",
     "conceptSearch": "Searching for concept",
     "license": "License",
+    "distributions": "Distributions",
     "searchInVocabulary": "search in {voc}"
   }
 }

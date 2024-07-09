@@ -11,6 +11,7 @@
     "test": "echo 'Tests not yet implemented' && npm run lint",
     "lint": "eslint . --ext .vue,.js,.jsx,.cjs,.mjs --ignore-path .gitignore",
     "fix": "npm run lint -- --fix",
+    "updateFormats": "curl -s https://format.gbv.de/formats.ndjson | jq -c '{key:(\"http://format.gbv.de/\"+.id),value:.title}' | jq -Ss 'from_entries' > src/client/formats.json",
     "release": "git checkout dev && git pull && npm test && npm version $SEMVER && git push && git checkout main && git merge dev && git push --follow-tags && git checkout dev",
     "release:patch": "SEMVER=patch npm run release",
     "release:minor": "SEMVER=minor npm run release",

@@ -215,6 +215,10 @@ export async function loadAncestors(concept) {
 
 // TODO: We probably shouldn't do it like this.
 import nkostypeConcepts from "@/nkostype-concepts.json"
+import formats from "@/formats.json"
+// Make "JSKOS" label shorter
+formats["http://format.gbv.de/jskos"] = "JSKOS"
+export { formats }
 
 export const quickSelection = computed(() => config.quickSelection.map(scheme => schemes.value?.find(s => jskos.compare(s, scheme))).filter(Boolean))
 

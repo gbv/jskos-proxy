@@ -2,7 +2,7 @@
 import config from "@/config.js"
 import * as jskos from "jskos-tools"
 import { AutoLink, LicenseInfo } from "jskos-vue"
-import { schemes, registry, loadTop, loadNarrower, loadConcept, loadAncestors, getConceptByUri } from "@/store.js"
+import { schemes, registry, loadTop, loadNarrower, loadConcept, loadAncestors, getConceptByUri, formats } from "@/store.js"
 import { computed, ref, watch } from "vue"
 import { useRoute, useRouter } from "vue-router"
 import { utils } from "jskos-vue"
@@ -191,6 +191,26 @@ const topConcepts = computed(() => {
             </router-link>
           </span>
         </div>
+        <ul 
+          v-if="!concept && scheme?.distributions?.length"
+          class="jskos-vue-itemDetails-list">
+          <li><b>{{ $t("distributions") }}:</b></li>
+          <li
+            v-for="distribution of scheme.distributions"
+            :key="distribution.download">
+            <a
+              :href="distribution.download"
+              target="_blank"
+              download>
+              {{ distribution.created || "Download" }}
+            </a>
+            (<a
+              :href="distribution.format"
+              target="_blank">
+              {{ formats[distribution.format] }}
+            </a>, {{ distribution.size }}) {{ jskos.languageMapContent(distribution, "definition")?.[0] || "" }}
+          </li>
+        </ul>
       </template>
     </item-details>
   </div>
