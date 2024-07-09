@@ -38,9 +38,13 @@ if (await exists(configFile)) {
 }
 
 // Symlink favicon
-const faviconFile = await exists("config/_current/favicon.ico") ? "../config/_current/favicon.ico" : "favicon-default.ico"
-await fs.rm("public/favicon.ico")
-await fs.symlink(faviconFile, "public/favicon.ico")
+const faviconFile = await exists("config/_current/favicon.ico") ? "../config/_current/favicon.ico" : "favicon-default.ico", faviconTarget = "public/favicon.ico"
+try {
+  await fs.rm(faviconTarget)
+} catch (error) {
+  // ignore
+}
+await fs.symlink(faviconFile, faviconTarget)
 
 import { readFile } from "node:fs/promises"
 const fileUrl = new URL("../package.json", import.meta.url)
