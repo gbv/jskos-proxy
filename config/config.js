@@ -11,7 +11,7 @@ async function exists(file) {
   }
 }
 
-const log = msg => console.log(msg)
+const log = msg => console.log(new Date().toISOString(), msg)
 
 const NODE_ENV = process.env.NODE_ENV || "development"
 
