@@ -1,5 +1,5 @@
 import { createRouter, createWebHistory } from "vue-router"
-import HomeView from "../views/HomeView.vue"
+import HomeView from "./views/HomeView.vue"
 
 import config from "@/config.js"
 import { routerBasePath } from "@/utils.js"
@@ -13,7 +13,7 @@ const routes = [
   {
     path: `${routerBasePath}about`,
     name: "about",
-    component: () => import("../views/AboutView.vue"),
+    component: () => import("./views/AboutView.vue"),
   },
 ]
 
@@ -21,7 +21,7 @@ if (routerBasePath !== "/") {
   routes.push({
     path: "/",
     name: "root",
-    component: () => import("../views/RootView.vue"),
+    component: () => import("./views/RootView.vue"),
   })
 }
 
@@ -29,7 +29,7 @@ if (config.listing) {
   routes.push({
     path: `${routerBasePath}:voc/:id?`,
     name: "item",
-    component: () => import("../views/ItemView.vue"),
+    component: () => import("./views/ItemView.vue"),
   })
 }
 

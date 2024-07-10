@@ -4,7 +4,8 @@ import * as jskos from "jskos-tools"
 import { schemes, quickSelection, publisherSelection, typeSelection, registry } from "@/store.js"
 import { ref, computed, watch } from "vue"
 import { getRouterUrl } from "@/utils.js"
-import SchemeGroup from "@/components/SchemeGroup.vue"
+import CategoryButton from "@/components/CategoryButton.vue"
+import SchemeButton from "@/components/SchemeButton.vue"
 
 const route = useRoute()
 
@@ -123,6 +124,7 @@ const filteredSchemes = computed(() => {
 })
 
 watch(mode, () => {
+  // Scroll to top when mode changes (e.g. nagivated by performing a search)
   window.scrollTo({
     top: 0,
     behavior: "smooth",
@@ -160,13 +162,10 @@ watch(mode, () => {
       <div 
         v-if="mode !== 'conceptSearch'"
         class="selection">
-        <RouterLink
+        <SchemeButton
           v-for="scheme in filteredSchemes"
           :key="scheme.uri"
-          class="scheme-selection"
-          :to="getRouterUrl({ scheme })">
-          {{ jskos.prefLabel(scheme) }}
-        </RouterLink>
+          :scheme="scheme" />
       </div>
       <div 
         v-else-if="!conceptSearchResults.includes(null)"
@@ -203,7 +202,7 @@ watch(mode, () => {
         v-for="pg in publisherGroups"
         :key="pg.name || '_'">
         <div class="selection">
-          <SchemeGroup
+          <CategoryButton
             v-for="p in pg.publishers"
             :key="p.id"
             :name="p.name"
@@ -218,7 +217,7 @@ watch(mode, () => {
       class="section">
       <h2>{{ $t("vocabularyType") }}</h2>
       <div class="selection">
-        <SchemeGroup
+        <CategoryButton
           v-for="t in typeSelection"
           :key="t"
           :name="jskos.prefLabel(t)"
@@ -228,6 +227,7 @@ watch(mode, () => {
     </div>
   </main>
   <main v-else>
+    <!-- TODO: Maybe make this a bit nicer -->
     <div class="section">
       <loading-indicator size="xl" />
     </div>
@@ -235,4 +235,11 @@ watch(mode, () => {
 </template>
 
 <style scoped>
+.selection {
+  max-width: 1200px;
+  margin: 0 auto 20px auto;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+}
 </style>
