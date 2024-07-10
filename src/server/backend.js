@@ -52,16 +52,19 @@ export class ApiBackend {
 
     // Load schemes in background and update every 60 seconds
     this.schemes = null
+    let previouslyErrored = false
     this.getSchemesPromise = new Promise(resolve => {
       cdk.repeat({
         function: () => this.registry.getSchemes({ params: { limit: 10000 } }),
         callback: (error, result) => {
           if (error) {
             log(`ApiBackend: Error when loading schemes - ${error}`)
+            previouslyErrored = true
             return
           }
-          if (!this.schemes) {
+          if (!this.schemes || previouslyErrored) {
             log(`Loaded ${result.length} schemes for backend.`)
+            previouslyErrored = false
           }
           // Only return schemes that have concepts
           this.schemes = result.filter(s => !s.concepts || s.concepts?.length > 0)
