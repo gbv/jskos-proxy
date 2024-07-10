@@ -15,6 +15,7 @@ const router = useRouter()
 const conceptTreeRef = ref(null)
 
 const errors = reactive({
+  schemesError: false,
   schemeError: false,
   loadConceptError: false,
   loadTopError: false,
@@ -43,9 +44,17 @@ let topLoadingPromise = null
 
 // Load top concepts when scheme is ready
 watch([schemes, scheme], async () => {
+  if (schemes.value?.length) {
+    errors.schemesError = false
+  } else {
+    errors.schemesError = true
+  }
   errors.loadTopError = false
   if (scheme.value && (!scheme.value?.topConcepts || scheme.value?.topConcepts?.includes(null))) {
-    topLoadingPromise = loadTop(scheme.value)
+    topLoadingPromise = loadTop(scheme.value).catch(error => {
+      console.error(`Error loading top concepts for ${scheme.value?.uri}:`, error)
+      errors.loadTopError = true
+    })
   }
   if (scheme.value) {
     errors.schemeError = false
@@ -97,12 +106,7 @@ watch(uri, async (value, prevValue) => {
     const tabsVueComponent = document.getElementsByClassName("jskos-vue-tabs")[0]?.__vueParentComponent
     tabsVueComponent?.proxy?.activateTab(0)
     // Wait for top concepts before doing anything else
-    try {
-      topLoadingPromise && await topLoadingPromise
-    } catch (error) {
-      console.error(`Error loading top concepts for ${scheme.value?.uri}:`, error)
-      errors.loadTopError = true
-    }
+    topLoadingPromise && await topLoadingPromise
     // Load concept data
     let loadedConcept
     try {
@@ -163,7 +167,7 @@ const topConcepts = computed(() => {
     @select="concept = { uri: $event.uri }" />
   <!-- ConceptTree has to be on the top level in order for "scrollToUri" to work -->
   <div 
-    v-if="!errors.schemeError && !errors.loadTopError"
+    v-if="!errors.schemesError && !errors.schemeError && !errors.loadTopError"
     id="conceptHierarchy">
     <concept-tree
       v-if="topConcepts"
@@ -181,7 +185,15 @@ const topConcepts = computed(() => {
   <div 
     v-else
     id="conceptHierarchy">
-    {{ errors.schemeError ? $t("schemeError") : $t("loadTopError") }}
+    <template v-if="errors.schemeError">
+      {{ t("schemeError") }}
+    </template>
+    <template v-if="errors.schemesError">
+      {{ $t("schemesError") }}
+    </template>
+    <template v-if="errors.loadTopError">
+      {{ $t("loadTopError") }}
+    </template>
   </div>
   <div 
     v-if="scheme"

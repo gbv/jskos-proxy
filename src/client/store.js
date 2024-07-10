@@ -37,8 +37,18 @@ export function setLocale(value) {
   }
 }
 
-export const schemeFetchPromise = fetch(config.namespace.pathname, { headers: { Accept: "application/json" } }).then(res => res.json()).then(data => {
+export const schemeFetchPromise = fetch(
+  config.namespace.pathname, 
+  { 
+    headers: { Accept: "application/json" } ,
+    signal: AbortSignal.timeout(20000),
+  },
+).then(res => res.json()).then(data => {
   state.schemes = data
+}).catch(() => {
+  console.error("Error loading schemes from backend.")
+  // TODO: Add retry mechanism
+  state.schemes = []
 })
 
 export const schemes = computed(() => state.schemes)

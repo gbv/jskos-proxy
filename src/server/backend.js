@@ -43,11 +43,6 @@ export class ApiBackend {
   constructor(base, log) {
 
     this.base = base
-    this.registry = cdk.initializeRegistry({
-      provider: "ConceptApi",
-      // ? Does "base" always have a trailing slash?
-      status: `${base}status`,
-    })
     this.log = log || (() => {})
 
     // Load schemes in background and update every 60 seconds
@@ -55,7 +50,16 @@ export class ApiBackend {
     let previouslyErrored = false
     this.getSchemesPromise = new Promise(resolve => {
       cdk.repeat({
-        function: () => this.registry.getSchemes({ params: { limit: 10000 } }),
+        function: () => {
+          if (!this.registry?._api?.api) {
+            this.registry = cdk.initializeRegistry({
+              provider: "ConceptApi",
+              // ? Does "base" always have a trailing slash?
+              status: `${this.base}status`,
+            })
+          }
+          return this.registry.getSchemes({ params: { limit: 10000 } })
+        },
         callback: (error, result) => {
           if (error) {
             log(`ApiBackend: Error when loading schemes - ${error}`)
@@ -70,7 +74,7 @@ export class ApiBackend {
           this.schemes = result.filter(s => !s.concepts || s.concepts?.length > 0)
           resolve()
         },
-        interval: 60 * 1000,
+        interval: 6 * 1000,
         callImmediately: true,
       })
     })

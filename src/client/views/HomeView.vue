@@ -134,7 +134,13 @@ watch(mode, () => {
 </script>
 
 <template>
-  <main v-if="schemes">
+  <main v-if="!schemes">
+    <!-- TODO: Maybe make this a bit nicer -->
+    <div class="section">
+      <loading-indicator size="xl" />
+    </div>
+  </main>
+  <main v-else-if="schemes.length">
     <!-- Default section -->
     <div class="section">
       <h2 v-if="mode === 'default'">
@@ -227,9 +233,9 @@ watch(mode, () => {
     </div>
   </main>
   <main v-else>
-    <!-- TODO: Maybe make this a bit nicer -->
     <div class="section">
-      <loading-indicator size="xl" />
+      <h2>{{ $t("error") }}</h2>
+      {{ $t("schemesError") }}
     </div>
   </main>
 </template>
