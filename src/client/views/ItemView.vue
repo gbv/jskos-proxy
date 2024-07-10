@@ -196,6 +196,7 @@ const topConcepts = computed(() => {
       id="itemDetails"
       :item="concept || scheme"
       :flat="true"
+      :fields="{ type: false }"
       @select="concept = { uri: $event.item.uri }">
       <template #additionalTabs>
         <div
