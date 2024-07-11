@@ -39,11 +39,15 @@ defineProps({
   left: 0;
   top: 0;
   border-right: none;
+  border-top-left-radius: 3px;
+  border-bottom-left-radius: 3px;
 }
 .schemeButton::after {
   right: 0;
   bottom: 0;
   border-left: none;
+  border-top-right-radius: 3px;
+  border-bottom-right-radius: 3px;
 }
 .schemeButton:hover::before, .schemeButton:hover::after {
   width: 100%;
