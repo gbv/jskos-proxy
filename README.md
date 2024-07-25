@@ -42,6 +42,7 @@ Instances of jskos-proxy are configured with environment variables, in local fil
 - `BACKEND` - JSKOS API base URL
 - `TITLE` - Title of the service (default `JSKOS Proxy`)
 <!-- - `LOGO` - optional logo image file, must be placed in `public` directory -->
+- `QUICK_SELECTION` - comma separated list of vocabulary URIs to prominently show at the start page
 
 A **configuration directory** under `config/` can be provided with environment variable `CONFIG`. It **must** contain:
 
