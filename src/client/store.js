@@ -195,7 +195,7 @@ export async function loadAncestors(concept) {
   concept.ancestors = saveConceptsWithOptions()(ancestors)
   // Set broader if necessary
   if (!concept.broader || concept.broader?.includes(null)) {
-    concept.broader = [concept.ancestors[0]]
+    concept.broader = concept.ancestors[0] ? [concept.ancestors[0]] : []
   }
   // Also load narrower
   await Promise.all(concept.ancestors.map(ancestor => loadNarrower(ancestor)))
