@@ -1,5 +1,5 @@
 <script setup>
-defineProps({
+const props = defineProps({
   location: Object,
 })
 
@@ -8,6 +8,9 @@ import { LMap, LTileLayer, LGeoJson } from "@vue-leaflet/vue-leaflet"
 
 const geojsonLayerReady = (layer) => {
   layer._map?.fitBounds(layer.getBounds())
+  if (props.location.type === "Point") {
+    layer._map?.setZoom(15)
+  }
 }
 </script>
 
