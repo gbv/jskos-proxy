@@ -1,29 +1,31 @@
 <script setup>
 defineProps({
-  longitude: Number,
-  latitude: Number,
+  location: Object,
 })
 
 import "leaflet/dist/leaflet.css"
-import { LMap, LTileLayer, LMarker } from "@vue-leaflet/vue-leaflet"
-import { ref } from "vue"
+import { LMap, LTileLayer, LGeoJson } from "@vue-leaflet/vue-leaflet"
 
-const zoom = ref(8)
+const geojsonLayerReady = (layer) => {
+  layer._map?.fitBounds(layer.getBounds())
+}
 </script>
 
 <template>
   <div style="height: 300px">
+    <!-- For some reason, we need zoom and center, even though we are providing bounds -->
     <l-map
-      ref="map"
-      v-model:zoom="zoom"
-      :center="[latitude, longitude]"
+      :zoom="1"
+      :center="[47.2, 12]"
       :use-global-leaflet="false">
       <l-tile-layer
         url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
         layer-type="base"
         name="OpenStreetMap"
         attribution="&copy; <a href='http://www.openstreetmap.org/copyright'>OpenStreetMap</a>" />
-      <l-marker :lat-lng="[latitude, longitude]" />
+      <l-geo-json 
+        :geojson="location"
+        @ready="geojsonLayerReady" />
     </l-map>
   </div>
 </template>
