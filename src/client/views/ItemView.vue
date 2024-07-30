@@ -155,7 +155,6 @@ const topConcepts = computed(() => {
     <div
       v-if="scheme?.license?.length"
       id="licenseInfo">
-      {{ $t("license") }}:
       <license-info :item="scheme" />
     </div>
   </h2>
@@ -365,7 +364,7 @@ const topConcepts = computed(() => {
 }
 #licenseInfo {
   font-weight: normal;
-  font-size: 15px;
+  font-size: 18px;
   margin-top: 5px;
 }
 #licenseInfo > .jskos-vue-itemDetails-licenseInfo {
