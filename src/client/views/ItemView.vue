@@ -265,6 +265,11 @@ const topConcepts = computed(() => {
             </a>, {{ distribution.size }}) {{ jskos.languageMapContent(distribution, "definition")?.[0] || "" }}
           </li>
         </ul>
+        <div 
+          v-if="config.env === 'development'">
+          <pre><code>{{ JSON.stringify(jskos.deepCopy(concept || scheme, ["topConceptOf", "inScheme", "topConcepts"]), null, 2) }}
+            </code></pre>
+        </div>
       </template>
     </item-details>
     <div
