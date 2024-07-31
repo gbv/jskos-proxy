@@ -226,14 +226,12 @@ const topConcepts = computed(() => {
             </li>
           </ul>
         </div>
-        <!-- TODO: Show all locations in one map? Needs test case. -->
         <div
           v-if="concept?.location?.length"
           title="Map">
           <MapView
-            v-for="(location, index) in concept.location"
-            :key="`${uri}-${index}`"
-            :location="location" />
+            :key="`${uri}`"
+            :locations="Array.isArray(concept.location) ? concept.location : [concept.location]" />
         </div>
         <div style="margin: 0 0 10px;">
           <b>Linked Data:</b>
