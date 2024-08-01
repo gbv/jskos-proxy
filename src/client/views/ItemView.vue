@@ -155,7 +155,9 @@ const topConcepts = computed(() => {
     <div
       v-if="scheme?.license?.length"
       id="licenseInfo">
-      <license-info :item="scheme" />
+      <license-info 
+        :item="scheme"
+        :shields-io-opt-in="true" />
     </div>
   </h2>
   <item-suggest
