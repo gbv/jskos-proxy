@@ -230,8 +230,7 @@ const topConcepts = computed(() => {
           v-if="concept?.location?.length"
           title="Map">
           <MapView
-            :key="`${uri}`"
-            :locations="Array.isArray(concept.location) ? concept.location : [concept.location]" />
+            :concept="concept" />
         </div>
         <div style="margin: 0 0 10px;">
           <b>Linked Data:</b>

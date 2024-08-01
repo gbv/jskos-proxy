@@ -1,25 +1,31 @@
 <script setup>
 const props = defineProps({
-  locations: Array,
+  concept: Object,
 })
 
 import "leaflet/dist/leaflet.css"
 import { LMap, LTileLayer, LGeoJson } from "@vue-leaflet/vue-leaflet"
-import { watch } from "vue"
+import { computed, watch } from "vue"
 
-const initialBounds = {
-  _northEast: {
-    lat: -90,
-    lng: -180,
-  },
-  _southWest: {
-    lat: 90,
-    lng: 180,
-  },
-}
+const locations = computed(() => {
+  if (!props.concept.location) {
+    return []
+  }
+  return Array.isArray(props.concept.location) ? props.concept.location : [props.concept.location]
+})
+
 let bounds, count
-watch(() => props.locations, () => {
-  bounds = initialBounds
+watch(locations, () => {
+  bounds = {
+    _northEast: {
+      lat: -90,
+      lng: -180,
+    },
+    _southWest: {
+      lat: 90,
+      lng: 180,
+    },
+  }
   count = 0
 }, { immediate: true })
 
@@ -31,7 +37,7 @@ const geojsonLayerReady = (layer, location) => {
   bounds._northEast.lng = Math.max(bounds._northEast.lng, layerBounds._northEast.lng)
   bounds._southWest.lat = Math.min(bounds._southWest.lat, layerBounds._southWest.lat)
   bounds._southWest.lng = Math.min(bounds._southWest.lng, layerBounds._southWest.lng)
-  if (count >= props.locations.length) {
+  if (count >= locations.value.length) {
     layer._map?.fitBounds([
       [bounds._northEast.lat, bounds._northEast.lng],
       [bounds._southWest.lat, bounds._southWest.lng],
@@ -58,7 +64,7 @@ const geojsonLayerReady = (layer, location) => {
         attribution="&copy; <a href='http://www.openstreetmap.org/copyright'>OpenStreetMap</a>" />
       <l-geo-json 
         v-for="(location, index) in locations"
-        :key="index"
+        :key="`${concept.uri}-${index}`"
         :geojson="location"
         @ready="geojsonLayerReady($event, location)" />
     </l-map>
