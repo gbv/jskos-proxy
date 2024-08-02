@@ -187,7 +187,7 @@ const topConcepts = computed(() => {
     v-else
     id="conceptHierarchy">
     <template v-if="errors.schemeError">
-      {{ t("schemeError") }}
+      {{ $t("schemeError") }}
     </template>
     <template v-if="errors.schemesError">
       {{ $t("schemesError") }}
