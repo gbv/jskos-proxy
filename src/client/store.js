@@ -3,6 +3,13 @@ import config from "@/config.js"
 import * as jskos from "jskos-tools"
 import i18n from "@/i18n.js"
 
+export const detailsLoadedKey = "__DETAILSLOADED__"
+export const detailsLoadedStates = {
+  noData: 0,
+  basicData: 1,
+  allData: 2,
+}
+
 export const state = reactive({
   schemes: null,
   concepts: {},
@@ -87,6 +94,10 @@ export function saveConcept(concept, { returnIfExists = false, returnNullOnError
   if (existing === concept || existing && returnIfExists) {
     return existing
   }
+  // Set loaded state if necessary and prefLabel exists
+  if (!concept[detailsLoadedKey] && concept.prefLabel) {
+    concept[detailsLoadedKey] = detailsLoadedStates.basicData
+  }
 
   // Replace scheme props
   for (const prop of schemeProps) {
@@ -106,6 +117,7 @@ export function saveConcept(concept, { returnIfExists = false, returnNullOnError
         }
       }
     }
+    existing[detailsLoadedKey] = concept[detailsLoadedKey]
     return existing
   } else {
     for (const uri of jskos.getAllUris(concept)) {
@@ -128,7 +140,7 @@ export function saveConceptsWithOptions(options) {
 export async function loadConcept(uri) {
   const existing = getConceptByUri(uri)
   // Make sure ALL details (including mappings and location) have been loaded
-  if (existing?._registry && existing?.__DETAILSLOADED__ === 1) {
+  if (existing?._registry && existing?.[detailsLoadedKey] === detailsLoadedStates.allData) {
     return existing
   }
   console.time(`loadConcept ${uri}`)
@@ -137,7 +149,7 @@ export async function loadConcept(uri) {
   if (!concept) {
     throw new Error(`Error loading concept ${uri}`)
   }
-  concept.__DETAILSLOADED__ = 1
+  concept[detailsLoadedKey] = detailsLoadedStates.allData
   return saveConcept(concept)
 }
 

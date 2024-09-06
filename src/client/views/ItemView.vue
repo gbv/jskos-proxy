@@ -2,7 +2,7 @@
 import config from "@/config.js"
 import * as jskos from "jskos-tools"
 import { AutoLink, LicenseInfo } from "jskos-vue"
-import { schemes, registry, loadTop, loadNarrower, loadConcept, loadAncestors, saveConcept, formats } from "@/store.js"
+import { schemes, registry, loadTop, loadNarrower, loadConcept, loadAncestors, saveConcept, formats, getConceptByUri, detailsLoadedKey, detailsLoadedStates } from "@/store.js"
 import { computed, ref, reactive, watch } from "vue"
 import { useRoute, useRouter } from "vue-router"
 import { utils } from "jskos-vue"
@@ -107,16 +107,23 @@ watch(uri, async (value, prevValue) => {
     tabsVueComponent?.proxy?.activateTab(0)
     // Wait for top concepts before doing anything else
     topLoadingPromise && await topLoadingPromise
-    // Load concept data
-    let loadedConcept
-    try {
-      loadedConcept = await loadConcept(value, scheme.value)
-    } catch (error) {
-      console.error(`Error loading concept ${value}:`, error)
-      errors.loadConceptError = true
-      conceptLoading.value = false
-      hierarchyLoading.value = false
-      return
+    // Load concept data...
+    let loadedConcept = getConceptByUri(value)
+    console.log(loadedConcept, loadedConcept[detailsLoadedKey], detailsLoadedStates.basicData)
+    // ...depending on loaded state
+    if (!loadedConcept?.[detailsLoadedKey]) {
+      try {
+        loadedConcept = await loadConcept(value, scheme.value)
+      } catch (error) {
+        console.error(`Error loading concept ${value}:`, error)
+        errors.loadConceptError = true
+        conceptLoading.value = false
+        hierarchyLoading.value = false
+        return
+      }
+    } else if (loadedConcept[detailsLoadedKey] === detailsLoadedStates.basicData) {
+      // Load all concept data, but don't wait for it here
+      loadConcept(value, scheme.value)
     }
     // Abort if concept has changed in the meantime
     if (value !== uri.value) {
@@ -266,6 +273,9 @@ const topConcepts = computed(() => {
             </a>, {{ distribution.size }}) {{ jskos.languageMapContent(distribution, "definition")?.[0] || "" }}
           </li>
         </ul>
+        <p v-if="concept?.[detailsLoadedKey] === detailsLoadedStates.basicData">
+          <loading-indicator />
+        </p>
         <div 
           v-if="config.env === 'development'">
           <pre><code>{{ JSON.stringify(jskos.deepCopy(concept || scheme, ["topConceptOf", "inScheme", "topConcepts"]), null, 2) }}
