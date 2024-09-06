@@ -127,7 +127,8 @@ export function saveConceptsWithOptions(options) {
 
 export async function loadConcept(uri) {
   const existing = getConceptByUri(uri)
-  if (existing?._registry) {
+  // Make sure ALL details (including mappings and location) have been loaded
+  if (existing?._registry && existing?.__DETAILSLOADED__ === 1) {
     return existing
   }
   console.time(`loadConcept ${uri}`)
@@ -136,6 +137,7 @@ export async function loadConcept(uri) {
   if (!concept) {
     throw new Error(`Error loading concept ${uri}`)
   }
+  concept.__DETAILSLOADED__ = 1
   return saveConcept(concept)
 }
 
@@ -146,7 +148,7 @@ export async function loadTop(scheme) {
     return scheme?.topConcepts
   }
   console.time(`loadTop ${scheme.uri}`)
-  const topConcepts = await registry.getTop({ scheme: { uri: scheme.uri } })
+  const topConcepts = await registry.getTop({ scheme: { uri: scheme.uri }, params: { properties: "" } })
   topConcepts.forEach(concept => {
     concept.ancestors = []
   })
@@ -165,7 +167,7 @@ export async function loadNarrower(concept) {
     return concept?.narrower
   }
   console.time(`loadNarrower ${concept.uri}`)
-  const narrower = await concept._getNarrower()
+  const narrower = await concept._getNarrower({ params: { properties: "" } })
   concept.narrower = jskos.sortConcepts(saveConceptsWithOptions()(narrower))
   // Set ancestors of narrower concepts
   if (concept.ancestors && !concept.ancestors?.includes(null)) {
@@ -188,7 +190,7 @@ export async function loadAncestors(concept) {
     return concept?.ancestors
   }
   console.time(`loadAncestors ${concept.uri}`)
-  const ancestors = await concept._getAncestors()
+  const ancestors = await concept._getAncestors({ params: { properties: "" } })
   for (let i = 0; i < ancestors.length; i += 1) {
     ancestors[i].ancestors = ancestors.slice(i + 1)
   }
