@@ -9,8 +9,8 @@
     "build": "vite build",
     "start": "NODE_ENV=production node src/server/server.js",
     "test": "echo 'Tests not yet implemented' && npm run lint",
-    "lint": "eslint . --ext .vue,.js,.jsx,.cjs,.mjs --ignore-path .gitignore",
-    "fix": "npm run lint -- --fix",
+    "lint": "eslint",
+    "fix": "eslint --fix",
     "updateTypes": "curl -s https://api.dante.gbv.de/voc/nkostype/top | jq -c '[.[] | { uri, prefLabel }]' > src/client/nkostype-concepts.json",
     "updateFormats": "curl -s https://format.gbv.de/formats.ndjson | jq -c '{key:(\"http://format.gbv.de/\"+.id),value:.title}' | jq -Ss 'from_entries' > src/client/formats.json",
     "release": "git checkout dev && git pull && npm test && npm version $SEMVER && git push && git checkout main && git merge dev && git push --follow-tags && git checkout dev",
@@ -50,8 +50,8 @@
   },
   "devDependencies": {
     "@vitejs/plugin-vue": "^5.1.3",
-    "eslint": "^8.57.0",
-    "eslint-config-gbv": "^1.1.0",
+    "eslint": "^9.10.0",
+    "eslint-config-gbv": "^2.0.0",
     "eslint-plugin-vue": "^9.28.0",
     "nodemon": "^3.1.4",
     "vite": "^5.4.5"

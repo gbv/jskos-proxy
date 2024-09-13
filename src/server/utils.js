@@ -2,7 +2,7 @@ export const protocolless = url => url.toString().replace(/^[^:]+:/,"")
 
 export const uriPath = (uri, base) => {
   if (protocolless(uri).startsWith(protocolless(base))) {
-    var origin = new URL(base)
+    const origin = new URL(base)
     origin.pathname = "/"
     return protocolless(uri).substr(protocolless(origin).length-1)
   } else {
@@ -11,7 +11,7 @@ export const uriPath = (uri, base) => {
 }
 
 export const link = (uri, base, format) => {
-  var localUrl = uriPath(uri, base)
+  let localUrl = uriPath(uri, base)
   const params = format ? {format} : {}
 
   if (localUrl === uri) {
