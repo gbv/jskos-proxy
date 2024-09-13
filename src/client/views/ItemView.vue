@@ -235,7 +235,7 @@ const topConcepts = computed(() => {
           </ul>
         </div>
         <div
-          v-if="concept?.location?.length"
+          v-if="concept?.location"
           title="Map">
           <MapView
             :concept="concept" />
