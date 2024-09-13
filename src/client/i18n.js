@@ -1,4 +1,4 @@
-import { createI18n } from "vue-i18n"
+import { createI18n } from "petite-vue-i18n"
 import messages from "#/locale.json"
 import config from "@/config.js"
 
