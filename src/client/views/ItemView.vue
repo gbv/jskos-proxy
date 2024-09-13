@@ -109,7 +109,6 @@ watch(uri, async (value, prevValue) => {
     topLoadingPromise && await topLoadingPromise
     // Load concept data...
     let loadedConcept = getConceptByUri(value)
-    console.log(loadedConcept, loadedConcept[detailsLoadedKey], detailsLoadedStates.basicData)
     // ...depending on loaded state
     if (!loadedConcept?.[detailsLoadedKey]) {
       try {
