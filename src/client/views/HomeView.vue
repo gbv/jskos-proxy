@@ -1,13 +1,14 @@
 <script setup>
-import { useRoute } from "vue-router"
+import { useRoute, useRouter } from "vue-router"
 import * as jskos from "jskos-tools"
-import { schemes, quickSelection, publisherSelection, typeSelection, registry } from "@/store.js"
+import { schemes, schemesAsConceptSchemes, quickSelection, publisherSelection, typeSelection, registry } from "@/store.js"
 import { ref, computed, watch } from "vue"
 import { getRouterUrl } from "@/utils.js"
 import CategoryButton from "@/components/CategoryButton.vue"
 import SchemeButton from "@/components/SchemeButton.vue"
 
 const route = useRoute()
+const router = useRouter()
 
 const mode = computed(() => {
   if (route.query?.publisher) {
@@ -24,6 +25,28 @@ const mode = computed(() => {
   }
   return "default"
 })
+
+watch(() => ([schemesAsConceptSchemes.value, route.query.uri]), ([schemes, uri]) => {
+  if (schemes?.length > 0 && uri) {
+    // Try to find scheme or concept that fits URI
+    const scheme = schemes.find(s => jskos.compare(s, { uri }))
+    if (scheme) {
+      // Scheme found, redirect
+      router.push(getRouterUrl({ scheme }))
+      return
+    }
+    for (const scheme of schemes) {
+      const concept = scheme.conceptFromUri(uri)
+      if (concept) {
+        // Concept found, redirect
+        router.push(getRouterUrl({ concept, scheme }))
+        return
+      }
+    }
+    // Report error on console
+    console.error(`Could find neither vocabulary or concept that fits given URI ${uri}`)
+  }
+}, { immediate: true })
 
 const publisherGroups = computed(() => {
   const groups = []

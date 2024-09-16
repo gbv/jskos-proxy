@@ -59,6 +59,7 @@ export const schemeFetchPromise = fetch(
 })
 
 export const schemes = computed(() => state.schemes)
+export const schemesAsConceptSchemes = computed(() => state.schemes?.map(scheme => new jskos.ConceptScheme(scheme)) || [])
 
 import { cdk } from "cocoda-sdk"
 
