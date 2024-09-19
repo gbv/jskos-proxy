@@ -96,8 +96,9 @@ export class ApiBackend {
   }
 
   async getConcept(uri) {
-    // TODO: Also load narrower concepts?
-    return (await this.registry.getConcepts({ concepts: [{ uri }] }))?.[0]
+    let properties = this.registry._defaultParams?.properties || ""
+    properties += (properties ? "," : "") + "broader,ancestors,narrower"
+    return (await this.registry.getConcepts({ concepts: [{ uri }], params: { properties } }))?.[0]
   }
 
   toString() {
