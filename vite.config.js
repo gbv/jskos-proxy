@@ -4,6 +4,7 @@ import { resolve, dirname } from "node:path"
 import { defineConfig } from "vite"
 import vue from "@vitejs/plugin-vue"
 import VueI18nPlugin from "@intlify/unplugin-vue-i18n/vite"
+import vueDevTools from "vite-plugin-vue-devtools"
 
 import config from "./config/config.js"
 
@@ -15,6 +16,7 @@ export default defineConfig({
     VueI18nPlugin({
       include: resolve(dirname(fileURLToPath(import.meta.url)), "./locale.json"),
     }),
+    vueDevTools(),
   ],
   resolve: {
     alias: {
