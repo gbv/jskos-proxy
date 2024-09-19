@@ -163,6 +163,22 @@ watch(mode, () => {
       <loading-indicator size="xl" />
     </div>
   </main>
+  <!-- If URI is given, but we stayed here, that means that URI could not be redirected. -->
+  <main v-else-if="route?.query?.uri">
+    <div 
+      class="section"
+      style="text-align: center;">
+      <h2>{{ $t("error") }}: {{ route.query.uri }}</h2>
+      <p>
+        {{ $t("loadUriError") }}
+      </p>
+      <p>
+        <RouterLink to="">
+          {{ $t("back") }}
+        </RouterLink>
+      </p>
+    </div>
+  </main>
   <main v-else-if="schemes.length">
     <!-- Default section -->
     <div class="section">

@@ -11,10 +11,12 @@
     "license": "Lizenz",
     "distributions": "Download",
     "error": "Fehler",
+    "back": "zurück",
     "schemesError": "Vokabulare konnten nicht vom Backend geladen werden. Bitte Seite neu laden, um es erneut zu versuchen.",
     "schemeError": "Vokabular konnte nicht gefunden werden.",
     "loadTopError": "@:error{':'} Oberkonzepte konnten nicht geladen werden.",
     "loadConceptError": "Konzeptdetails konnten nicht geladen werden. Entweder existiert das Konzept nicht oder es gibt Probleme beim Zugriff auf das Backend.",
+    "loadUriError": "Diese Anfrage führt leider ins Leere.",
     "searchInVocabulary": "in {voc} suchen"
   },
   "en": {
@@ -29,10 +31,12 @@
     "license": "License",
     "distributions": "Download",
     "error": "Error",
+    "back": "back",
     "schemesError": "Could not load vocabularies from backend. Please reload to try again.",
     "schemeError": "Vocabulary could not be found.",
     "loadTopError": "@:error{':'} Top concepts could not be loaded.",
     "loadConceptError": "Concept details could not be loaded. Either the concept does not exist, or there are issues with the backend.",
+    "loadUriError": "Unfortunately, this request was not successful.",
     "searchInVocabulary": "search in {voc}"
   }
 }
