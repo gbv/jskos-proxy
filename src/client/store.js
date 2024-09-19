@@ -118,7 +118,9 @@ export function saveConcept(concept, { returnIfExists = false, returnNullOnError
         }
       }
     }
-    existing[detailsLoadedKey] = concept[detailsLoadedKey]
+    if (concept[detailsLoadedKey] > (existing[detailsLoadedKey] ?? 0)) {
+      existing[detailsLoadedKey] = concept[detailsLoadedKey]
+    }
     return existing
   } else {
     for (const uri of jskos.getAllUris(concept)) {
