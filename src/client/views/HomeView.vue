@@ -1,7 +1,7 @@
 <script setup>
 import { useRoute, useRouter } from "vue-router"
 import * as jskos from "jskos-tools"
-import { schemes, schemesAsConceptSchemes, quickSelection, publisherSelection, typeSelection, registry } from "@/store.js"
+import { schemes, schemesAsConceptSchemes, quickSelection, publisherSelection, typeSelection, registry, loadConcept } from "@/store.js"
 import { ref, computed, watch } from "vue"
 import { getRouterUrl } from "@/utils.js"
 import CategoryButton from "@/components/CategoryButton.vue"
@@ -26,7 +26,7 @@ const mode = computed(() => {
   return "default"
 })
 
-watch(() => ([schemesAsConceptSchemes.value, route.query.uri]), ([schemes, uri]) => {
+watch(() => ([schemesAsConceptSchemes.value, route.query.uri]), async ([schemes, uri]) => {
   if (schemes?.length > 0 && uri) {
     // Try to find scheme or concept that fits URI
     const scheme = schemes.find(s => jskos.compare(s, { uri }))
@@ -42,6 +42,17 @@ watch(() => ([schemesAsConceptSchemes.value, route.query.uri]), ([schemes, uri])
         router.push(getRouterUrl({ concept, scheme }))
         return
       }
+    }
+    // Fallback: Request data from backend about concept directly
+    try {
+      const concept = await loadConcept(uri)
+      const scheme = schemes.find(s => jskos.compare(s, concept?.inScheme?.[0]))
+      if (concept && scheme) {
+        router.push(getRouterUrl({ concept, scheme }))
+        return
+      }
+    } catch (error) {
+      // ignore
     }
     // Report error on console
     console.error(`Could find neither vocabulary or concept that fits given URI ${uri}`)
