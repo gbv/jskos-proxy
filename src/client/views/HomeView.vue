@@ -26,8 +26,10 @@ const mode = computed(() => {
   return "default"
 })
 
+const loadingUri = ref(false)
 watch(() => ([schemesAsConceptSchemes.value, route.query.uri]), async ([schemes, uri]) => {
   if (schemes?.length > 0 && uri) {
+    loadingUri.value = true
     // Try to find scheme or concept that fits URI
     const scheme = schemes.find(s => jskos.compare(s, { uri }))
     if (scheme) {
@@ -55,6 +57,7 @@ watch(() => ([schemesAsConceptSchemes.value, route.query.uri]), async ([schemes,
       // ignore
     }
     // Report error on console
+    loadingUri.value = false
     console.error(`Could find neither vocabulary or concept that fits given URI ${uri}`)
   }
 }, { immediate: true })
@@ -179,15 +182,20 @@ watch(mode, () => {
     <div 
       class="section"
       style="text-align: center;">
-      <h2>{{ $t("error") }}: {{ route.query.uri }}</h2>
-      <p>
-        {{ $t("loadUriError") }}
-      </p>
-      <p>
-        <RouterLink to="">
-          {{ $t("back") }}
-        </RouterLink>
-      </p>
+      <template v-if="loadingUri">
+        <h2>{{ $t("loading") }} {{ route.query.uri }}...</h2>
+      </template>
+      <template v-else>
+        <h2>{{ $t("error") }}: {{ route.query.uri }}</h2>
+        <p>
+          {{ $t("loadUriError") }}
+        </p>
+        <p>
+          <RouterLink to="">
+            {{ $t("back") }}
+          </RouterLink>
+        </p>
+      </template>
     </div>
   </main>
   <main v-else-if="schemes.length">
