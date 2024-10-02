@@ -13,7 +13,8 @@
     "fix": "eslint --fix",
     "updateTypes": "curl -s https://api.dante.gbv.de/voc/nkostype/top | jq -c '[.[] | { uri, prefLabel }]' > src/client/nkostype-concepts.json",
     "updateFormats": "curl -s https://format.gbv.de/formats.ndjson | jq -c '{key:(\"http://format.gbv.de/\"+.id),value:.title}' | jq -Ss 'from_entries' > src/client/formats.json",
-    "release": "git checkout dev && git pull && npm test && npm version $SEMVER && git push && git checkout main && git merge dev && git push --follow-tags && git checkout dev",
+    "yesno": "node -e \"const yesno = require('yesno'); yesno({ question: 'Are you sure you want to continue?' }).then(ok => process.exit(ok ? 0 : 1));\"",
+    "release": "test $(git rev-parse --abbrev-ref HEAD) = dev && git pull && npm test && npm version $SEMVER && npm run --silent yesno && (git push && git checkout main && git merge dev && git push --follow-tags && git checkout dev) || (git tag -d $(git describe --tags) && git reset --hard HEAD~1)",
     "release:patch": "SEMVER=patch npm run release",
     "release:minor": "SEMVER=minor npm run release",
     "release:major": "SEMVER=major npm run release"
@@ -55,6 +56,7 @@
     "eslint-plugin-vue": "^9.28.0",
     "nodemon": "^3.1.7",
     "vite": "^5.4.8",
-    "vite-plugin-vue-devtools": "^7.4.6"
+    "vite-plugin-vue-devtools": "^7.4.6",
+    "yesno": "^0.4.0"
   }
 }
