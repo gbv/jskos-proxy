@@ -7,7 +7,7 @@
 
 > Serve [JSKOS] objects in multiple formats over HTTP, in particular HTML and RDF
 
-This web service can be put in front of [JSKOS] (0.5.2) data sources to provide RDF serializations and browseable HTML display of controlled vocabularies at a common base URL.
+This web service can be put in front of [JSKOS] (0.5.4) data sources to provide RDF serializations and browseable HTML display of controlled vocabularies at a common base URL.
 
 [JSKOS]: https://gbv.github.io/jskos/jskos.html
 
