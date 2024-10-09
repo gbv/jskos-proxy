@@ -140,14 +140,20 @@ export function saveConceptsWithOptions(options) {
   return items => items.map(item => saveConcept(item, options))
 }
 
+let properties
 export async function loadConcept(uri) {
+  if (!properties) {
+    // Adjust properties for concept details
+    properties = registry._defaultParams?.properties || ""
+    properties += (properties ? "," : "") + "location,startPlace,endPlace,startDate,endDate"
+  }
   const existing = getConceptByUri(uri)
   // Make sure ALL details (including mappings and location) have been loaded
   if (existing?._registry && existing?.[detailsLoadedKey] === detailsLoadedStates.allData) {
     return existing
   }
   console.time(`loadConcept ${uri}`)
-  const concept = (await registry.getConcepts({ concepts: [{ uri }] }))[0]
+  const concept = (await registry.getConcepts({ concepts: [{ uri }], params: { properties } }))[0]
   console.timeEnd(`loadConcept ${uri}`)
   if (!concept) {
     throw new Error(`Error loading concept ${uri}`)

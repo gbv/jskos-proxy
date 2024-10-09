@@ -219,6 +219,33 @@ const topConcepts = computed(() => {
       @select="concept = { uri: $event.item.uri }">
       <template #additionalTabs>
         <div
+          v-if="concept?.startDate || concept?.endDate || concept?.startPlace?.length || concept?.endPlace?.length">
+          <ul class="jskos-vue-itemDetails-list">
+            <li v-if="concept?.startDate">
+              <b>{{ $t("startDate") }}:</b> {{ utils.dateToString(concept.startDate) }}
+            </li>
+            <li v-if="concept?.startPlace?.length">
+              <b>{{ $t("startPlace") }}:</b> <auto-link
+                v-for="c in concept.startPlace"
+                :key="c?.uri"
+                :title="c?.uri"
+                :href="c?.uri"
+                :text="jskos.prefLabel(c)" />
+            </li>
+            <li v-if="concept?.endDate">
+              <b>{{ $t("endDate") }}:</b> {{ utils.dateToString(concept.endDate) }}
+            </li>
+            <li v-if="concept?.endPlace?.length">
+              <b>{{ $t("endPlace") }}:</b> <auto-link
+                v-for="c in concept.endPlace"
+                :key="c?.uri"
+                :title="c?.uri"
+                :href="c?.uri"
+                :text="jskos.prefLabel(c)" />
+            </li>
+          </ul>
+        </div>
+        <div
           v-if="concept?.mappings?.length">
           <ul class="jskos-vue-itemDetails-list">
             <li><b>Mappings:</b></li>

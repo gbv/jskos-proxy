@@ -18,7 +18,11 @@
     "loadTopError": "@:error{':'} Oberkonzepte konnten nicht geladen werden.",
     "loadConceptError": "Konzeptdetails konnten nicht geladen werden. Entweder existiert das Konzept nicht oder es gibt Probleme beim Zugriff auf das Backend.",
     "loadUriError": "Diese Anfrage führt leider ins Leere.",
-    "searchInVocabulary": "in {voc} suchen"
+    "searchInVocabulary": "in {voc} suchen",
+    "startDate": "Startdatum",
+    "endDate": "Enddatum",
+    "startPlace": "Startort",
+    "endPlace": "Endort"
   },
   "en": {
     "about": "About",
@@ -39,6 +43,10 @@
     "loadTopError": "@:error{':'} Top concepts could not be loaded.",
     "loadConceptError": "Concept details could not be loaded. Either the concept does not exist, or there are issues with the backend.",
     "loadUriError": "Unfortunately, this request was not successful.",
-    "searchInVocabulary": "search in {voc}"
+    "searchInVocabulary": "search in {voc}",
+    "startDate": "Start Date",
+    "endDate": "End Date",
+    "startPlace": "Start Place",
+    "endPlace": "End Place"
   }
 }
