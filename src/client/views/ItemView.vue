@@ -225,23 +225,29 @@ const topConcepts = computed(() => {
               <b>{{ $t("startDate") }}:</b> {{ utils.dateToString(concept.startDate) }}
             </li>
             <li v-if="concept?.startPlace?.length">
-              <b>{{ $t("startPlace") }}:</b> <auto-link
-                v-for="c in concept.startPlace"
-                :key="c?.uri"
-                :title="c?.uri"
-                :href="c?.uri"
-                :text="jskos.prefLabel(c)" />
+              <b>{{ $t("startPlace") }}:</b> <template
+                v-for="(c, i) in concept.startPlace"
+                :key="c?.uri">
+                <auto-link 
+                  :title="c?.uri"
+                  :href="c?.uri"
+                  :text="jskos.prefLabel(c)" />
+                <span v-if="i < concept.startPlace.length -1">, </span>
+              </template>
             </li>
             <li v-if="concept?.endDate">
               <b>{{ $t("endDate") }}:</b> {{ utils.dateToString(concept.endDate) }}
             </li>
             <li v-if="concept?.endPlace?.length">
-              <b>{{ $t("endPlace") }}:</b> <auto-link
-                v-for="c in concept.endPlace"
-                :key="c?.uri"
-                :title="c?.uri"
-                :href="c?.uri"
-                :text="jskos.prefLabel(c)" />
+              <b>{{ $t("endPlace") }}:</b> <template
+                v-for="(c, i) in concept.endPlace"
+                :key="c?.uri">
+                <auto-link 
+                  :title="c?.uri"
+                  :href="c?.uri"
+                  :text="jskos.prefLabel(c)" />
+                <span v-if="i < concept.endPlace.length -1">, </span>
+              </template>
             </li>
           </ul>
         </div>
