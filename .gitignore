@@ -32,6 +32,7 @@ config/*
 !config/config.js
 !config/uri.gbv.de
 !config/rvk
+!config/uri.gbv.de+coli-conc
 
 # Will be symlinked dynamically
 public/favicon.ico
