@@ -77,6 +77,13 @@ app.get(`${config.namespace.pathname}:voc?/:id?`, async (req, res, next) => {
 
     // Clean data
     for (const _item of Array.isArray(item) ? item : [item]) {
+      // Add REGISTRY field so that frontend knows which registry this item belongs to
+      if (_item._registry) {
+        _item.REGISTRY = {
+          provider: _item._registry.constructor.providerName,
+          status: _item._registry._api.status || `${_item._registry._api.api}status`,
+        }
+      }
       // Remove keys started with _
       Object.keys(_item).filter(key => key.startsWith("_")).forEach(key => delete _item[key])
       // Replace certain subsets with URI only objects

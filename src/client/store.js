@@ -44,6 +44,13 @@ export function setLocale(value) {
   }
 }
 
+import { cdk } from "cocoda-sdk"
+
+export const registries = config.backend.split(",").map(base => cdk.initializeRegistry({
+  provider: "ConceptApi",
+  status: `${base}status`,
+}))
+
 export const schemeFetchPromise = fetch(
   config.namespace.pathname, 
   { 
@@ -51,7 +58,18 @@ export const schemeFetchPromise = fetch(
     signal: AbortSignal.timeout(20000),
   },
 ).then(res => res.json()).then(data => {
-  state.schemes = data
+  state.schemes = data.map(scheme => {
+    scheme = new jskos.ConceptScheme(scheme)
+    // Add _registry to scheme (via special REGISTRY field provided by backend)
+    scheme._registry = registries.find(registry => registry._api?.status === scheme.REGISTRY?.status)
+    // If there's an identifier with the current namespace, use it as the main identifier
+    const identifier = (scheme.identifier || []).find(i => i.startsWith(config.namespace))
+    if (identifier) {
+      scheme.identifier.push(scheme.uri)
+      scheme.uri = identifier
+    }
+    return scheme
+  })
 }).catch(() => {
   console.error("Error loading schemes from backend.")
   // TODO: Add retry mechanism
@@ -61,13 +79,16 @@ export const schemeFetchPromise = fetch(
 export const schemes = computed(() => state.schemes)
 export const schemesAsConceptSchemes = computed(() => state.schemes?.map(scheme => new jskos.ConceptScheme(scheme)) || [])
 
-import { cdk } from "cocoda-sdk"
+export async function getRegistryForScheme(scheme) {
+  await schemeFetchPromise
+  return state.schemes.find(s => jskos.compare(s, scheme))?._registry
+}
 
-export const registry = cdk.initializeRegistry({
-  provider: "ConceptApi",
-  // ? Does "config.backend" always have a trailing slash?
-  status: `${config.backend}status`,
-})
+export async function getRegistryForUri(uri) {
+  await schemeFetchPromise
+  // Find scheme where URI matches namespace
+  return await getRegistryForScheme(state.schemes.find(scheme => scheme.notationFromUri(uri)))
+}
 
 export function getConcept(concept) {
   for (const uri of jskos.getAllUris(concept)) {
@@ -142,6 +163,10 @@ export function saveConceptsWithOptions(options) {
 
 let properties
 export async function loadConcept(uri) {
+  const registry = await getRegistryForUri(uri)
+  if (!registry) {
+    return null
+  }
   if (!properties) {
     // Adjust properties for concept details
     properties = registry._defaultParams?.properties || ""
@@ -169,7 +194,11 @@ export async function loadTop(scheme) {
     return scheme?.topConcepts
   }
   console.time(`loadTop ${scheme.uri}`)
-  const topConcepts = await registry.getTop({ scheme: { uri: scheme.uri }, params: { properties: "" } })
+  const registry = await getRegistryForScheme(scheme)
+  if (!registry) {
+    return null
+  }
+  const topConcepts = await registry.getTop({ scheme: { uri: scheme.uri, identifier: scheme.identifier }, params: { properties: "" } })
   topConcepts.forEach(concept => {
     concept.ancestors = []
   })

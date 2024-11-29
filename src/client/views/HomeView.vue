@@ -1,7 +1,7 @@
 <script setup>
 import { useRoute, useRouter } from "vue-router"
 import * as jskos from "jskos-tools"
-import { schemes, schemesAsConceptSchemes, quickSelection, publisherSelection, typeSelection, registry, loadConcept } from "@/store.js"
+import { schemes, schemesAsConceptSchemes, quickSelection, publisherSelection, typeSelection, loadConcept, registries } from "@/store.js"
 import { ref, computed, watch } from "vue"
 import { getRouterUrl } from "@/utils.js"
 import CategoryButton from "@/components/CategoryButton.vue"
@@ -95,12 +95,14 @@ watch(() => route.query?.conceptSearch, async (value) => {
   }
   console.time(`concept search ${value}`)
   conceptSearchResults.value = [null]
-  const results = await registry.search({ search: value.trim() })
+  // Load concept results from all configured registries
+  const results = (await Promise.all(registries.map(registry => registry.search({ search: value.trim() }).catch(() => ([]))))).reduce((all, cur) => all.concat(cur), [])
   console.timeEnd(`concept search ${value}`)
   if (value === route.query?.conceptSearch) {
     const groupedResults = []
     for (const result of results) {
-      const scheme = result.inScheme[0]
+      let scheme = result.inScheme[0]
+      scheme = schemes.value?.find(s => jskos.compare(s, scheme)) || scheme
       const existingGroup = groupedResults.find(g => jskos.compare(g.scheme, scheme))
       if (existingGroup) {
         existingGroup.results.push(result)

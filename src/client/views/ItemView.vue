@@ -2,7 +2,7 @@
 import config from "@/config.js"
 import * as jskos from "jskos-tools"
 import { AutoLink, LicenseInfo } from "jskos-vue"
-import { schemes, registry, loadTop, loadNarrower, loadConcept, loadAncestors, saveConcept, formats, getConceptByUri, detailsLoadedKey, detailsLoadedStates } from "@/store.js"
+import { schemes, loadTop, loadNarrower, loadConcept, loadAncestors, saveConcept, formats, getConceptByUri, detailsLoadedKey, detailsLoadedStates } from "@/store.js"
 import { computed, ref, reactive, watch } from "vue"
 import { useRoute, useRouter } from "vue-router"
 import { utils } from "jskos-vue"
@@ -25,6 +25,7 @@ const schemeUri = computed(() => route.params.voc.match(/^https?:\/\//) ? route.
 const scheme = computed(() => {
   return schemes.value?.find(s => jskos.compare(s, { uri: schemeUri.value }))
 })
+const registry = computed(() => scheme.value?._registry)
 
 const uri = computed(() => scheme.value && (route.params.id && `${config.namespace}${route.params.voc}/${route.params.id}` || route.query.uri))
 const concept = computed({

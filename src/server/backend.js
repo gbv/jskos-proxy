@@ -50,15 +50,28 @@ export class ApiBackend {
     let previouslyErrored = false
     this.getSchemesPromise = new Promise(resolve => {
       cdk.repeat({
-        function: () => {
-          if (!this.registry?._api?.api) {
-            this.registry = cdk.initializeRegistry({
+        function: async () => {
+          if (!this.registries?.length) {
+            this.registries = this.base.split(",").map(base => cdk.initializeRegistry({
               provider: "ConceptApi",
               // ? Does "base" always have a trailing slash?
-              status: `${this.base}status`,
+              status: `${base}status`,
+            }))
+            // Explicitly set cdk instance for each registry to null so that `registryForScheme` won't be used
+            this.registries.forEach(registry => {
+              registry.cdk = null
             })
           }
-          return this.registry.getSchemes({ params: { limit: 10000 } })
+          let schemes = []
+          const results = (await Promise.all(this.registries.map(registry => registry.getSchemes({ params: { limit: 10000 } })))).reduce((all, cur) => all.concat(cur), [])
+          for (const result of results) {
+            // Only add to schemes if not there yet = backends specified first have priority
+            // Also don't add schemes that explicitly do not provide concepts
+            if (!schemes.find(scheme => jskos.compare(scheme, result)) && result.concepts?.length !== 0) {
+              schemes.push(result)
+            }
+          }
+          return schemes.map(scheme => new jskos.ConceptScheme(scheme))
         },
         callback: (error, result) => {
           if (error) {
@@ -70,8 +83,7 @@ export class ApiBackend {
             log(`Loaded ${result.length} schemes for backend.`)
             previouslyErrored = false
           }
-          // Only return schemes that have concepts
-          this.schemes = result.filter(s => !s.concepts || s.concepts?.length > 0)
+          this.schemes = result
           resolve()
         },
         interval: 6 * 1000,
@@ -96,9 +108,17 @@ export class ApiBackend {
   }
 
   async getConcept(uri) {
-    let properties = this.registry._defaultParams?.properties || ""
+    if (!this.schemes) {
+      await this.getSchemesPromise
+    }
+    // Determine registry
+    const registry = this.schemes.find(scheme => scheme.notationFromUri(uri))?._registry
+    if (!registry) {
+      return null
+    }
+    let properties = registry._defaultParams?.properties || ""
     properties += (properties ? "," : "") + "broader,ancestors,narrower"
-    return (await this.registry.getConcepts({ concepts: [{ uri }], params: { properties } }))?.[0]
+    return (await registry.getConcepts({ concepts: [{ uri }], params: { properties } }))?.[0]
   }
 
   toString() {
