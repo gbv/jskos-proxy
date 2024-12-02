@@ -84,10 +84,10 @@ export async function getRegistryForScheme(scheme) {
   return state.schemes.find(s => jskos.compare(s, scheme))?._registry
 }
 
-export async function getRegistryForUri(uri) {
+export async function getRegistryForUri(uri, scheme) {
   await schemeFetchPromise
   // Find scheme where URI matches namespace
-  return await getRegistryForScheme(state.schemes.find(scheme => scheme.notationFromUri(uri)))
+  return await getRegistryForScheme(scheme || state.schemes.find(scheme => scheme.notationFromUri(uri)))
 }
 
 export function getConcept(concept) {
@@ -162,8 +162,8 @@ export function saveConceptsWithOptions(options) {
 }
 
 let properties
-export async function loadConcept(uri) {
-  const registry = await getRegistryForUri(uri)
+export async function loadConcept(uri, scheme) {
+  const registry = await getRegistryForUri(uri, scheme)
   if (!registry) {
     return null
   }
@@ -178,7 +178,8 @@ export async function loadConcept(uri) {
     return existing
   }
   console.time(`loadConcept ${uri}`)
-  const concept = (await registry.getConcepts({ concepts: [{ uri }], params: { properties } }))[0]
+  scheme = scheme ? { uri: scheme.uri, identifier: scheme.identifier } : null
+  const concept = (await registry.getConcepts({ concepts: [{ uri }], params: { properties }, scheme }))[0]
   console.timeEnd(`loadConcept ${uri}`)
   if (!concept) {
     throw new Error(`Error loading concept ${uri}`)
