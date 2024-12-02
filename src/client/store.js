@@ -283,6 +283,15 @@ import formats from "@/formats.json"
 formats["http://format.gbv.de/jskos"] = "JSKOS"
 export { formats }
 
+export function getFormat(distribution) {
+  if (formats[distribution?.format]) {
+    return formats[distribution?.format]
+  }
+  // Try to guess format from URL
+  const [, format] = distribution?.download?.match?.(/(?:download|format)=([^&]*)/) || []
+  return format ? format.toUpperCase() : "?"
+}
+
 export const quickSelection = computed(() => config.quickSelection.map(scheme => schemes.value?.find(s => jskos.compare(s, scheme))).filter(Boolean))
 
 export const publisherSelection = computed(() => {

@@ -2,7 +2,7 @@
 import config from "@/config.js"
 import * as jskos from "jskos-tools"
 import { AutoLink, LicenseInfo } from "jskos-vue"
-import { schemes, loadTop, loadNarrower, loadConcept, loadAncestors, saveConcept, formats, getConceptByUri, detailsLoadedKey, detailsLoadedStates } from "@/store.js"
+import { schemes, loadTop, loadNarrower, loadConcept, loadAncestors, saveConcept, getFormat, getConceptByUri, detailsLoadedKey, detailsLoadedStates } from "@/store.js"
 import { computed, ref, reactive, watch } from "vue"
 import { useRoute, useRouter } from "vue-router"
 import { utils } from "jskos-vue"
@@ -299,11 +299,11 @@ const topConcepts = computed(() => {
               download>
               {{ distribution.created || "Download" }}
             </a>
-            (<a
+            (<auto-link
               :href="distribution.format"
               target="_blank">
-              {{ formats[distribution.format] }}
-            </a>, {{ distribution.size }}) {{ jskos.languageMapContent(distribution, "definition")?.[0] || "" }}
+              {{ getFormat(distribution) }}
+            </auto-link>, {{ distribution.size || $t("sizeUnknown") }}) {{ jskos.languageMapContent(distribution, "definition")?.[0] || "" }}
           </li>
         </ul>
         <p v-if="concept?.[detailsLoadedKey] === detailsLoadedStates.basicData">
