@@ -27,6 +27,15 @@ const scheme = computed(() => {
 })
 const registry = computed(() => scheme.value?._registry)
 
+const registryTitle = ref("...")
+const registryLink = ref("")
+// Registry object is not reactive, so we need to wait for initialization to get info from it
+watch(registry, async (registry) => {
+  await registry.init()
+  registryTitle.value = registry?._config?.title
+  registryLink.value = registry?._config?.baseUrl || registry?._api?.api || registry?._api?.status?.replace?.("/status", "")
+}, { immediate: true })
+
 const uri = computed(() => scheme.value && (route.params.id && `${config.namespace}${route.params.voc}/${route.params.id}` || route.query.uri))
 const concept = computed({
   get() {
@@ -166,6 +175,14 @@ const topConcepts = computed(() => {
         :item="scheme"
         :shields-io-opt-in="true" />
     </div>
+    <auto-link
+      id="sourceInfo"
+      :href="registryLink"
+      :title="`${$t('source')}: ${registryTitle}`">
+      <span class="badge">
+        {{ registryTitle }}
+      </span>
+    </auto-link>
   </h2>
   <item-suggest
     v-if="scheme"
@@ -420,6 +437,25 @@ const topConcepts = computed(() => {
   display: block;
   margin-top: -5px;
   margin-left: -4px;
+}
+#sourceInfo {
+  font-weight: normal;
+  font-size: 13px;
+  margin-top: 3px;
+  height: 1em;
+}
+.badge {
+  display: inline-block;
+  padding: 2px 5px 2px 5px;
+  margin: 0 4px;
+  font-size: 75%;
+  font-weight: bold;
+  line-height: 1;
+  text-align: center;
+  white-space: nowrap;
+  border-radius: .1rem;
+  background-color: black;
+  color: white;
 }
 .loading {
   position: absolute;
