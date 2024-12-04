@@ -440,22 +440,23 @@ const topConcepts = computed(() => {
 }
 #sourceInfo {
   font-weight: normal;
-  font-size: 13px;
-  margin-top: 3px;
+  font-size: 18px;
   height: 1em;
 }
 .badge {
   display: inline-block;
-  padding: 2px 5px 2px 5px;
+  padding: 0.3em 0.5em 0.3em 0.5em;
   margin: 0 4px;
-  font-size: 75%;
+  font-size: 0.6em;
   font-weight: bold;
   line-height: 1;
   text-align: center;
   white-space: nowrap;
-  border-radius: .1rem;
-  background-color: black;
+  background-color: var(--color-background);
   color: white;
+  /* Fix alignment with badges */
+  margin-top: -0.45em;
+  vertical-align: middle;
 }
 .loading {
   position: absolute;
