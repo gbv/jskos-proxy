@@ -32,14 +32,14 @@
     "node": ">=20.10"
   },
   "dependencies": {
-    "@intlify/unplugin-vue-i18n": "^6.0.0",
+    "@intlify/unplugin-vue-i18n": "^6.0.1",
     "@vue-leaflet/vue-leaflet": "^0.10.1",
     "axios": "^1.7.9",
     "cocoda-sdk": "^3.4.12",
     "dotenv": "^16.4.7",
-    "express": "^4.21.1",
-    "jskos-tools": "^1.0.42",
-    "jskos-vue": "^0.3.17",
+    "express": "^4.21.2",
+    "jskos-tools": "^1.0.43",
+    "jskos-vue": "^0.3.18",
     "jsonld": "^8.3.2",
     "leaflet": "^1.9.4",
     "petite-vue-i18n": "^10.0.5",
@@ -55,7 +55,7 @@
     "eslint-config-gbv": "~2.6",
     "eslint-plugin-vue": "^9.32.0",
     "nodemon": "^3.1.7",
-    "vite": "^6.0.2",
+    "vite": "^6.0.3",
     "vite-plugin-vue-devtools": "^7.6.7",
     "yesno": "^0.4.0"
   }
