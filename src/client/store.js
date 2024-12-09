@@ -64,8 +64,8 @@ export const schemeFetchPromise = fetch(
     scheme._registry = registries.find(registry => registry._api?.status === scheme.REGISTRY?.status)
     // If there's an identifier with the current namespace, use it as the main identifier
     const identifier = (scheme.identifier || []).find(i => i.startsWith(config.namespace))
-    if (identifier) {
-      scheme.identifier.push(scheme.uri)
+    if (identifier && scheme.uri !== identifier) {
+      scheme.identifier = scheme.identifier.filter(i => i !== identifier).concat(scheme.uri)
       scheme.uri = identifier
     }
     return scheme
