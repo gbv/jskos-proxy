@@ -99,6 +99,8 @@ watch(uri, async (value, prevValue) => {
       }, 50)
     }
     window.scrollTo(0, 0)
+    // Also scroll to top in ItemDetails
+    document.getElementById("itemDetails")?.scrollTo(0, 0)
     // Debounce loading values so that we prevent "flashing" loading overlays
     conceptLoading.value = null
     // Only show hierarchy loading if anything needs to be opened
