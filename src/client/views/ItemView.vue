@@ -31,6 +31,11 @@ const registryTitle = ref("...")
 const registryLink = ref("")
 // Registry object is not reactive, so we need to wait for initialization to get info from it
 watch(registry, async (registry) => {
+  if (!registry) {
+    registryTitle.value = "..."
+    registryLink.value = ""
+    return
+  }
   await registry.init()
   registryTitle.value = registry?._config?.title
   registryLink.value = registry?._config?.baseUrl || registry?._api?.api || registry?._api?.status?.replace?.("/status", "")
