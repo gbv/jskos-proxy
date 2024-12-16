@@ -51,7 +51,7 @@ export class ApiBackend {
     this.getSchemesPromise = new Promise(resolve => {
       cdk.repeat({
         function: async () => {
-          if (!this.registries?.length) {
+          if (!this.registries?.length || previouslyErrored) {
             this.registries = this.base.split(",").map(base => cdk.initializeRegistry({
               provider: "ConceptApi",
               // ? Does "base" always have a trailing slash?
