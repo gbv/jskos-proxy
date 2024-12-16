@@ -47,7 +47,7 @@ export class ApiBackend {
 
     // Load schemes in background and update every 60 seconds
     this.schemes = null
-    let previouslyErrored = false
+    let previouslyErrored = false, partialError
     this.getSchemesPromise = new Promise(resolve => {
       cdk.repeat({
         function: async () => {
@@ -63,7 +63,20 @@ export class ApiBackend {
             })
           }
           let schemes = []
-          const results = (await Promise.all(this.registries.map(registry => registry.getSchemes({ params: { limit: 10000 } })))).reduce((all, cur) => all.concat(cur), [])
+          partialError = null
+          const results = (await Promise.all(
+            this.registries
+              .map(
+                registry => registry.getSchemes({ params: { limit: 10000 } }).catch(error => {
+                  partialError = error
+                  log(`ApiBackend: Partial error when loading schemes (API: ${registry._jskos.status}) - ${error}`)
+                  return []
+                }),
+              ),
+          )).reduce((all, cur) => all.concat(cur), [])
+          if (partialError && results.length === 0) {
+            throw partialError
+          }
           for (const result of results) {
             // Only add to schemes if not there yet = backends specified first have priority
             // Also don't add schemes that explicitly do not provide concepts
@@ -79,7 +92,7 @@ export class ApiBackend {
             previouslyErrored = true
             return
           }
-          if (!this.schemes || previouslyErrored) {
+          if ((this.schemes?.length !== result?.length) || previouslyErrored) {
             log(`Loaded ${result.length} schemes for backend.`)
             previouslyErrored = false
           }
