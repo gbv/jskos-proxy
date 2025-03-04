@@ -286,7 +286,7 @@ const topConcepts = computed(() => {
               <span :title="jskos.prefLabel(jskos.mappingTypeByType(mapping.type) || jskos.defaultMappingType)">
                 {{ (jskos.mappingTypeByType(mapping.type) || jskos.defaultMappingType).notation[0] }}
               </span>&nbsp;<auto-link
-                v-for="c in jskos.conceptsOfMapping(mapping)"
+                v-for="c in jskos.conceptsOfMapping(mapping, 'to')"
                 :key="c?.uri"
                 :href="c?.uri" />
             </li>
