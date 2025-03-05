@@ -24,7 +24,8 @@
     "startDate": "Startdatum",
     "endDate": "Enddatum",
     "startPlace": "Startort",
-    "endPlace": "Endort"
+    "endPlace": "Endort",
+    "namespace": "Namensraum"
   },
   "en": {
     "about": "About",
@@ -51,6 +52,7 @@
     "startDate": "Start Date",
     "endDate": "End Date",
     "startPlace": "Start Place",
-    "endPlace": "End Place"
+    "endPlace": "End Place",
+    "namespace": "Namespace"
   }
 }

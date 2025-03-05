@@ -298,7 +298,16 @@ const topConcepts = computed(() => {
           <MapView
             :concept="concept" />
         </div>
-        <div style="margin: 0 0 10px;">
+        <div v-if="scheme?.namespace">
+          <b>{{ $t("namespace") }}: </b> 
+          <span>
+            <auto-link 
+              :title="Namespace"
+              :href="scheme.namespace"
+              :text="scheme.namespace" />
+          </span> 
+        </div>
+        <div style="margin: 10px 0 10px;">
           <b>Linked Data:</b>
           <span
             v-for="format in ['jskos', 'turtle', 'rdfxml', 'ntriples']"
