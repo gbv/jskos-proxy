@@ -1,4 +1,4 @@
-import { computed, reactive } from "vue"
+import { computed, reactive, ref } from "vue"
 import config from "@/config.js"
 import * as jskos from "jskos-tools"
 import i18n from "@/i18n.js"
@@ -354,3 +354,41 @@ export const typeSelection = computed(() => {
     return 0
   })
 })
+
+export const aboutDetails = ref([]) // Reactive storage for aboutDetails
+
+export const fetchData = async (url) => {
+  try {
+    const response = await fetch(url, {
+      headers: { Accept: "application/json" },
+    })
+    if (!response.ok) {
+      throw new Error("Network response was not ok")
+    }
+    return await response.json()
+  } catch (error) {
+    console.error(`Error fetching data from ${url}:`, error)
+    return null // Return null in case of error
+  }
+}
+
+export const fetchStatusesForRegistries = async () => {
+  const fetchedStatuses = await Promise.all(
+    registries.map(async (registry) => {
+      const statusData = await fetchData(registry._api.status)
+
+      if (!statusData) {
+        return { error: "Failed to fetch status" }
+      }
+
+      const vocabularies = await fetchData(statusData.schemes)
+      statusData.numberOfVocabularies = vocabularies ? vocabularies.length : 0
+
+      statusData.name = registry
+
+      return statusData
+    }),
+  )
+
+  aboutDetails.value = fetchedStatuses // Update the reactive ref
+}
