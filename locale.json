@@ -26,9 +26,9 @@
     "startPlace": "Startort",
     "endPlace": "Endort",
     "namespace": "Namensraum",
-    "backendDetailsTitle": "Datenabruf-API",
-    "backendDetailsDoc": "Dokumentation",
-    "backendDetailsVoc": "Anzahl Vokabulare"
+    "backendDetailsTitle": "Vokabular-Server",
+    "backendDetailsDoc": "API",
+    "backendDetailsVoc": "Vokabulare"
   },
   "en": {
     "about": "About",
@@ -57,8 +57,8 @@
     "startPlace": "Start Place",
     "endPlace": "End Place",
     "namespace": "Namespace",
-    "backendDetailsTitle": "Data Retrieval API",
-    "backendDetailsDoc": "Documentation",
-    "backendDetailsVoc": "Number of Vocabularies"
+    "backendDetailsTitle": "Terminology service",
+    "backendDetailsDoc": "API",
+    "backendDetailsVoc": "Terminologies"
   }
 }
