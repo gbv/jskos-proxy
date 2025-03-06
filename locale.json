@@ -25,7 +25,10 @@
     "endDate": "Enddatum",
     "startPlace": "Startort",
     "endPlace": "Endort",
-    "namespace": "Namensraum"
+    "namespace": "Namensraum",
+    "backendDetailsTitle": "Datenabruf-API",
+    "backendDetailsDoc": "Dokumentation",
+    "backendDetailsVoc": "Anzahl Vokabulare"
   },
   "en": {
     "about": "About",
@@ -53,6 +56,9 @@
     "endDate": "End Date",
     "startPlace": "Start Place",
     "endPlace": "End Place",
-    "namespace": "Namespace"
+    "namespace": "Namespace",
+    "backendDetailsTitle": "Data Retrieval API",
+    "backendDetailsDoc": "Documentation",
+    "backendDetailsVoc": "Number of Vocabularies"
   }
 }
