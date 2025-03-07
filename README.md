@@ -17,7 +17,7 @@ This web service can be put in front of [JSKOS] (0.5.4) data sources to provide 
   - [Configuration](#configuration)
   - [Running](#running)
 - [Usage](#usage)
-- [Architecture](#architecture)
+- [Data flow](#data-flow)
 - [Related works](#related-works)
 - [Maintainers](#maintainers)
 - [License](#license)
@@ -96,9 +96,9 @@ The URI is then looked up in the backend, and returned in a requested RDF serial
 - Turtle (format `ttl` or `turtle`)
 - RDF/XML (format `rdfxml` or `xml`)
 
-## Architecture
+## Data flow
 
-The application consists of a server and a client. Both access terminology data from backends via JSKOS API. The server can also return JSKOS converted to RDF (that's why the application is called "proxy").
+The application consists of a server and a client. Both access terminology data from backends via JSKOS API. The server can also return JSKOS converted to RDF, that's why the application is called a proxy.
 
 ~~~mermaid
 graph TD
@@ -106,11 +106,13 @@ graph TD
     client[**client**: Vue]
     backends(backends: JSKOS Server, DANTE...)
     backends -- terminologies: JSKOS API --> server
-    backends -- concepts: JSKOS API --> client   
-    server -- HTML+JS --> client
+    backends -- concepts: JSKOS API --> client       
     server -- terminologies: JSKOS --> client
     server -- RDF & JSKOS --> applications(applications)
     client -- browser --> user(user)
+    subgraph app [ ]
+        server -- HTML+JS --> client
+    end
 ~~~
     
 ## Related works
