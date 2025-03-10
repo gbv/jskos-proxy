@@ -122,7 +122,7 @@ See <https://bartoc.org/software> for a collection of software for knowledge org
 ## Maintainers
 
 - [@nichtich](https://github.com/nichtich)
-- [@stefandesu](https://github.com/stefandesu)
+- [@rodolv-commons](https://github.com/rodolv-commons)
 
 ## License
 
