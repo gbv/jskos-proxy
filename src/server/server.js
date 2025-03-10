@@ -39,7 +39,7 @@ app.get(`${config.namespace.pathname}:voc?/:id?`, async (req, res, next) => {
       if (req.params.voc && jskos.isValidUri(req.params.voc)) {
         return req.params.voc
       }
-      return config.namespace + (req.params.voc ? `${req.params.voc}/` : "") + (req.params.id ?? "")
+      return config.namespace + (req.params.voc ? `${req.params.voc}/` : "") + (encodeURIComponent(req.params.id) ?? "")
     })()
 
     config.info(`get ${uri}`)
