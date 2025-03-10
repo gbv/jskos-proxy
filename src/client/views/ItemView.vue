@@ -41,7 +41,7 @@ watch(registry, async (registry) => {
   registryLink.value = registry?._config?.baseUrl || registry?._api?.api || registry?._api?.status?.replace?.("/status", "")
 }, { immediate: true })
 
-const uri = computed(() => scheme.value && (route.params.id && `${config.namespace}${route.params.voc}/${route.params.id}` || route.query.uri))
+const uri = computed(() => scheme.value && (route.params.id && `${config.namespace}${route.params.voc}/${encodeURIComponent(route.params.id)}` || route.query.uri))
 const concept = computed({
   get() {
     if (!uri.value) {
