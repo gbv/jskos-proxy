@@ -1,7 +1,6 @@
 # jskos-proxy
 
 <!-- [![Test](https://github.com/gbv/jskos-proxy/actions/workflows/test.yml/badge.svg)](https://github.com/gbv/jskos-proxy/actions/workflows/test.yml) -->
-[![Status](https://coli-conc-status.fly.dev/api/badge/29/status)](https://coli-conc-status.fly.dev/status/all)
 [![License](https://img.shields.io/github/license/gbv/jskos-proxy.svg)](https://github.com/gbv/jskos-proxy/blob/master/LICENSE)
 [![standard-readme compliant](https://img.shields.io/badge/readme%20style-standard-brightgreen.svg)](https://github.com/RichardLitt/standard-readme)
 
