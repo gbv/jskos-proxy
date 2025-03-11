@@ -67,6 +67,9 @@ export const schemeFetchPromise = fetch(
     if (identifier && scheme.uri !== identifier) {
       scheme.identifier = scheme.identifier.filter(i => i !== identifier).concat(scheme.uri)
       scheme.uri = identifier
+      if (!scheme.uri.endsWith("/")) {
+        scheme.uri += "/"
+      } 
     }
     return scheme
   })
