@@ -2,8 +2,8 @@
 
 [![License](https://img.shields.io/github/license/gbv/jskos-proxy.svg)](https://github.com/gbv/jskos-proxy/blob/master/LICENSE)
 [![Docker image](https://github.com/gbv/jskos-proxy/actions/workflows/docker.yml/badge.svg)](https://github.com/gbv/jskos-proxy/pkgs/container/jskos-proxy)
-<!-- [![Test](https://github.com/gbv/jskos-proxy/actions/workflows/test.yml/badge.svg)](https://github.com/gbv/jskos-proxy/actions/workflows/test.yml) -->
 [![standard-readme compliant](https://img.shields.io/badge/readme%20style-standard-brightgreen.svg)](https://github.com/RichardLitt/standard-readme)
+<!-- [![Test](https://github.com/gbv/jskos-proxy/actions/workflows/test.yml/badge.svg)](https://github.com/gbv/jskos-proxy/actions/workflows/test.yml) -->
 
 > Serve [JSKOS] objects in multiple formats over HTTP, in particular HTML and RDF
 
