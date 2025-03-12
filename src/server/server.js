@@ -1,4 +1,5 @@
 import express from "express"
+import portfinder from "portfinder"
 import ViteExpress from "vite-express"
 import * as jskos from "jskos-tools"
 
@@ -103,6 +104,21 @@ app.get(`${config.namespace.pathname}:voc?/:id?`, async (req, res, next) => {
   }
 })
 
-ViteExpress.listen(app, config.port, () => {
-  config.log(`JSKOS proxy ${config.namespace} from ${backend} at http://localhost:${config.port} in ${config.env} mode...`)
-})
+
+const startServer = async () => {
+  if (config.env == "test") {
+    portfinder.basePort = config.port
+    config.port = await portfinder.getPortPromise()
+  }
+
+  return new Promise(resolve => {
+    // TODO: Check if ViteExpress.listen is suitable for production
+    ViteExpress.listen(app, config.port, () => {
+      config.log(`JSKOS proxy ${config.namespace} from ${backend} at http://localhost:${config.port} in ${config.env} mode...`)
+      resolve(app)
+    })
+  })
+
+}
+
+export const appStarted = startServer()
