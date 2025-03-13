@@ -16,11 +16,14 @@ const log = msg => console.log(new Date().toISOString(), msg)
 const NODE_ENV = process.env.NODE_ENV || "development"
 
 // use default configuration when testing
-if (NODE_ENV !== "test") {
+if (NODE_ENV === "test") {
+  process.env.CONFIG = "test"
+} else {
   dotenv.config()
 }
 
 const configDir = process.env.CONFIG || ""
+
 const configFile = path.resolve(`config/${configDir}`, "config.env")
 if (await exists(configFile)) {
   dotenv.populate(process.env, dotenv.parse(await fs.readFile(configFile, "utf8")))
