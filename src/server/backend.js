@@ -116,8 +116,18 @@ export class ApiBackend {
     if (!this.schemes) {
       await this.getSchemesPromise
     }
-    // TODO: Also load topConcepts?
-    return this.schemes.find(scheme => jskos.compare(scheme, { uri }))
+  
+    // Try to find the scheme
+    let schemeMatch = this.schemes.find(scheme => jskos.compare(scheme, { uri }))
+  
+    if (!schemeMatch) {
+      // No exact match found, trying with a trailing slash...
+      const uriWithSlash = uri.endsWith("/") ? uri : `${uri}/`
+      
+      schemeMatch = this.schemes.find(scheme => jskos.compare(scheme, { uri: uriWithSlash }))
+    }
+  
+    return schemeMatch
   }
 
   async getConcept(uri) {
@@ -126,6 +136,7 @@ export class ApiBackend {
     }
     // Determine registry
     const registry = this.schemes.find(scheme => scheme.notationFromUri(uri))?._registry
+
     if (!registry) {
       return null
     }
