@@ -51,58 +51,53 @@ const cleanData = (data) => {
 
 }
 
-app.get(`${config.namespace.pathname}`, async (req, res, next) => {
-  const format = req.query.format || rdf.requestFormat(req) || "jsonld"
-  const isHtmlFormat = format === "html"
 
-  // Error if format is unsupported
-  if (format !== "html" && format !== "debug" && !rdf.contentTypes[format]) {
-    res.status(400)
-    res.send(`Serialization format ${format} not supported!`)
-    return
+const validateFormat = (req, res, next) => {
+  const format = req.query.format || rdf.requestFormat(req) || "jsonld"
+  if (!["html", "debug"].includes(format) && !rdf.contentTypes[format]) {
+    return res.status(400).send(`Serialization format ${format} not supported!`)
+  }
+  req.format = format
+  next()
+}
+
+const retrieveURI = (req) => {
+  if (req.query.uri) {
+    return req.query.uri
+  }
+  if (req.params.voc && jskos.isValidUri(req.params.voc)) {
+    return req.params.voc
   }
 
-  if (isHtmlFormat) {
+  if (req.params.id) {
+    return config.namespace + (req.params.voc ? `${req.params.voc}/` : "") + (encodeURIComponent(req.params.id))
+  }
+
+  return config.namespace + (req.params.voc ? `${req.params.voc}` : "")
+}
+
+app.get(`${config.namespace.pathname}`, validateFormat, async (req, res, next) => {
+  if (req.format === "html") {
     next()
     return
-  }
+  }  
 
   const allTheSchemes = await backend.getSchemes() || []
-
   const allTheSchemesCleaned = cleanData(allTheSchemes)
 
   res.status(200).send(allTheSchemesCleaned)
 })
 
 
-app.get(`${config.namespace.pathname}:voc`, async (req, res, next) => {
-  console.log("VOC")
-  const format = req.query.format || rdf.requestFormat(req) || "jsonld"
-  // Error if format is unsupported
-  if (format !== "html" && format !== "debug" && !rdf.contentTypes[format]) {
-    res.status(400)
-    res.send(`Serialization format ${format} not supported!`)
-    return
-  }
-
-  
-  if (format === "html") {
+app.get(`${config.namespace.pathname}:voc`, validateFormat, async (req, res, next) => {
+  if (req.format === "html") {
     // Refer HTML back to Vite
     next()
     return
   } 
 
   // Return serialized entity when is it the endpoint with ?format parameter and possibily uri paramter
-  const uri = (() => {
-    if (req.query.uri) {
-      return req.query.uri
-    }
-    // URI in "voc" param (part of URL)
-    if (req.params.voc && jskos.isValidUri(req.params.voc)) {
-      return req.params.voc
-    }
-    return config.namespace + (req.params.voc ? `${req.params.voc}` : "")
-  })()
+  const uri = retrieveURI(req)
 
   config.info(`getting the following ${uri}`)
 
@@ -110,11 +105,9 @@ app.get(`${config.namespace.pathname}:voc`, async (req, res, next) => {
   try {
     if (req.params.voc && req.query.uri) {
       // uri is a concept
-      console.log("uri is a concept!")
       item = await backend.getConcept(uri)
     }  else if (req.params.voc || !config.listing) {
       // uri is a scheme
-      console.log("uri is a scheme!")
       item = await backend.getScheme(uri)
     } 
 
@@ -141,7 +134,57 @@ app.get(`${config.namespace.pathname}:voc`, async (req, res, next) => {
   const cleanItem= cleanData(item)
 
 
-  const contentType = rdf.contentTypes[format]
+  const contentType = rdf.contentTypes[req.format]
+  if (contentType && contentType !== "application/json") {
+    res.set("Content-Type", contentType)
+    res.send(await rdf.serialize(cleanItem, contentType))
+  } else {
+    res.json(cleanItem)
+  }
+
+})
+
+
+app.get(`${config.namespace.pathname}:voc/:id`, validateFormat, async (req, res, next) => {
+  if (req.format === "html") {
+    // Refer HTML back to Vite
+    next()
+    return
+  } 
+
+  // Return serialized entity when is it the endpoint with ?format parameter and possibily uri paramter
+  const uri = retrieveURI(req)
+
+  config.info(`getting the following ${uri}`)
+
+  let item
+  try {
+    item = await backend.getConcept(uri)
+
+  } catch (error) {
+    console.error(`Error loading ${uri}`, error)
+    // TODO: Send different error messages depending on specific error (https://github.com/gbv/jskos-proxy/issues/40)
+    res.status(500).send({
+      message: `Error loading data from backend: ${error.message}`,
+    })
+    return
+  }
+
+  if (!item) {
+    console.error(`${uri} not found.`)
+    res.status(404).send({
+      message: `Entity with URI ${uri} not found.`,
+    })
+    return
+  }
+
+  res.status(200)
+
+
+  const cleanItem= cleanData(item)
+
+
+  const contentType = rdf.contentTypes[req.format]
   if (contentType && contentType !== "application/json") {
     res.set("Content-Type", contentType)
     res.send(await rdf.serialize(cleanItem, contentType))
