@@ -18,4 +18,4 @@ jobs:
     - run: npm ci
     - run: echo "CONFIG=uri.gbv.de" > .env
     - run: npm run build
-    # - run: npm test
+    - run: npm test
