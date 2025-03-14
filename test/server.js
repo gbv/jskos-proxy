@@ -21,10 +21,10 @@ describe("server", () => {
         assert.equal(res.text, "Serialization format NO_FORMAT not supported!")
       }))
   
+  // Testing linked data formats 
   // Vocabulary with slash at the end, isil as value
   for (const format in rdf.contentTypes){
     const value = rdf.contentTypes[format]
-  
     it(`/terminology/isil/?format=${format} should return ${value}` , 
       () => chai.request.execute(app).get(`/terminology/isil/?format=${format}`)
         .then(res => {
@@ -32,34 +32,11 @@ describe("server", () => {
           assert.equal(res.type, `${value}`) // Check Content-Type
         }))
   }
-  // Vocabulary without slash at the end, isil as value
-  for (const format in rdf.contentTypes){
-    const value = rdf.contentTypes[format]
   
-    it(`/terminology/isil?format=${format} should return ${value}` , 
-      () => chai.request.execute(app).get(`/terminology/isil?format=${format}`)
-        .then(res => {
-          assert.equal(res.status, 200) // Ensure success response
-          assert.equal(res.type, `${value}`) // Check Content-Type
-        }))
-  } 
-
-  // Vocabulary with slash at the end, fbl as value
-  for (const format in rdf.contentTypes){
-    const value = rdf.contentTypes[format]
-  
-    it(`/terminology/fbl/?format=${format} should return ${value}` , 
-      () => chai.request.execute(app).get(`/terminology/fbl/?format=${format}`)
-        .then(res => {
-          assert.equal(res.status, 200) // Ensure success response
-          assert.equal(res.type, `${value}`) // Check Content-Type
-        }))
-  }
-
+  // Testing linked data formats 
   // Vocabulary without slash at the end, fbl as value
   for (const format in rdf.contentTypes){
     const value = rdf.contentTypes[format]
-  
     it(`/terminology/fbl?format=${format} should return ${value}` , 
       () => chai.request.execute(app).get(`/terminology/fbl?format=${format}`)
         .then(res => {
@@ -67,5 +44,20 @@ describe("server", () => {
           assert.equal(res.type, `${value}`) // Check Content-Type
         }))
   }
+
+  // Testing linked data formats 
+  // Vocabulary isil whic child DE-131 Stadtbibliothek am Neumarkt
+  // In this case, it is attached as Uri to the requests, uri paramter
+  for (const format in rdf.contentTypes){
+    const value = rdf.contentTypes[format]
+    it(`/terminology/isil/?format=${format} and uri parameter should return ${value}` , 
+      () => chai.request.execute(app).get(`/terminology/isil/?format=${format}&uri=https%3A%2F%2Fld.zdb-services.de%2Fresource%2Forganisations%2FDE-131`)
+        .then(res => {
+          assert.equal(res.status, 200) // Ensure success response
+          assert.equal(res.type, `${value}`) // Check Content-Type
+        }))
+  }
+
+  
 
 })
