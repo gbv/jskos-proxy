@@ -4,7 +4,7 @@ import assert from "node:assert"
 const { appStarted } = await import("../src/server/server.js")
 const app = await appStarted
 
-// import * as rdf from "../src/server/rdf.js"
+import * as rdf from "../src/server/rdf.js"
 
 
 describe("server", () => {
@@ -21,7 +21,7 @@ describe("server", () => {
         assert.equal(res.text, "Serialization format NO_FORMAT not supported!")
       }))
   
-  /* // Vocabulary with slash at the end, isil as value
+  // Vocabulary with slash at the end, isil as value
   for (const format in rdf.contentTypes){
     const value = rdf.contentTypes[format]
   
@@ -42,40 +42,30 @@ describe("server", () => {
           assert.equal(res.status, 200) // Ensure success response
           assert.equal(res.type, `${value}`) // Check Content-Type
         }))
-  } */
+  } 
 
-  /* // Vocabulary with slash at the end, fbl as value
+  // Vocabulary with slash at the end, fbl as value
+  for (const format in rdf.contentTypes){
+    const value = rdf.contentTypes[format]
+  
+    it(`/terminology/fbl/?format=${format} should return ${value}` , 
+      () => chai.request.execute(app).get(`/terminology/fbl/?format=${format}`)
+        .then(res => {
+          assert.equal(res.status, 200) // Ensure success response
+          assert.equal(res.type, `${value}`) // Check Content-Type
+        }))
+  }
+
+  // Vocabulary without slash at the end, fbl as value
   for (const format in rdf.contentTypes){
     const value = rdf.contentTypes[format]
   
     it(`/terminology/fbl?format=${format} should return ${value}` , 
       () => chai.request.execute(app).get(`/terminology/fbl?format=${format}`)
         .then(res => {
-          console.log(res.status)  // Debugging response status
-          console.log(res.text)    // Check the response text
           assert.equal(res.status, 200) // Ensure success response
           assert.equal(res.type, `${value}`) // Check Content-Type
         }))
-  } */
-
-  it("/terminology/fbl?format=jskos should return application/json", async () => {
-    const res = await chai.request.execute(app).get("/terminology/fbl?format=jskos")
-        
-    console.log("res.status ->", res.status)  // Debugging response status
-    console.log("res.text ->", res.text)      // Check the response text
-        
-    assert.equal(res.status, 200)  // Ensure success response
-    assert.equal(res.type, "application/json")  // Check Content-Type
-  })
-
-  it("/terminology/fbl/?format=jskos should return application/json", async () => {
-    const res = await chai.request.execute(app).get("/terminology/fbl/?format=jskos")
-        
-    console.log("res.status ->", res.status)  // Debugging response status
-    console.log("res.text ->", res.text)      // Check the response text
-        
-    assert.equal(res.status, 200)  // Ensure success response
-    assert.equal(res.type, "application/json")  // Check Content-Type
-  })
+  }
 
 })
