@@ -68,4 +68,14 @@ describe("server", () => {
     assert.equal(res.type, "application/json")  // Check Content-Type
   })
 
+  it("/terminology/fbl/?format=jskos should return application/json", async () => {
+    const res = await chai.request.execute(app).get("/terminology/fbl/?format=jskos")
+        
+    console.log("res.status ->", res.status)  // Debugging response status
+    console.log("res.text ->", res.text)      // Check the response text
+        
+    assert.equal(res.status, 200)  // Ensure success response
+    assert.equal(res.type, "application/json")  // Check Content-Type
+  })
+
 })
