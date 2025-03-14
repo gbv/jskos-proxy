@@ -58,6 +58,17 @@ describe("server", () => {
         }))
   }
 
-  
+  // Testing linked data formats 
+  // Vocabulary ulbb with id ROM C 41-80 Grammatik
+  // In this case id value is not encoded
+  for (const format in rdf.contentTypes){
+    const value = rdf.contentTypes[format]
+    it(`/terminology/ulbb/ROM C 41-80/?format=${format} and uri parameter should return ${value}` , 
+      () => chai.request.execute(app).get(`/terminology/ulbb/ROM C 41-80/?format=${format}`)
+        .then(res => {
+          assert.equal(res.status, 200) // Ensure success response
+          assert.equal(res.type, `${value}`) // Check Content-Type
+        }))
+  }
 
 })
