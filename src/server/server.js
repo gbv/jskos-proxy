@@ -76,6 +76,30 @@ const retrieveURI = (req) => {
   return config.namespace + (req.params.voc ? `${req.params.voc}` : "")
 }
 
+
+const handleRequest = async (req, res, fetchFunction) => {
+  const uri = retrieveURI(req)
+  config.info(`Fetching: ${uri}`)
+
+  try {
+    const item = await fetchFunction(uri)
+    if (!item) {
+      return res.status(404).send({ message: `Entity with URI ${uri} not found.` })
+    }
+    const cleanedItem = cleanData(item)
+    if (rdf.contentTypes[req.format] && rdf.contentTypes[req.format] !== "application/json") {
+      res.set("Content-Type", rdf.contentTypes[req.format])
+      res.send(await rdf.serialize(cleanedItem, rdf.contentTypes[req.format]))
+    } else {
+      res.json(cleanedItem)
+    }
+  } catch (error) {
+    console.error(`Error loading ${uri}`, error)
+    res.status(500).send({ message: `Error loading data from backend: ${error.message}` })
+  }
+}
+
+
 app.get(`${config.namespace.pathname}`, validateFormat, async (req, res, next) => {
   if (req.format === "html") {
     next()
@@ -96,51 +120,13 @@ app.get(`${config.namespace.pathname}:voc`, validateFormat, async (req, res, nex
     return
   } 
 
-  // Return serialized entity when is it the endpoint with ?format parameter and possibily uri paramter
-  const uri = retrieveURI(req)
-
-  config.info(`getting the following ${uri}`)
-
-  let item
-  try {
-    if (req.params.voc && req.query.uri) {
-      // uri is a concept
-      item = await backend.getConcept(uri)
-    }  else if (req.params.voc || !config.listing) {
-      // uri is a scheme
-      item = await backend.getScheme(uri)
-    } 
-
-  } catch (error) {
-    console.error(`Error loading ${uri}`, error)
-    // TODO: Send different error messages depending on specific error (https://github.com/gbv/jskos-proxy/issues/40)
-    res.status(500).send({
-      message: `Error loading data from backend: ${error.message}`,
-    })
-    return
-  }
-
-  if (!item) {
-    console.error(`${uri} not found.`)
-    res.status(404).send({
-      message: `Entity with URI ${uri} not found.`,
-    })
-    return
-  }
-
-  res.status(200)
-
-
-  const cleanItem= cleanData(item)
-
-
-  const contentType = rdf.contentTypes[req.format]
-  if (contentType && contentType !== "application/json") {
-    res.set("Content-Type", contentType)
-    res.send(await rdf.serialize(cleanItem, contentType))
-  } else {
-    res.json(cleanItem)
-  }
+  if (req.params.voc && req.query.uri) {
+    // uri is a concept
+    handleRequest(req, res, backend.getConcept.bind(backend))
+  }  else if (req.params.voc || !config.listing) {
+    // uri is a scheme
+    handleRequest(req, res, backend.getScheme.bind(backend))
+  } 
 
 })
 
@@ -152,45 +138,7 @@ app.get(`${config.namespace.pathname}:voc/:id`, validateFormat, async (req, res,
     return
   } 
 
-  // Return serialized entity when is it the endpoint with ?format parameter and possibily uri paramter
-  const uri = retrieveURI(req)
-
-  config.info(`getting the following ${uri}`)
-
-  let item
-  try {
-    item = await backend.getConcept(uri)
-
-  } catch (error) {
-    console.error(`Error loading ${uri}`, error)
-    // TODO: Send different error messages depending on specific error (https://github.com/gbv/jskos-proxy/issues/40)
-    res.status(500).send({
-      message: `Error loading data from backend: ${error.message}`,
-    })
-    return
-  }
-
-  if (!item) {
-    console.error(`${uri} not found.`)
-    res.status(404).send({
-      message: `Entity with URI ${uri} not found.`,
-    })
-    return
-  }
-
-  res.status(200)
-
-
-  const cleanItem= cleanData(item)
-
-
-  const contentType = rdf.contentTypes[req.format]
-  if (contentType && contentType !== "application/json") {
-    res.set("Content-Type", contentType)
-    res.send(await rdf.serialize(cleanItem, contentType))
-  } else {
-    res.json(cleanItem)
-  }
+  handleRequest(req, res, backend.getConcept.bind(backend))
 
 })
 
