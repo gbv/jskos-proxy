@@ -21,10 +21,22 @@ const errors = reactive({
   loadTopError: false,
 })
 
-const schemeUri = computed(() => route.params.voc.match(/^https?:\/\//) ? route.params.voc : `${config.namespace}${route.params.voc}/`)
+const schemeUri = computed(() => route.params.voc.match(/^https?:\/\//) ? route.params.voc : `${config.namespace}${route.params.voc}`)
 const scheme = computed(() => {
-  return schemes.value?.find(s => jskos.compare(s, { uri: schemeUri.value }))
+  // Try to find the scheme
+  let schemeMatch = schemes.value?.find(s => jskos.compare(s, { uri: schemeUri.value }))
+  
+  if (!schemeMatch) {
+    // No exact match found, trying with a trailing slash...
+    const uriWithSlash = schemeUri.value.endsWith("/") ? schemeUri.value : `${schemeUri.value}/`
+    
+    schemeMatch = schemes.value?.find(scheme => jskos.compare(scheme, { uri: uriWithSlash }))
+  }
+
+  return schemeMatch
 })
+
+
 const registry = computed(() => scheme.value?._registry)
 
 const registryTitle = ref("...")
