@@ -363,11 +363,14 @@ const topConcepts = computed(() => {
     </item-details>
     <div
       v-else
-      id="itemDetails">
-      <div class="jskos-vue-itemDetails-name">
-        {{ $t("error") }}: {{ uri }}
+      id="itemDetails"
+      class="error-message-container">
+      <div class="error-message-title">
+        <strong>{{ $t("error") }} at </strong> {{ uri }}
       </div>
-      {{ $t("loadConceptError") }}
+      <div class="error-message-body">
+        {{ $t("loadConceptError") }}
+      </div>
     </div>
   </div>
 </template>
@@ -504,13 +507,32 @@ const topConcepts = computed(() => {
 .jskos-vue-itemDetails-tabs {
   margin: 15px 0;
 }
-.jskos-vue-itemDetails-name {
-  font-weight: 700;
-  padding: 18px 0;
-  position: sticky;
-  top: 0;
-  background-color: var(--color-section-background-primary);
-  /* Without this, some elements with position: relative; will still overlap */
+/* Container for the error message */
+.error-message-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  height: min-content;
+  background-color: #f8d7da;   /* Light red background */
+  color: #721c24;              /* Dark red text */
+  border: 1px solid #f5c6cb;   /* Light red border */
+  padding: 20px;
+  margin-top: 20px;
+  border-radius: 5px;
+  font-size: 15px;
+  font-weight: bold;
   z-index: 1;
 }
+
+/* Title part of the error message */
+.error-message-title {
+  margin-bottom: 10px;
+  color: #b10f2e;  /* Dark red for the link */
+  text-decoration: none;
+}
+
+.error-message-title:hover {
+  text-decoration: underline;
+}
+
 </style>
