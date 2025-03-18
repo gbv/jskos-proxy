@@ -3,6 +3,7 @@ import { ref, watch } from "vue"
 import { useRouter, useRoute } from "vue-router"
 import { utils } from "jskos-vue"
 import { locale } from "@/store.js"
+import * as jskos from "jskos-tools"
 
 import { routerBasePath } from "@/utils.js"
 const router = useRouter()
@@ -10,10 +11,18 @@ const route = useRoute()
 
 // TODO: Improve search (probably use API instead)
 const search = ref(null)
+
 watch(search, utils.debounce((value) => {
   if (value != null) {
-    router.push(`${routerBasePath}${value === "" ? "" : "?search="}${encodeURIComponent(value)}`)
+    const trimmedValue = value.trim()
+
+    if (jskos.isValidUri(trimmedValue)) {
+      router.push(`${routerBasePath}?uri=${encodeURIComponent(trimmedValue)}`)
+    } else {
+      router.push(`${routerBasePath}${value === "" ? "" : "?search="}${encodeURIComponent(trimmedValue)}`)
+    }
   }
+
 }, 150))
 
 watch(() => route.query.search, (value) => {
