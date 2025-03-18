@@ -507,6 +507,15 @@ const topConcepts = computed(() => {
 .jskos-vue-itemDetails-tabs {
   margin: 15px 0;
 }
+.jskos-vue-itemDetails-name {
+  font-weight: 700;
+  padding: 18px 0;
+  position: sticky;
+  top: 0;
+  background-color: var(--color-section-background-primary);
+  /* Without this, some elements with position: relative; will still overlap */
+  z-index: 1;
+}
 /* Container for the error message */
 .error-message-container {
   display: flex;
