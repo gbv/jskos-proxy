@@ -1,6 +1,6 @@
 {
   "name": "jskos-proxy",
-  "version": "0.5.0",
+  "version": "0.5.1",
   "description": "HTTP proxy to serve JSKOS objects",
   "type": "module",
   "exports": "./src/server/server.js",
