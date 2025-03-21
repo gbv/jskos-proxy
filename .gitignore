@@ -34,6 +34,7 @@ config/*
 !config/rvk
 !config/uri.gbv.de+coli-conc
 !config/test
+!config/bartoc
 
 # Will be symlinked dynamically
 public/favicon.ico
