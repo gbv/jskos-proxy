@@ -4,8 +4,15 @@ import { useRouter, useRoute } from "vue-router"
 import { utils } from "jskos-vue"
 import { locale } from "@/store.js"
 import * as jskos from "jskos-tools"
-
 import { routerBasePath } from "@/utils.js"
+
+const props = defineProps({
+  logoPath: {
+    type: String,
+    required: true,
+  },
+})
+
 const router = useRouter()
 const route = useRoute()
 
@@ -32,6 +39,7 @@ watch(() => route.query.search, (value) => {
 }, { immediate: true })
 
 import CustomHeader from "#/config/_current/Header.vue"
+
 </script>
 
 <template>
@@ -41,7 +49,7 @@ import CustomHeader from "#/config/_current/Header.vue"
     :to="routerBasePath">
     <img
       alt="Logo"
-      src="@/assets/logo.svg">
+      :src="props.logoPath">
   </RouterLink>
 
   <div id="header_menu">
