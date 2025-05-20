@@ -54,7 +54,7 @@ header {
   padding: max(2vh, 17px) 5vw;
   /* Subgrid */
   display: grid;
-  grid-template-columns: 1fr auto;
+  grid-template-columns: 1fr 1fr;
   grid-template-rows: 1fr auto;
   grid-template-areas: 
     "header_logo header_menu"
