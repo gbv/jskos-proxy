@@ -348,7 +348,8 @@ const topConcepts = computed(() => {
               :href="distribution.format"
               target="_blank">
               {{ getFormat(distribution) }}
-            </auto-link>, {{ distribution.size || $t("sizeUnknown") }}) {{ jskos.languageMapContent(distribution, "definition")?.[0] || "" }}
+            </auto-link><span v-if="distribution.size">, {{ distribution.size }}</span>)
+            {{ jskos.languageMapContent(distribution, "definition")?.[0] || "" }}
           </li>
         </ul>
         <p v-if="concept?.[detailsLoadedKey] === detailsLoadedStates.basicData">
