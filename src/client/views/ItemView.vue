@@ -2,11 +2,12 @@
 import config from "@/config.js"
 import * as jskos from "jskos-tools"
 import { AutoLink, LicenseInfo } from "jskos-vue"
-import { schemes, loadTop, loadNarrower, loadConcept, loadAncestors, saveConcept, getFormat, getConceptByUri, detailsLoadedKey, detailsLoadedStates } from "@/store.js"
+import { schemes, loadTop, loadNarrower, loadConcept, loadAncestors, saveConcept, getConceptByUri, detailsLoadedKey, detailsLoadedStates } from "@/store.js"
 import { computed, ref, reactive, watch } from "vue"
 import { useRoute, useRouter } from "vue-router"
 import { utils } from "jskos-vue"
 import MapView from "@/components/MapView.vue"
+import ItemTechnicalView from "@/components/ItemTechnicalView.vue"
 
 import { getRouterUrl } from "@/utils.js"
 const route = useRoute()
@@ -179,11 +180,11 @@ const topConcepts = computed(() => {
 
 <template>
   <h2 id="schemeHeader">
-    <router-link 
+    <RouterLink 
       v-if="scheme && !errors.schemeError"
       :to="getRouterUrl({ scheme })">
       {{ jskos.prefLabel(scheme) }}
-    </router-link>
+    </RouterLink>
     <span v-else>
       {{ $t("error") }}: {{ schemeUri }}
     </span>
@@ -194,14 +195,14 @@ const topConcepts = computed(() => {
         :item="scheme"
         :shields-io-opt-in="true" />
     </div>
-    <auto-link
+    <AutoLink
       id="sourceInfo"
       :href="registryLink"
       :title="`${$t('source')}: ${registryTitle}`">
       <span class="badge">
         {{ registryTitle }}
       </span>
-    </auto-link>
+    </AutoLink>
   </h2>
   <item-suggest
     v-if="scheme"
@@ -252,41 +253,57 @@ const topConcepts = computed(() => {
       id="itemDetails"
       :item="concept || scheme"
       :flat="true"
-      :fields="{ type: false, license: false }"
+      :fields="{ type: false, license: false, created: false, issued: false, modified: false }"
       @select="concept = { uri: $event.item.uri }">
       <template #additionalTabs>
         <div
           v-if="concept?.startDate || concept?.endDate || concept?.startPlace?.length || concept?.endPlace?.length">
-          <ul class="jskos-vue-itemDetails-list">
-            <li v-if="concept?.startDate">
-              <b>{{ $t("startDate") }}:</b> {{ utils.dateToString(concept.startDate) }}
-            </li>
-            <li v-if="concept?.startPlace?.length">
-              <b>{{ $t("startPlace") }}:</b> <template
-                v-for="(c, i) in concept.startPlace"
-                :key="c?.uri">
-                <auto-link 
-                  :title="c?.uri"
-                  :href="c?.uri"
-                  :text="jskos.prefLabel(c)" />
-                <span v-if="i < concept.startPlace.length -1">, </span>
-              </template>
-            </li>
-            <li v-if="concept?.endDate">
-              <b>{{ $t("endDate") }}:</b> {{ utils.dateToString(concept.endDate) }}
-            </li>
-            <li v-if="concept?.endPlace?.length">
-              <b>{{ $t("endPlace") }}:</b> <template
+          <b>{{ $t("startEnd") }}:</b>
+          {{ utils.dateToString(concept.startDate) }}
+          <span v-if="concept.startPlace?.length">
+            <span> in </span>
+            <template
+              v-for="(c, i) in concept.startPlace"
+              :key="c?.uri">
+              <AutoLink 
+                :title="c?.uri"
+                :href="c?.uri"
+                :text="jskos.prefLabel(c)" />
+              <span v-if="i < concept.startPlace.length -1">, </span>
+            </template>
+          </span>            
+          <span v-if="concept.endDate || concept.endPlace">
+            –
+            {{ utils.dateToString(concept.endDate) }}
+            <span
+              v-if="concept?.endPlace?.length"
+              li>
+              <span> in </span> <template
                 v-for="(c, i) in concept.endPlace"
                 :key="c?.uri">
-                <auto-link 
+                <AutoLink 
                   :title="c?.uri"
                   :href="c?.uri"
                   :text="jskos.prefLabel(c)" />
                 <span v-if="i < concept.endPlace.length -1">, </span>
               </template>
-            </li>
-          </ul>
+            </span>
+          </span>
+        </div>
+        <div
+          v-if="concept?.location"
+          title="Map">
+          <MapView
+            :concept="concept" />
+        </div>
+        <div v-if="!concept && scheme?.namespace">
+          <b>{{ $t("namespace") }}: </b> 
+          <span>
+            <AutoLink 
+              :title="Namespace"
+              :href="scheme.namespace"
+              :text="scheme.namespace" />
+          </span> 
         </div>
         <div
           v-if="concept?.mappings?.length">
@@ -297,69 +314,21 @@ const topConcepts = computed(() => {
               :key="index">
               <span :title="jskos.prefLabel(jskos.mappingTypeByType(mapping.type) || jskos.defaultMappingType)">
                 {{ (jskos.mappingTypeByType(mapping.type) || jskos.defaultMappingType).notation[0] }}
-              </span>&nbsp;<auto-link
+              </span>&nbsp;<AutoLink
                 v-for="c in jskos.conceptsOfMapping(mapping, 'to')"
                 :key="c?.uri"
                 :href="c?.uri" />
             </li>
           </ul>
         </div>
-        <div
-          v-if="concept?.location"
-          title="Map">
-          <MapView
-            :concept="concept" />
-        </div>
-        <div v-if="scheme?.namespace">
-          <b>{{ $t("namespace") }}: </b> 
-          <span>
-            <auto-link 
-              :title="Namespace"
-              :href="scheme.namespace"
-              :text="scheme.namespace" />
-          </span> 
-        </div>
-        <div style="margin: 10px 0 10px;">
-          <b>Linked Data:</b>
-          <span
-            v-for="format in ['jskos', 'turtle', 'rdfxml', 'ntriples']"
-            :key="format">&nbsp;
-            <router-link 
-              :to="getRouterUrl({ scheme, concept, params: { format }})"
-              target="_blank">
-              {{ format }}
-            </router-link>
-          </span>
-        </div>
-        <ul 
-          v-if="!concept && scheme?.distributions?.length"
-          class="jskos-vue-itemDetails-list">
-          <li><b>{{ $t("distributions") }}:</b></li>
-          <li
-            v-for="distribution of scheme.distributions"
-            :key="distribution.download">
-            <a
-              :href="distribution.download"
-              target="_blank"
-              download>
-              {{ distribution.created || "Download" }}
-            </a>
-            (<auto-link
-              :href="distribution.format"
-              target="_blank">
-              {{ getFormat(distribution) }}
-            </auto-link><span v-if="distribution.size">, {{ distribution.size }}</span>)
-            {{ jskos.languageMapContent(distribution, "definition")?.[0] || "" }}
-          </li>
-        </ul>
         <p v-if="concept?.[detailsLoadedKey] === detailsLoadedStates.basicData">
           <loading-indicator />
         </p>
-        <div 
-          v-if="config.env === 'development'">
-          <pre><code>{{ JSON.stringify(jskos.deepCopy(concept || scheme, ["topConceptOf", "inScheme", "topConcepts"]), null, 2) }}
-            </code></pre>
-        </div>
+      </template>
+      <template #after>          
+        <ItemTechnicalView
+          :concept="concept"
+          :scheme="scheme" />
       </template>
     </item-details>
     <div
