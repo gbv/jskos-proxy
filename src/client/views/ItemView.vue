@@ -8,8 +8,9 @@ import { useRoute, useRouter } from "vue-router"
 import { utils } from "jskos-vue"
 import MapView from "@/components/MapView.vue"
 import ItemTechnicalView from "@/components/ItemTechnicalView.vue"
-
 import { getRouterUrl } from "@/utils.js"
+import QualifiedRelationsTree from "@/components/QualifiedRelationsTree.vue"
+
 const route = useRoute()
 const router = useRouter()
 
@@ -320,6 +321,14 @@ const topConcepts = computed(() => {
                 :href="c?.uri" />
             </li>
           </ul>
+        </div>
+        <div
+          v-if="concept?.qualifiedRelations && Object.keys(concept.qualifiedRelations).length"
+          title="Qualified relations">
+          <QualifiedRelationsTree
+            :item="concept"
+            :max-depth="4"
+            :visited="[concept?.uri].filter(Boolean)" />
         </div>
         <p v-if="concept?.[detailsLoadedKey] === detailsLoadedStates.basicData">
           <loading-indicator />

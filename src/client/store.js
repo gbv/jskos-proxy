@@ -162,7 +162,7 @@ export function saveConceptsWithOptions(options) {
 }
 
 let properties
-export async function loadConcept(uri, scheme) {
+export async function loadConcept(uri, scheme, saveConceptFlag = true) {
   const registry = await getRegistryForUri(uri, scheme)
   if (!registry) {
     return null
@@ -170,7 +170,7 @@ export async function loadConcept(uri, scheme) {
   if (!properties) {
     // Adjust properties for concept details
     properties = registry._defaultParams?.properties || ""
-    properties += (properties ? "," : "") + "location,startPlace,endPlace,startDate,endDate"
+    properties += (properties ? "," : "") + "location,startPlace,endPlace,startDate,endDate,qualifiedRelations,qualifiedLiterals,qualifiedDates"
   }
   const existing = getConceptByUri(uri)
   // Make sure ALL details (including mappings and location) have been loaded
@@ -185,6 +185,11 @@ export async function loadConcept(uri, scheme) {
     throw new Error(`Error loading concept ${uri}`)
   }
   concept[detailsLoadedKey] = detailsLoadedStates.allData
+
+  if (!saveConceptFlag) {
+    return concept
+  }
+
   return saveConcept(concept)
 }
 
