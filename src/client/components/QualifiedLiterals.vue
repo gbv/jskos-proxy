@@ -146,9 +146,6 @@ function labelForUri(u) {
   <div
     class="qualified-literals_wrapper"
     :class="{ dense }">
-    <div class="qualified-literals__title">
-      Qualified Literals:
-    </div>
     <ul
       v-if="literals.length"
       class="qualified-literals-list">
@@ -157,13 +154,10 @@ function labelForUri(u) {
         :key="propertyUri"
         class="qualified-literals__item">
         <div class="property-uri__head">
-          <code class="code">
-            Property Uri:
-            <AutoLink
-              :href="propertyUri"
-              :text="labelProp(propertyUri)"
-              :title="propertyUri" />
-          </code>
+          <AutoLink
+            :href="propertyUri"
+            :text="labelProp(propertyUri)"
+            :title="propertyUri" />
         </div>
 
         <ul class="qualifiedList__wrapper">
@@ -174,9 +168,7 @@ function labelForUri(u) {
             <div
               v-if="statement.literal"
               class="statement-row">
-              <div class="statement-row__head">
-                Literal
-              </div>:
+              <b>Value: </b>
               <span
                 class="lang-apex"
                 :data-lang="statement.literal.language ?? ''
@@ -299,10 +291,6 @@ function labelForUri(u) {
     list-style: none;
     padding: 0;
  }
- .qualified-literals__title {
-    font-weight:600; 
-    margin-bottom: 12px; 
- }
 .qualified-literals_wrapper.dense .qualified-literals-row { 
     margin:.15rem 0; 
 }
@@ -334,10 +322,8 @@ function labelForUri(u) {
   border-bottom: 1px solid var(--color-primary);
 }
 .property-uri__head{ 
-  margin-left: 8px;
-}
-.code{ 
-    opacity:.85;
+  margin-top: 0.2em;
+  font-weight: bold;
 }
 .statement-row { 
     margin:.1rem 0;

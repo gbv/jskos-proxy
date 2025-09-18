@@ -172,10 +172,6 @@ const loading = computed(() => {
 
   <!-- 2) When not loading, render the rest -->
   <template v-else>
-    <div class="qualified-relations-tree__title">
-      Qualified Relations:
-    </div>
-
     <ul
       v-if="hasAny"
       class="qualified-relations-tree__wrapper">
@@ -185,15 +181,10 @@ const loading = computed(() => {
         :key="propertyUri"
         class="qualified-relations__item">
         <div class="property-uri__head">
-          <code
-            class="code"
-            :title="propertyUri">
-            Property Uri:
-            <AutoLink
-              :href="propertyUri"
-              :text="labelForUri(propertyUri)"
-              :title="propertyUri" />
-          </code>
+          <AutoLink
+            :href="propertyUri"
+            :text="labelForUri(propertyUri)"
+            :title="propertyUri" />
         </div>
 
         <ul class="qualifiedList__wrapper">
@@ -206,7 +197,7 @@ const loading = computed(() => {
               <div
                 v-if="statement.resource.uri"
                 class="statement-row">
-                <b>Resource Uri: </b>
+                <b>Value: </b>
                 <AutoLink
                   :href="statement.resource.uri"
                   :text="labelForUri(statement.resource.uri)"
@@ -287,10 +278,6 @@ const loading = computed(() => {
   list-style: none;
   padding: 0;
 }
-.qualified-relations-tree__title { 
-  font-weight:600; 
-  margin-bottom:.25rem 
-}  
 .qualified-relations__item:not(:first-child) { 
   margin-top: 12px;
 }
@@ -326,10 +313,8 @@ const loading = computed(() => {
   list-style: none;
 } 
 .property-uri__head { 
-  margin-left: 8px;
-}
-.code { 
-  opacity:.8; 
+  margin-top: 0.2em;
+  font-weight: bold;
 }
 .rank-badge { 
   margin-left:.25rem; 
