@@ -108,24 +108,24 @@ function collectUris() {
     if (propUri) {
       set.add(propUri)
     }
-    for (const st of (qualifiedList || [])) {
-      const resUri = st?.resource?.uri
+    for (const statement of (qualifiedList || [])) {
+      const resUri = statement?.resource?.uri
       if (typeof resUri === "string") {
         set.add(resUri)
       }
 
-      const types = st?.resource?.type || []
-      for (const t of types) {
-        if (typeof t === "string") {
-          set.add(t) 
+      const types = statement?.resource?.type || []
+      for (const type of types) {
+        if (typeof type === "string") {
+          set.add(type) 
         }
       }
 
-      const places = st?.resource?.place || []
-      for (const p of places) {
-        const pu = p?.uri
-        if (typeof pu === "string") {
-          set.add(pu) 
+      const places = statement?.resource?.place || []
+      for (const place of places) {
+        const placeUri = place?.uri
+        if (typeof placeUri === "string") {
+          set.add(placeUri) 
         }
       }
 
@@ -157,6 +157,7 @@ const loading = computed(() => {
   })
   return false
 })
+
 
 </script>
 
@@ -199,6 +200,7 @@ const loading = computed(() => {
           <li
             v-for="(statement, idx) in qualifiedList"
             :key="propertyUri + '-' + idx">
+            <!-- resource -->
             <div v-if="statement.resource">
               <!-- URI -->
               <div
@@ -253,19 +255,18 @@ const loading = computed(() => {
                 :depth="depth + 1"
                 :max-depth="maxDepth"
                 :visited="localVisited" />
-
-              <!-- meta (rank/date range) -->
-              <small
-                v-if="statement.rank"
-                class="rank-badge">
-                Rank: {{ statement.rank }}
-              </small>
-              <small
-                v-if="statement.startDate || statement.endDate"
-                class="range-dates">
-                · {{ fmtRange(statement.startDate, statement.endDate) }}
-              </small>
             </div>
+            <!-- meta (rank/date range) -->
+            <small
+              v-if="statement.rank"
+              class="rank-badge">
+              Rank: {{ statement.rank }}
+            </small>
+            <small
+              v-if="statement.startDate || statement.endDate"
+              class="range-dates">
+              · {{ fmtRange(statement.startDate, statement.endDate) }}
+            </small>
           </li>
         </ul>
       </li>

@@ -9,7 +9,7 @@ import { utils } from "jskos-vue"
 import MapView from "@/components/MapView.vue"
 import ItemTechnicalView from "@/components/ItemTechnicalView.vue"
 import { getRouterUrl } from "@/utils.js"
-import QualifiedRelationsTree from "@/components/QualifiedRelationsTree.vue"
+import QualifiedStatements from "@/components/QualifiedStatements.vue"
 
 const route = useRoute()
 const router = useRouter()
@@ -177,6 +177,16 @@ watch(uri, async (value, prevValue) => {
 const topConcepts = computed(() => {
   return scheme.value?.topConcepts
 })
+
+// Related to qualified statements tab
+const hasQualifiedStatements = computed(() => {
+  const qr = concept.value?.qualifiedRelations && Object.keys(concept.value.qualifiedRelations).length
+  const qd = concept.value?.qualifiedDates && Object.keys(concept.value.qualifiedDates).length
+  const ql = concept.value?.qualifiedLiterals && Object.keys(concept.value.qualifiedLiterals).length
+  return !!(qr || qd || ql)
+})
+
+
 </script>
 
 <template>
@@ -323,13 +333,14 @@ const topConcepts = computed(() => {
           </ul>
         </div>
         <div
-          v-if="concept?.qualifiedRelations && Object.keys(concept.qualifiedRelations).length"
-          title="Qualified relations">
-          <QualifiedRelationsTree
+          v-if="hasQualifiedStatements"
+          title="Qualified statements">
+          <QualifiedStatements
             :item="concept"
-            :max-depth="4"
-            :visited="[concept?.uri].filter(Boolean)" />
+            :max-depth="4" />
         </div>
+
+
         <p v-if="concept?.[detailsLoadedKey] === detailsLoadedStates.basicData">
           <loading-indicator />
         </p>
