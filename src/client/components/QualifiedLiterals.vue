@@ -168,7 +168,6 @@ function labelForUri(u) {
             <div
               v-if="statement.literal"
               class="statement-row">
-              <b>Value: </b>
               <span
                 class="lang-apex"
                 :data-lang="statement.literal.language ?? ''
@@ -277,12 +276,6 @@ function labelForUri(u) {
         </ul>
       </li>
     </ul>
-
-    <div
-      v-else
-      class="qualified-literals-empty">
-      No qualified literals.
-    </div>
   </div>
 </template>
 
@@ -327,6 +320,10 @@ function labelForUri(u) {
 }
 .statement-row { 
     margin:.1rem 0;
+}
+.statement-row > ul {
+  padding-left: 1em;
+  list-style-type: disc;
 }
 .lang-apex[data-lang]::after{
   content: attr(data-lang);

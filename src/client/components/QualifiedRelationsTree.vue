@@ -197,7 +197,6 @@ const loading = computed(() => {
               <div
                 v-if="statement.resource.uri"
                 class="statement-row">
-                <b>Value: </b>
                 <AutoLink
                   :href="statement.resource.uri"
                   :text="labelForUri(statement.resource.uri)"
@@ -262,14 +261,6 @@ const loading = computed(() => {
         </ul>
       </li>
     </ul>
-
-    <!-- Optional empty-state -->
-    <div
-      v-else
-      class="statement-row"
-      style="opacity:.8">
-      No qualified relations.
-    </div>
   </template>
 </template>
 
@@ -305,9 +296,13 @@ const loading = computed(() => {
 .statement-row { 
   margin:.1rem 0;
 }
+..qualifiedList__wrapper {
+  padding-left: 1em;
+  list-style-type: disc;
+}
 .statement-row__head { 
-    display:inline-block;
-    font-weight:600;
+  display:inline-block;
+  font-weight:600;
 }
 .statement-row__value { 
   list-style: none;
