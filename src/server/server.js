@@ -10,7 +10,11 @@ import { initBackend } from "./backend.js"
 const app = express()
 ViteExpress.config({ mode: config.isProduction ? "production" : "development" })
 
-const backend = initBackend({ backend: config.backend, log: config.log })
+console.log("config.backend =>", config.backend)
+
+const backend = initBackend({ backend: config.backend, log: config.log, 
+  requireConcepts: config.requireConcepts,
+  requireConceptsOverrides: config.requireConceptsOverrides })
 
 /**
  * Cleans a given item or array of items by:

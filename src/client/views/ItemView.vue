@@ -38,6 +38,16 @@ const scheme = computed(() => {
   return schemeMatch
 })
 
+const schemeProvidesConcepts = computed(() => {
+  if (typeof scheme.value?.providesConcepts === "boolean") {
+    return scheme.value.providesConcepts
+  }
+  // fallback inference (if ever missing)
+  if (Array.isArray(scheme.value?.concepts)) {
+    return scheme.value.concepts.length !== 0
+  }
+  return true
+})
 
 const registry = computed(() => scheme.value?._registry)
 
@@ -79,7 +89,7 @@ watch([schemes, scheme], async () => {
     errors.schemesError = true
   }
   errors.loadTopError = false
-  if (scheme.value && (!scheme.value?.topConcepts || scheme.value?.topConcepts?.includes(null))) {
+  if (scheme.value && schemeProvidesConcepts.value && (!scheme.value?.topConcepts || scheme.value?.topConcepts?.includes(null))) {
     topLoadingPromise = loadTop(scheme.value).catch(error => {
       console.error(`Error loading top concepts for ${scheme.value?.uri}:`, error)
       errors.loadTopError = true
@@ -216,39 +226,47 @@ const hasQualifiedStatements = computed(() => {
     </AutoLink>
   </h2>
   <item-suggest
-    v-if="scheme"
+    v-if="scheme && schemeProvidesConcepts"
     id="searchInScheme"
     :search="utils.cdkRegistryToSuggestFunction(registry, { scheme })"
     :placeholder="jskos.notation(scheme) ? $t('searchInVocabulary', { voc: jskos.notation(scheme) }) : null"
     @select="concept = { uri: $event.uri }" />
   <!-- ConceptTree has to be on the top level in order for "scrollToUri" to work -->
-  <div 
-    v-if="!errors.schemesError && !errors.schemeError && !errors.loadTopError"
-    id="conceptHierarchy">
-    <concept-tree
-      v-if="topConcepts"
-      id="conceptTree"
-      ref="conceptTreeRef"
-      v-model="concept"
-      :concepts="topConcepts"
-      @open="loadNarrower($event)" />
-    <div
-      v-if="!topConcepts || hierarchyLoading"
-      class="loading">
-      <loading-indicator size="xl" />
-    </div>
-  </div>
-  <div 
-    v-else
-    id="conceptHierarchy">
-    <template v-if="errors.schemeError">
-      {{ $t("schemeError") }}
+  <div id="conceptHierarchy">
+    <!-- A: no concepts -->
+    <template v-if="scheme && !schemeProvidesConcepts">
+      <div class="alert alert--warning">
+        {{ $t('schemeHasNoConcepts') }}
+      </div>
     </template>
-    <template v-if="errors.schemesError">
-      {{ $t("schemesError") }}
+
+    <!-- Normal tree path (no errors) -->
+    <template v-else-if="!errors.schemesError && !errors.schemeError && !errors.loadTopError">
+      <concept-tree
+        v-if="topConcepts"
+        id="conceptTree"
+        ref="conceptTreeRef"
+        v-model="concept"
+        :concepts="topConcepts"
+        @open="loadNarrower($event)" />
+      <div
+        v-if="!topConcepts || hierarchyLoading"
+        class="loading">
+        <loading-indicator size="xl" />
+      </div>
     </template>
-    <template v-if="errors.loadTopError">
-      {{ $t("loadTopError") }}
+
+    <!-- Error messages -->
+    <template v-else>
+      <template v-if="errors.schemeError">
+        {{ $t("schemeError") }}
+      </template>
+      <template v-if="errors.schemesError">
+        {{ $t("schemesError") }}
+      </template>
+      <template v-if="errors.loadTopError">
+        {{ $t("loadTopError") }}
+      </template>
     </template>
   </div>
   <div 

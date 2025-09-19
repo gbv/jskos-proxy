@@ -2,6 +2,21 @@ import * as dotenv from "dotenv"
 import path from "node:path"
 import fs from "node:fs/promises"
 
+function parseRequireConceptsOverrides(raw) {
+  const map = new Map()
+  if (!raw) {
+    return map
+  }
+  for (const pair of raw.split(",").map(s => s.trim()).filter(Boolean)) {
+    const [base, val] = pair.split("=")
+    if (!base) {
+      continue
+    }
+    map.set(base.trim(), String(val).trim().toLowerCase() !== "false")
+  }
+  return map
+}
+
 async function exists(file) {
   try {
     await fs.access(file, fs.constants.F_OK)
@@ -56,6 +71,13 @@ const pkg = JSON.parse(await readFile(fileUrl, "utf8"))
 const { name, version, homepage } = pkg
 const { env } = process
 
+
+// Global default: true unless explicitly set to "false"
+const requireConcepts = env.REQUIRE_CONCEPTS !== "false"
+
+// Per-registry: "<base>=<true|false>,<base>=<true|false>"
+const requireConceptsOverrides = parseRequireConceptsOverrides(env.REQUIRE_CONCEPTS_OVERRIDES || "")
+
 const config = {
   env: NODE_ENV,
   configDir,
@@ -71,6 +93,8 @@ const config = {
   homepage,
   listing: !(env.LISTING||"").match(/^0|false$/),
   quickSelection: (env.QUICK_SELECTION ?? "").split(",").filter(Boolean).map(uri => ({ uri })),
+  requireConcepts,
+  requireConceptsOverrides,
   // methods
   log,
   info: (NODE_ENV === "development" ? log : () => {}),

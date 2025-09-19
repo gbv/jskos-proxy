@@ -58,8 +58,9 @@ export const schemeFetchPromise = fetch(
     signal: AbortSignal.timeout(20000),
   },
 ).then(res => res.json()).then(data => {
-  state.schemes = data.map(scheme => {
-    scheme = new jskos.ConceptScheme(scheme)
+  state.schemes = data.map(raw => {
+    const scheme = new jskos.ConceptScheme(raw)
+    scheme.providesConcepts = raw.providesConcepts
     // Add _registry to scheme (via special REGISTRY field provided by backend)
     scheme._registry = registries.find(registry => registry._api?.status === scheme.REGISTRY?.status)
     // If there's an identifier with the current namespace, use it as the main identifier
@@ -77,7 +78,15 @@ export const schemeFetchPromise = fetch(
 })
 
 export const schemes = computed(() => state.schemes)
-export const schemesAsConceptSchemes = computed(() => state.schemes?.map(scheme => new jskos.ConceptScheme(scheme)) || [])
+
+export const schemesAsConceptSchemes = computed(() =>
+  state.schemes?.map(s => {
+    const cs = new jskos.ConceptScheme(s)
+    cs.providesConcepts = s.providesConcepts
+    cs._registry = s._registry
+    return cs
+  }) || [],
+)
 
 export async function getRegistryForScheme(scheme) {
   await schemeFetchPromise

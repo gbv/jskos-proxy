@@ -40,10 +40,12 @@ export class FileBackend {
 
 export class ApiBackend {
 
-  constructor(base, log) {
+  constructor(base, log, opts = {}) {
 
     this.base = base
     this.log = log || (() => {})
+    this.requireConceptsDefault = opts.requireConcepts !== false
+    this.requireConceptsOverrides = opts.requireConceptsOverrides || new Map()
 
     // Load schemes in background and update every 60 seconds
     this.schemes = null
@@ -51,7 +53,9 @@ export class ApiBackend {
     this.getSchemesPromise = new Promise(resolve => {
       cdk.repeat({
         function: async () => {
-          if (!this.registries?.length || previouslyErrored) {
+
+
+          /* if (!this.registries?.length || previouslyErrored) {
             this.registries = this.base.split(",").map(base => cdk.initializeRegistry({
               provider: "ConceptApi",
               // ? Does "base" always have a trailing slash?
@@ -61,8 +65,33 @@ export class ApiBackend {
             this.registries.forEach(registry => {
               registry.cdk = null
             })
+          } */
+
+          if (!this.registries?.length || previouslyErrored) {
+            this.registries = this.base.split(",").map(base => {
+              const registry = cdk.initializeRegistry({
+                provider: "ConceptApi",
+                status: `${base}status`,
+              })
+              // prevent automatic registryForScheme
+              registry.cdk = null
+              // attach base + per-registry requireConcepts flag (override -> default)
+              registry._base = base
+              registry._requireConcepts = this.requireConceptsOverrides.has(base)
+                ? this.requireConceptsOverrides.get(base)
+                : this.requireConceptsDefault
+              return registry
+            })
           }
-          let schemes = []
+
+
+
+
+
+
+
+
+          /* let schemes = []
           partialError = null
           const results = (await Promise.all(
             this.registries
@@ -80,11 +109,54 @@ export class ApiBackend {
           for (const result of results) {
             // Only add to schemes if not there yet = backends specified first have priority
             // Also don't add schemes that explicitly do not provide concepts
-            if (!schemes.find(scheme => jskos.compare(scheme, result)) && result.concepts?.length !== 0) {
+            if (!schemes.find(scheme => jskos.compare(scheme, result))) {
               schemes.push(result)
             }
           }
-          return schemes.map(scheme => new jskos.ConceptScheme(scheme))
+          return schemes.map(scheme => new jskos.ConceptScheme(scheme)) */
+
+          let schemes = []
+          partialError = null
+
+          // fetch per registry so we know where each scheme came from
+          const perRegistry = await Promise.all(
+            this.registries.map(async (registry) => {
+              try {
+                const list = await registry.getSchemes({ params: { limit: 10000 } })
+                return { registry, list }
+              } catch (error) {
+                partialError = error
+                this.log(`ApiBackend: Partial error when loading schemes (API: ${registry._api?.status || registry._jskos?.status || registry._base}) - ${error}`)
+                return { registry, list: [] }
+              }
+            }),
+          )
+
+          const allCount = perRegistry.reduce((n, x) => n + x.list.length, 0)
+          if (partialError && allCount === 0) {
+            throw partialError
+          }
+
+          // merge with priority = earlier registries first
+          for (const { registry, list } of perRegistry) {
+            for (const raw of list) {
+              const providesConcepts = !(Array.isArray(raw.concepts) && raw.concepts.length === 0)
+              // per-registry filter
+              if (registry._requireConcepts && !providesConcepts) {
+                continue
+              }
+              // skip duplicates (compare by identity/uri)
+              if (schemes.find(s => jskos.compare(s, raw))) {
+                continue
+              }
+              // make JSKOS ConceptScheme and tag metadata for client
+              const cs = new jskos.ConceptScheme(raw)
+              cs._registry = registry
+              cs.providesConcepts = providesConcepts  // <-- visible to frontend (not underscored)
+              schemes.push(cs)
+            }
+          }
+          return schemes
         },
         callback: (error, result) => {
           if (error) {
@@ -150,9 +222,9 @@ export class ApiBackend {
   }
 }
 
-export function initBackend({ backend, log }) {
+export function initBackend({ backend, log, requireConcepts, requireConceptsOverrides }) {
   if (backend.match(/^https?:/)) {
-    return new ApiBackend(backend, log)
+    return new ApiBackend(backend, log, { requireConcepts, requireConceptsOverrides })
   } else {
     return new FileBackend(backend, log)
   }

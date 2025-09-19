@@ -12,7 +12,10 @@
   --color-button-text: var(--color-text-on-dark);
   --color-section-background-primary: #f8fafc;
   --color-section-background-secondary: #EAEAEA;
-}
+  --color-warning: #B45309;           
+  --color-warning-text: #7C2D12;      
+  --color-warning-bg: #FFFBEB;        
+  --color-warning-border: #F59E0B;
 
 html, body, #app {
   margin: 0;
@@ -174,4 +177,27 @@ a {
 
 a:hover {
   color: var(--color-link-hover);
+}
+
+/* General Warnings */
+.alert {
+  padding: .75rem .9rem;
+  border: 1px solid transparent;
+  border-radius: 8px;
+  font-size: .95em;
+}
+
+.alert--warning {
+  background: var(--color-warning-bg);
+  border-color: var(--color-warning-border);
+  color: var(--color-warning-text);
+}
+
+.badge--warning {
+  background: var(--color-warning);
+  color: #fff;
+  border-radius: 999px;
+  padding: .15rem .5rem;
+  font-size: .75em;
+  font-weight: 600;
 }
