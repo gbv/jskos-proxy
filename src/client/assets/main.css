@@ -15,8 +15,9 @@
   --color-warning: #B45309;           
   --color-warning-text: #7C2D12;      
   --color-warning-bg: #FFFBEB;        
-  --color-warning-border: #F59E0B;
-  
+  --color-warning-border: #F59E0B; 
+}
+
 
 html, body, #app {
   margin: 0;
