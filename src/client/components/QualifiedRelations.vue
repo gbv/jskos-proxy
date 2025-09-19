@@ -1,14 +1,13 @@
 <script setup>
-import { computed, reactive, watch, onMounted } from "vue"
+import { computed, watch, onMounted } from "vue"
 import { AutoLink } from "jskos-vue"
-import { schemes } from "@/store.js"
-import * as jskos from "jskos-tools"
-import { loadConcept} from "../store"
 import PlaceItem from "./PlaceItem.vue"
+import { schemes, loadConcept } from "@/store.js"
+import { useUriResolution } from "@/composables/useUriResolution"
 
 
 // Name component (allows recursion) + disable suspense
-defineOptions({ name: "QualifiedRelationsTree", suspensible: false })
+defineOptions({ name: "QualifiedRelations", suspensible: false })
 
 const props = defineProps({
   // Root item containing qualified relations
@@ -35,71 +34,12 @@ const localVisited = computed(() => {
   return [...props.visited, ...cur]
 })
 
+
+const { fmtRange, labelForUri, prefetch, anyLoading } =
+  useUriResolution({ schemesRef: schemes, loadConcept })
+
 // True if there is at least one relation
 const hasAny = computed(() => Object.keys(relations.value).length > 0)
-
-// --- small helpers ---
-
-// Shorten long URLs for display
-const shorten = (u) => {
-  try {
-    const x = new URL(u)
-    const host = x.hostname.replace(/^www\./, "")
-    const segs = x.pathname.split("/").filter(Boolean)
-    const path = segs.length > 2 ? `/…/${segs.at(-1)}` : `/${segs.join("/")}`
-    return (host + path).replace(/\/$/, "")
-  } catch {
-    return u 
-  }
-}
-
-// Format date range compactly
-const fmtRange = (s, e) => (s || e) ? `${s || "…"}–${e || "…"}` : ""
-
-// Find best matching scheme by longest URI prefix
-function findSchemeForUri(u) {
-  if (!schemes?.value?.length || !u) {
-    return null
-  }
-  const candidates = schemes.value.filter(s => typeof s?.uri === "string" && u.startsWith(s.uri))
-  if (candidates.length === 0) {
-    return null
-  }
-  // Most specific base wins
-  return candidates.sort((a, b) => b.uri.length - a.uri.length)[0]
-}
-
-
-// ---------- lightweight cache ----------
-// Resolved concepts by URI
-const cache = reactive({})
-// Load errors by URI
-const errors = reactive({})
-// Loading flags by URI
-const conceptLoading = reactive({})
-
-
-// Ensure a concept is loaded
-function ensureConcept(u) {
-  if (!u || cache[u] || conceptLoading[u]) {
-    return
-  }
-  const scheme = findSchemeForUri(u)
-  if (!scheme) {
-    return
-  }
-  conceptLoading[u] = true
-  loadConcept(u, scheme, false)
-    .then(concept => {
-      cache[u] = concept 
-    })
-    .catch(e => {
-      errors[u] = e 
-    })
-    .finally(() => {
-      conceptLoading[u] = false 
-    })
-}
 
 // Collect all URIs to resolve (properties, resources, types, places)
 function collectUris() {
@@ -131,33 +71,11 @@ function collectUris() {
 
     }
   }
-  return [...set]
+  return Array.from(set)
 }
 
-watch(relations, () => {
-  collectUris().forEach(ensureConcept)
-}, { immediate: true, deep: true })
-
-onMounted(() => {
-  collectUris().forEach(ensureConcept)
-})
-
-function labelForUri(u) {
-  if (!u) {
-    return ""
-  }
-  return cache[u] ? (jskos.prefLabel(cache[u]) || shorten(u)) : shorten(u)
-}
-
-const loading = computed(() => {
-  Object.keys(conceptLoading).forEach(u => {
-    if (conceptLoading[u]) {
-      return true 
-    }
-  })
-  return false
-})
-
+watch(relations, () => prefetch(collectUris()), { immediate: true, deep: true })
+onMounted(() => prefetch(collectUris()))
 
 </script>
 
@@ -165,7 +83,7 @@ const loading = computed(() => {
 <template>
   <!-- 1) Show ONLY the loader when loading -->
   <div
-    v-if="loading"
+    v-if="anyLoading"
     class="loading">
     <loading-indicator size="xl" />
   </div>
@@ -174,20 +92,20 @@ const loading = computed(() => {
   <template v-else>
     <ul
       v-if="hasAny"
-      class="qualified-relations-tree__wrapper">
+      class="qstmt-tree">
       <!-- Loop properties of qualifiedRelations (object, not array) -->
       <li
         v-for="(qualifiedList, propertyUri) in relations"
         :key="propertyUri"
-        class="qualified-relations__item">
-        <div class="property-uri__head">
+        class="qstmt-branch">
+        <div class="qstmt-prop">
           <AutoLink
             :href="propertyUri"
             :text="labelForUri(propertyUri)"
             :title="propertyUri" />
         </div>
 
-        <ul class="qualifiedList__wrapper">
+        <ul class="qstmt-list">
           <li
             v-for="(statement, idx) in qualifiedList"
             :key="propertyUri + '-' + idx">
@@ -196,7 +114,7 @@ const loading = computed(() => {
               <!-- URI -->
               <div
                 v-if="statement.resource.uri"
-                class="statement-row">
+                class="qstmt-row">
                 <AutoLink
                   :href="statement.resource.uri"
                   :text="labelForUri(statement.resource.uri)"
@@ -206,15 +124,15 @@ const loading = computed(() => {
               <!-- types -->
               <div
                 v-if="statement.resource.type?.length"
-                class="statement-row">
-                <div class="statement-row__head">
+                class="qstmt-row">
+                <div class="qstmt-row__head">
                   Types
                 </div>:
-                <ul class="statement-row__value-list">
+                <ul class="qstmt-values">
                   <li
                     v-for="(type, idxType) in statement.resource.type"
                     :key="propertyUri + '-' + idxType"
-                    class="statement-row__value">
+                    class="qstmt-value">
                     <AutoLink
                       :href="type"
                       :text="labelForUri(type)"
@@ -226,8 +144,8 @@ const loading = computed(() => {
               <!-- place -->
               <div
                 v-if="statement.resource.place?.length"
-                class="statement-row">
-                <div class="statement-row__head">
+                class="qstmt-row">
+                <div class="qstmt-row__head">
                   Place
                 </div>:
                 <PlaceItem
@@ -237,7 +155,7 @@ const loading = computed(() => {
               </div>
 
               <!-- recurse -->
-              <QualifiedRelationsTree
+              <QualifiedRelations
                 v-if="statement.resource?.qualifiedRelations
                   && depth < maxDepth
                   && !(statement.resource?.uri && visited.includes(statement.resource.uri))"
@@ -249,12 +167,12 @@ const loading = computed(() => {
             <!-- meta (rank/date range) -->
             <small
               v-if="statement.rank"
-              class="rank-badge">
+              class="qstmt-badge--rank">
               Rank: {{ statement.rank }}
             </small>
             <small
               v-if="statement.startDate || statement.endDate"
-              class="range-dates">
+              class="qstmt-meta--range">
               · {{ fmtRange(statement.startDate, statement.endDate) }}
             </small>
           </li>
@@ -263,62 +181,3 @@ const loading = computed(() => {
     </ul>
   </template>
 </template>
-
-<style scoped>
-.qualified-relations-tree__wrapper { 
-  list-style: none;
-  padding: 0;
-}
-.qualified-relations__item:not(:first-child) { 
-  margin-top: 12px;
-}
-.qualified-relations__item {
-  position: relative;
-  padding-left: 12px;
-}
-.qualified-relations__item::before, 
-.qualified-relations__item::after {
-  content: "";
-  position: absolute;
-  left: 0;
-  width: 12px;
-  height: 100%;
-  border-left: 1px solid var(--color-primary);
-}
-.qualified-relations__item::before {
-  top: 0;
-  border-top: 1px solid var(--color-primary);
-}
-.qualified-relations__item::after {
-  bottom: 0;
-  border-bottom: 1px solid var(--color-primary);
-}
-.statement-row { 
-  margin:.1rem 0;
-}
-..qualifiedList__wrapper {
-  padding-left: 1em;
-  list-style-type: disc;
-}
-.statement-row__head { 
-  display:inline-block;
-  font-weight:600;
-}
-.statement-row__value { 
-  list-style: none;
-} 
-.property-uri__head { 
-  margin-top: 0.2em;
-  font-weight: bold;
-}
-.rank-badge { 
-  margin-left:.25rem; 
-  padding:.05rem .35rem; 
-  border:1px solid var(--color-primary); 
-  border-radius:999px; 
-}
-.range-dates { 
-  opacity:.8; 
-}
-</style>
-

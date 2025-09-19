@@ -1,6 +1,6 @@
 <script setup>
 import { computed } from "vue"
-import QualifiedRelationsTree from "@/components/QualifiedRelationsTree.vue"
+import QualifiedRelations from "@/components/QualifiedRelations.vue"
 import QualifiedLiterals from "@/components/QualifiedLiterals.vue"
 // import QualifiedDatesBlock from "@/components/QualifiedDatesBlock.vue" 
 
@@ -21,13 +21,13 @@ const visitedRoot = computed(() => [props.item?.uri].filter(Boolean))
 <template>
   <section class="qualified-statements__wrapper">
     <div class="qualified-statements-title">
-      Qualified Statements
+      {{ $t('qualifiedStatements') }}
     </div>
 
     <div
       v-if="!hasAny"
       class="qualified-statements-empty">
-      No qualified statements.
+      No {{ $t('qualifiedStatements') }}
     </div>
 
     <template v-else>
@@ -36,7 +36,7 @@ const visitedRoot = computed(() => [props.item?.uri].filter(Boolean))
         v-if="hasQR"
         class="qualified-statements-section"
         aria-label="Qualified relations">
-        <QualifiedRelationsTree
+        <QualifiedRelations
           :item="item"
           :max-depth="maxDepth"
           :visited="visitedRoot" />
@@ -50,7 +50,6 @@ const visitedRoot = computed(() => [props.item?.uri].filter(Boolean))
         <QualifiedLiterals
           :literals="item.qualifiedLiterals"
           :uri="item.uri"
-          :dense="true"
           :max-depth="maxDepth"
           :visited="visitedRoot" />
       </section>
@@ -63,8 +62,8 @@ const visitedRoot = computed(() => [props.item?.uri].filter(Boolean))
     padding-bottom: 12px;;
 }
 
-.qualified-statements-title { 
-    font-size: 16px;
+.qualified-statements-title {
+    font-weight: 600;
     padding-bottom: 12px;
 }
 .qualified-statements-empty { 

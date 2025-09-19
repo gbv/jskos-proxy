@@ -29,7 +29,8 @@
     "backendDetailsTitle": "Vokabular-Server",
     "backendDetailsDoc": "API",
     "backendDetailsVoc": "Vokabulare",
-    "schemeHasNoConcepts": "Dieses Vokabular enthält keine durchsuchbaren Konzepte."
+    "schemeHasNoConcepts": "Dieses Vokabular enthält keine durchsuchbaren Konzepte.",
+    "qualifiedStatements": "Zusätzliche Details — Beziehungen, Bezeichnungen, Daten & Zeiträume"
   },
   "en": {
     "about": "About",
@@ -61,6 +62,7 @@
     "backendDetailsTitle": "Terminology service",
     "backendDetailsDoc": "API",
     "backendDetailsVoc": "Terminologies",
-    "schemeHasNoConcepts": "This scheme does not provide concepts to browse."
+    "schemeHasNoConcepts": "This scheme does not provide concepts to browse.",
+    "qualifiedStatements": "Additional details — Relations, Labels, Dates"
   }
 }
