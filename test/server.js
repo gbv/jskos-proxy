@@ -85,4 +85,24 @@ describe("server", () => {
     assert.ok(res.body.identifier.includes(ALIAS.replace(/\/$/, ""))) // backends may omit slash
   })
 
+
+  // Concept canonical/deprecated resolution
+
+  const CONCEPT_ID = "1b6398db-fc61-45f8-b325-e96666f4505b"
+  const DEPREC_SCHEME = "prizepapers_lading"
+  const CANON_SCHEME  = "prizepapers_lading_type"
+  
+  it("redirects HTML concept route from deprecated scheme path to canonical path", async () => {
+    const res = await chai.request.execute(app)
+      .get(`/terminology/${DEPREC_SCHEME}/${CONCEPT_ID}`)
+      .redirects(0) // don't follow, we want to inspect Location
+
+    assert.equal(res.status, 301)
+    // Location should be the canonical app path (no host)
+    assert.equal(
+      res.headers.location,
+      `/terminology/${CANON_SCHEME}/${encodeURIComponent(CONCEPT_ID)}`,
+    )
+  })
+
 })
