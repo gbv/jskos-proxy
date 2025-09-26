@@ -185,21 +185,43 @@ export class ApiBackend {
   }
 
   async getScheme(uri) {
+    // Ensure schemes are loaded before we try to match
     if (!this.schemes) {
       await this.getSchemesPromise
     }
-  
-    // Try to find the scheme
-    let schemeMatch = this.schemes.find(scheme => jskos.compare(scheme, { uri }))
-  
-    if (!schemeMatch) {
-      // No exact match found, trying with a trailing slash...
-      const uriWithSlash = uri.endsWith("/") ? uri : `${uri}/`
-      
-      schemeMatch = this.schemes.find(scheme => jskos.compare(scheme, { uri: uriWithSlash }))
+    // Helper: normalize a URI to always have a trailing slash
+    // (prevents mismatches between ".../foo" and ".../foo/")
+    const norm = u => (typeof u === "string" && u.length ? (u.endsWith("/") ? u : `${u}/`) : u)
+
+    // Candidate forms we want to test against:
+    // - the raw URI we got
+    // - the normalized-with-slash variant
+    const cand = [uri, norm(uri)]
+
+    // --- Direct match on canonical `scheme.uri` --------------------------
+    // Try to find a scheme whose canonical URI matches either candidate form.
+    // We also normalize the scheme's own uri when comparing, to be safe.
+    let hit = this.schemes.find(s =>
+      cand.includes(s.uri) || cand.includes(norm(s.uri)),
+    )
+    if (hit) {
+      return hit
     }
-  
-    return schemeMatch
+
+    // --- Identifier fallback (alias/deprecated → canonical) --------------
+    // No direct match? Then check every scheme’s `identifier` list.
+    // If any identifier matches our candidates, we treat that scheme as the hit.
+    // This covers the “deprecated URI → current canonical URI” use case.
+    hit = this.schemes.find(s =>
+      (s.identifier || []).some(id => cand.includes(id) || cand.includes(norm(id))),
+    )
+    if (hit) {
+      return hit
+    }
+
+    // Nothing matched.
+    return null
+
   }
 
   async getConcept(uri) {

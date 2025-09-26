@@ -24,18 +24,33 @@ const errors = reactive({
 })
 
 const schemeUri = computed(() => route.params.voc.match(/^https?:\/\//) ? route.params.voc : `${config.namespace}${route.params.voc}`)
+
+// Resolve the current scheme, accepting canonical URI *or* any alias in `identifier`.
 const scheme = computed(() => {
-  // Try to find the scheme
-  let schemeMatch = schemes.value?.find(s => jskos.compare(s, { uri: schemeUri.value }))
-  
-  if (!schemeMatch) {
-    // No exact match found, trying with a trailing slash...
-    const uriWithSlash = schemeUri.value.endsWith("/") ? schemeUri.value : `${schemeUri.value}/`
-    
-    schemeMatch = schemes.value?.find(scheme => jskos.compare(scheme, { uri: uriWithSlash }))
+  const all = schemes.value || []
+  const want = schemeUri.value
+  if (!want) {
+    return null
   }
 
-  return schemeMatch
+  // Normalize to compare consistently (add trailing slash if missing)
+  const norm = (u) => (u?.endsWith("/") ? u : `${u}/`)
+  const wantNorm = norm(want)
+
+  // 1) Direct match against canonical `uri`
+  let hit = all.find(s => norm(s.uri) === wantNorm)
+  if (hit) {
+    return hit
+  }
+
+  // 2) Match against any alias in `identifier` (deprecated/old URIs)
+  hit = all.find(s => (s.identifier || []).some(id => norm(id) === wantNorm))
+  if (hit) {
+    return hit
+  }
+
+  // Nothing found
+  return null
 })
 
 const schemeProvidesConcepts = computed(() => {
@@ -80,6 +95,33 @@ const concept = computed({
 const conceptLoading = ref(true)
 const hierarchyLoading = ref(true)
 let topLoadingPromise = null
+
+
+// Keep the route normalized to the scheme's *canonical* URI
+// (handles cases where the user entered an alias/identifier or missed the trailing slash)
+watch(scheme, (s) => {
+  // If we don't (yet) have a resolved scheme, do nothing
+  if (!s) {
+    return
+  }
+  // Normalizer that ensures a trailing slash (to compare apples to apples)
+  const norm = u => (u?.endsWith("/") ? u : `${u}/`)
+
+  // What the route currently points to (based on the path param)
+  const currentFull = norm(schemeUri.value)
+
+  // What the backend/frontend considers the canonical scheme URI
+  const canonical = norm(s.uri)
+
+  // If the route uses an alias/deprecated URI (or missing slash), rewrite it
+  if (currentFull !== canonical) {
+    // Replace the route (no history entry) with the canonical scheme path.
+    // Preserve the currently selected concept (if any) so deep-links remain stable.    
+    router.replace(getRouterUrl({ scheme: s, concept: concept.value || undefined }))
+  }
+}, { immediate: true })
+
+
 
 // Load top concepts when scheme is ready
 watch([schemes, scheme], async () => {

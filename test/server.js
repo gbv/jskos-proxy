@@ -71,4 +71,18 @@ describe("server", () => {
         }))
   }
 
+  const CANONICAL = "http://uri.gbv.de/terminology/prizepapers_lading_type/"
+  const ALIAS     = "http://uri.gbv.de/terminology/prizepapers_lading/"
+
+  it("resolves an aliased/deprecated scheme URI via `identifier` to the canonical scheme", async () => {
+    const res = await chai.request.execute(app).get("/terminology/prizepapers_lading/?format=jsonld")
+    assert.equal(res.status, 200)
+    assert.equal(res.type, "application/json")
+    // Should return the canonical record
+    assert.equal(res.body.uri, CANONICAL)
+    // And keep the alias in `identifier`
+    assert.ok(Array.isArray(res.body.identifier))
+    assert.ok(res.body.identifier.includes(ALIAS.replace(/\/$/, ""))) // backends may omit slash
+  })
+
 })

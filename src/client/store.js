@@ -51,6 +51,17 @@ export const registries = config.backend.split(",").map(base => cdk.initializeRe
   status: `${base}status`,
 }))
 
+
+// helper: check if a URI is inside our configured namespace
+// (e.g., config.namespace === "http://uri.gbv.de/terminology/")
+// Note: String(config.namespace) because config.namespace is a URL object.
+const inOurNS = (u) => typeof u === "string" && u.startsWith(String(config.namespace))
+
+// helper: normalize a URI to ALWAYS end with a trailing slash (if present and not already)
+// This avoids mismatches like "…/foo" vs "…/foo/"
+const withSlash = (u) => (u && !u.endsWith("/") ? `${u}/` : u)
+
+
 export const schemeFetchPromise = fetch(
   config.namespace.pathname, 
   { 
@@ -59,21 +70,48 @@ export const schemeFetchPromise = fetch(
   },
 ).then(res => res.json()).then(data => {
   state.schemes = data.map(raw => {
+    // Wrap raw object with JSKOS ConceptScheme helper for utils (notationFromUri, etc.)
     const scheme = new jskos.ConceptScheme(raw)
+    
+    // Preserve backend flag "providesConcepts" (added server-side if REQUIRE_CONCEPTS=false)
     scheme.providesConcepts = raw.providesConcepts
-    // Add _registry to scheme (via special REGISTRY field provided by backend)
+    
+    // Add the registry instance (the SDK registry that will be used to fetch concepts)
+    // The server includes REGISTRY.status to allow us to match the right registry.
     scheme._registry = registries.find(registry => registry._api?.status === scheme.REGISTRY?.status)
-    // If there's an identifier with the current namespace, use it as the main identifier
-    const identifier = (scheme.identifier || []).find(i => i.startsWith(config.namespace))
-    if (identifier && scheme.uri !== identifier) {
-      scheme.identifier = scheme.identifier.filter(i => i !== identifier).concat(scheme.uri)
-      scheme.uri = identifier
+    
+    // --- Canonicalize via `identifier` ---------------------------------
+    // Prefer a local (config.namespace) URI as the scheme's canonical `uri`.
+    // If a local URI exists in `identifier`, promote it to `scheme.uri` and
+    // push the previous `scheme.uri` into `identifier`. Always normalize with a
+    // trailing slash.
+
+    // Only promote if current canonical URI is NOT in our namespace,
+    // but we DO have a local identifier that IS in our namespace.
+    if (!inOurNS(scheme.uri)) {
+      // Find the first identifier that belongs to our namespace
+      const localId = (scheme.identifier || []).find(inOurNS)
+
+      // Promote that identifier to the primary URI if different
+      if (localId && scheme.uri !== localId) {
+        // 1) Move current canonical URI into the identifier list
+        // (keep all other identifiers EXCEPT the one we are promoting)
+        scheme.identifier = (scheme.identifier || []).filter(i => i !== localId).concat(scheme.uri)
+        
+        // 2) Set the promoted local identifier as the new canonical URI (normalized with slash)
+        scheme.uri = withSlash(localId)
+      }
+    } else {
+      // If the current canonical is already ours, just normalize it to include a trailing slash.
+      // This makes matching by URI more reliable throughout the app.
+      scheme.uri = withSlash(scheme.uri)
     }
+
     return scheme
   })
 }).catch(() => {
   console.error("Error loading schemes from backend.")
-  // TODO: Add retry mechanism
+  // TODO: Add retry mechanism (exponential backoff, retry button, etc.)
   state.schemes = []
 })
 
