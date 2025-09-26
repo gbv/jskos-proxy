@@ -10,8 +10,6 @@ import { initBackend } from "./backend.js"
 const app = express()
 ViteExpress.config({ mode: config.isProduction ? "production" : "development" })
 
-console.log("config.backend =>", config.backend)
-
 const backend = initBackend({ backend: config.backend, log: config.log, 
   requireConcepts: config.requireConcepts,
   requireConceptsOverrides: config.requireConceptsOverrides })
@@ -136,14 +134,42 @@ app.get(`${config.namespace.pathname}:voc`, validateFormat, async (req, res, nex
 
 
 app.get(`${config.namespace.pathname}:voc/:id`, validateFormat, async (req, res, next) => {
-  if (req.format === "html") {
-    // Refer HTML back to Vite
-    next()
-    return
-  } 
 
-  handleRequest(req, res, backend.getConcept.bind(backend))
+  const norm = u => (u && !u.endsWith("/") ? `${u}/` : u)
+  const ns   = new URL(config.namespace)               // e.g. http://uri.gbv.de/terminology/
+  const wantBase = norm(new URL(req.params.voc + "/", ns).href) // requested scheme base
+  const idPart   = encodeURIComponent(req.params.id)
 
+  // Look up scheme; backend.getScheme already supports identifier fallback.
+  let scheme
+  try {
+    scheme = await backend.getScheme(wantBase)
+  } catch (e) {
+    config.error(e)
+  }
+
+  const canonicalBase = norm(scheme?.uri || wantBase)  // fall back to requested if unknown
+  const targetUri     = canonicalBase + idPart         // concept URI under canonical scheme
+
+  if (req.format !== "html") {
+    // API: serve the canonical concept transparently (no HTTP redirect)
+    req.query.uri = targetUri
+    return handleRequest(req, res, backend.getConcept.bind(backend))
+  }
+
+  // HTML: if the requested base is not canonical, 301 to the canonical path
+  if (norm(wantBase) !== norm(canonicalBase)) {
+    // Build canonical app path: /<nsPath>/<canonicalVoc>/<id>
+    const nsPath = ns.pathname                         // e.g. "/terminology/"
+    const canonPathname = new URL(canonicalBase).pathname
+    const canonicalVoc  = canonPathname.slice(nsPath.length) // strip namespace prefix
+    const canonicalPath = `${nsPath}${canonicalVoc}${idPart}`
+    return res.redirect(301, canonicalPath)
+  }
+
+  // Already canonical → let the Vue app render it
+  return next()
+  
 })
 
 const startServer = async () => {
