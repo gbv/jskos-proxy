@@ -47,11 +47,14 @@ watch(() => ([schemesAsConceptSchemes.value, route.query.uri]), async ([schemes,
     }
     // Fallback: Request data from backend about concept directly
     try {
-      const scheme = schemes.find(s => jskos.compare(s, concept?.inScheme?.[0]))
-      const concept = await loadConcept(uri, scheme)
-      if (concept && scheme) {
-        router.push(getRouterUrl({ concept, scheme }))
-        return
+      const concept = await loadConcept(uri)
+      if (concept) {
+        const scheme = schemes.find(s => jskos.compare(s, concept.inScheme?.[0]))
+        if (scheme) {
+          router.push(getRouterUrl({ concept, scheme }))
+          return
+        }
+        console.error("Resource {URI} found but not its vocabulary!\"")
       }
     } catch (error) {
       // ignore

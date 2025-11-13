@@ -210,23 +210,28 @@ export function saveConceptsWithOptions(options) {
 
 let properties
 export async function loadConcept(uri, scheme, saveConceptFlag = true) {
-  const registry = await getRegistryForUri(uri, scheme)
-  if (!registry) {
-    return null
-  }
-  if (!properties) {
-    // Adjust properties for concept details
-    properties = registry._defaultParams?.properties || ""
-    properties += (properties ? "," : "") + "location,startPlace,endPlace,startDate,endDate,qualifiedRelations,qualifiedLiterals,qualifiedDates"
-  }
+  const knownRegistry = await getRegistryForUri(uri, scheme)
+  const possibleRegistries = knownRegistry ? [knownRegistry] : registries
   const existing = getConceptByUri(uri)
   // Make sure ALL details (including mappings and location) have been loaded
   if (existing?._registry && existing?.[detailsLoadedKey] === detailsLoadedStates.allData) {
     return existing
   }
+
+  let concept
   console.time(`loadConcept ${uri}`)
-  scheme = scheme ? { uri: scheme.uri, identifier: scheme.identifier } : null
-  const concept = (await registry.getConcepts({ concepts: [{ uri }], params: { properties }, scheme }))[0]
+  for (let registry of possibleRegistries) {
+    if (!properties) {
+      // Adjust properties for concept details
+      properties = registry._defaultParams?.properties || ""
+      properties += (properties ? "," : "") + "location,startPlace,endPlace,startDate,endDate,qualifiedRelations,qualifiedLiterals,qualifiedDates,inScheme"
+    }
+    scheme = scheme ? { uri: scheme.uri, identifier: scheme.identifier } : null
+    concept = (await registry.getConcepts({ concepts: [{ uri }], params: { properties }, scheme }))[0]
+    if (concept) {
+      break
+    }
+  }
   console.timeEnd(`loadConcept ${uri}`)
   if (!concept) {
     throw new Error(`Error loading concept ${uri}`)
