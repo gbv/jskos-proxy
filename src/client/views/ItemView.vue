@@ -238,7 +238,6 @@ const hasQualifiedStatements = computed(() => {
   return !!(qr || qd || ql)
 })
 
-
 </script>
 
 <template>

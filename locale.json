@@ -23,14 +23,16 @@
     "startEnd": "Verlauf",
     "startDate": "Startdatum",
     "endDate": "Enddatum",
+    "place": "Ort",
     "startPlace": "Startort",
     "endPlace": "Endort",
+    "sources": "Quellen",
     "namespace": "Namensraum",
     "backendDetailsTitle": "Vokabular-Server",
     "backendDetailsDoc": "API",
     "backendDetailsVoc": "Vokabulare",
     "schemeHasNoConcepts": "Dieses Vokabular enthält keine durchsuchbaren Konzepte.",
-    "qualifiedStatements": "Zusätzliche Details — Beziehungen, Bezeichnungen, Daten & Zeiträume"
+    "qualifiedStatements": "Zusätzliche Details (Beziehungen, Bezeichnungen, Daten & Zeiträume)"
   },
   "en": {
     "about": "About",
@@ -56,13 +58,15 @@
     "startEnd": "History",
     "startDate": "Start Date",
     "endDate": "End Date",
+    "place": "Place",
     "startPlace": "Start Place",
-    "endPlace": "End Place",
+    "endPlace": "End Place",    
+    "sources": "Sources",
     "namespace": "Namespace",
     "backendDetailsTitle": "Terminology service",
     "backendDetailsDoc": "API",
     "backendDetailsVoc": "Terminologies",
     "schemeHasNoConcepts": "This scheme does not provide concepts to browse.",
-    "qualifiedStatements": "Additional details — Relations, Labels, Dates"
+    "qualifiedStatements": "Additional details (Relations, Labels, Dates)"
   }
 }

@@ -136,7 +136,7 @@ onMounted(() => prefetch(collectUris()))
               v-if="statement.source?.length"
               class="qstmt-row">
               <div class="qstmt-row__head">
-                Source
+                {{ $t('sources') }}
               </div>:
               <ul class="qstmt-values">
                 <li
@@ -147,10 +147,6 @@ onMounted(() => prefetch(collectUris()))
                   <div
                     v-if="sourceItem.prefLabel"
                     class="qstmt-row">
-                    <div class="qstmt-row__head">
-                      Labels
-                    </div>:
-
                     <span
                       v-for="(text, lang) in sourceItem.prefLabel"
                       :key="lang"
@@ -166,7 +162,7 @@ onMounted(() => prefetch(collectUris()))
                     v-if="sourceItem.uri"
                     class="qstmt-row">
                     <div class="qstmt-row__head">
-                      Uri
+                      URI
                     </div>:
                     <AutoLink
                       :href="sourceItem.uri"
@@ -178,7 +174,7 @@ onMounted(() => prefetch(collectUris()))
                     v-if="sourceItem.url"
                     class="qstmt-row">
                     <div class="qstmt-row__head">
-                      Url
+                      URL
                     </div>:
                     <AutoLink
                       :href="sourceItem.url"
@@ -201,7 +197,7 @@ onMounted(() => prefetch(collectUris()))
 
             <!-- meta (rank/date range) -->
             <small
-              v-if="statement.rank"
+              v-if="statement.rank && statement.rank != 'normal'"
               class="qstmt-badge--rank">
               Rank: {{ statement.rank }}
             </small>

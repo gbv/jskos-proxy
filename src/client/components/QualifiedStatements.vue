@@ -19,55 +19,41 @@ const visitedRoot = computed(() => [props.item?.uri].filter(Boolean))
 </script>
 
 <template>
-  <section class="qualified-statements__wrapper">
+  <section v-if="hasAny">
     <div class="qualified-statements-title">
-      {{ $t('qualifiedStatements') }}
+      {{ $t('qualifiedStatements') }}:
     </div>
+    
+    <!-- Relations -->
+    <section
+      v-if="hasQR"
+      class="qualified-statements-section"
+      aria-label="Qualified relations">
+      <QualifiedRelations
+        :item="item"
+        :max-depth="maxDepth"
+        :visited="visitedRoot" />
+    </section>
 
-    <div
-      v-if="!hasAny"
-      class="qualified-statements-empty">
-      No {{ $t('qualifiedStatements') }}
-    </div>
+    <!-- Literals -->
+    <section
+      v-if="hasQL"
+      class="qualified-statements-section"
+      aria-label="Qualified literals">
+      <QualifiedLiterals
+        :literals="item.qualifiedLiterals"
+        :uri="item.uri"
+        :max-depth="maxDepth"
+        :visited="visitedRoot" />
+    </section>
 
-    <template v-else>
-      <!-- Relations -->
-      <section
-        v-if="hasQR"
-        class="qualified-statements-section"
-        aria-label="Qualified relations">
-        <QualifiedRelations
-          :item="item"
-          :max-depth="maxDepth"
-          :visited="visitedRoot" />
-      </section>
-
-      <!-- Literals -->
-      <section
-        v-if="hasQL"
-        class="qualified-statements-section"
-        aria-label="Qualified literals">
-        <QualifiedLiterals
-          :literals="item.qualifiedLiterals"
-          :uri="item.uri"
-          :max-depth="maxDepth"
-          :visited="visitedRoot" />
-      </section>
-    </template>
+    <!-- TODO: qualified dates -->
   </section>
 </template>
 
-<style scoped>
-.qualified-statements__wrapper {
-    padding-bottom: 12px;;
-}
-
+<style>
 .qualified-statements-title {
     font-weight: 600;
-    padding-bottom: 12px;
-}
-.qualified-statements-empty { 
-    opacity: .7; 
 }
 .qualified-statements-section + .qualified-statements-section { 
     margin-top: .75rem; 

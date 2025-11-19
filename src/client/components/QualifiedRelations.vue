@@ -146,7 +146,7 @@ onMounted(() => prefetch(collectUris()))
                 v-if="statement.resource.place?.length"
                 class="qstmt-row">
                 <div class="qstmt-row__head">
-                  Place
+                  {{ $t('place') }}
                 </div>:
                 <PlaceItem
                   :places="statement.resource.place"
@@ -166,7 +166,7 @@ onMounted(() => prefetch(collectUris()))
             </div>
             <!-- meta (rank/date range) -->
             <small
-              v-if="statement.rank"
+              v-if="statement.rank && statement.rank != 'normal'"
               class="qstmt-badge--rank">
               Rank: {{ statement.rank }}
             </small>
