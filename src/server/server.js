@@ -1,4 +1,5 @@
 import express from "express"
+import cors from "cors"
 import portfinder from "portfinder"
 import ViteExpress from "vite-express"
 import * as jskos from "jskos-tools"
@@ -8,6 +9,8 @@ import * as rdf from "./rdf.js"
 import { initBackend } from "./backend.js"
 
 const app = express()
+app.use(cors())
+
 ViteExpress.config({ mode: config.isProduction ? "production" : "development" })
 
 const backend = initBackend({ backend: config.backend, log: config.log, 

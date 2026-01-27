@@ -36,6 +36,7 @@
     "@vue-leaflet/vue-leaflet": "^0.10.1",
     "axios": "^1.7.9",
     "cocoda-sdk": "^3.4.12",
+    "cors": "^2.8.6",
     "dotenv": "^16.4.7",
     "express": "^4.21.2",
     "jskos-tools": "^1.0.43",
