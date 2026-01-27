@@ -23,7 +23,7 @@ const backend = initBackend({ backend: config.backend, log: config.log,
  * @param {Object|Object[]} data - Single item or array of items to clean
  * @returns {Object|Object[]} - Cleaned item(s)
  */
-const cleanData = (data) => {
+const cleanData = (data, single=true) => {
   const items = Array.isArray(data) ? data : [data]
   let cleanedData = []
 
@@ -49,8 +49,7 @@ const cleanData = (data) => {
 
   }
 
-  return cleanedData.length === 1 ? cleanedData[0] : cleanedData
-
+  return single && cleanedData.length === 1 ? cleanedData[0] : cleanedData
 }
 
 
@@ -109,7 +108,7 @@ app.get(`${config.namespace.pathname}`, validateFormat, async (req, res, next) =
   }  
 
   const allTheSchemes = await backend.getSchemes() || []
-  const allTheSchemesCleaned = cleanData(allTheSchemes)
+  const allTheSchemesCleaned = cleanData(allTheSchemes,false)
 
   res.status(200).send(allTheSchemesCleaned)
 })

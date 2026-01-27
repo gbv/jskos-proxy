@@ -384,8 +384,8 @@ export const publisherSelection = computed(() => {
 
 export const typeSelection = computed(() => {
   const types = []
-  schemes.value?.forEach(scheme => {
-    scheme.type
+  schemes.value?.forEach(scheme => {    
+    (scheme.type || [])
       .filter(t => t !== "http://www.w3.org/2004/02/skos/core#ConceptScheme")
       .map(t => nkostypeConcepts.find(c => jskos.compare(c, { uri: t })))
       .filter(Boolean)

@@ -54,7 +54,6 @@ export class ApiBackend {
       cdk.repeat({
         function: async () => {
 
-
           /* if (!this.registries?.length || previouslyErrored) {
             this.registries = this.base.split(",").map(base => cdk.initializeRegistry({
               provider: "ConceptApi",
@@ -83,13 +82,6 @@ export class ApiBackend {
               return registry
             })
           }
-
-
-
-
-
-
-
 
           /* let schemes = []
           partialError = null
