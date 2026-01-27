@@ -43,17 +43,17 @@ Instances of jskos-proxy are configured with environment variables, in local fil
 - `BACKEND` - JSKOS API base URLs (seperated by `,`)
 - `TITLE` - Title of the service (default `JSKOS Proxy`)
 <!-- - `LOGO` - optional logo image file, must be placed in `public` directory -->
+- `LISTING` - set to `false` or `0` to not listing of terminologies at root
 - `QUICK_SELECTION` - comma separated list of vocabulary URIs to prominently show at the start page
-- `REQUIRE_CONCEPTS` — `true` to **exclude** schemes that do not provide concepts (default: `true`).  
+- `REQUIRE_CONCEPTS` - `true` to **exclude** schemes that do not provide concepts (default: `true`).  
   Set to `false` to include such schemes as well.
-
-- `REQUIRE_CONCEPTS_OVERRIDES` — optional per-registry overrides in the form  
+- `REQUIRE_CONCEPTS_OVERRIDES` - optional per-registry overrides in the form  
   `<base>=<true|false>,<base>=<true|false>`.  
-  
-Example:  
-  `REQUIRE_CONCEPTS_OVERRIDES=https://api.dante.gbv.de/=false,https://bartoc.org/api/=false`
 
-The value controls whether each backend includes schemes that lack concepts.
+  Example:  
+      `REQUIRE_CONCEPTS_OVERRIDES=https://api.dante.gbv.de/=false,https://bartoc.org/api/=false`
+
+  The value controls whether each backend includes schemes that lack concepts.
 
 A **configuration directory** under `config/` can be provided with environment variable `CONFIG`. It **must** contain:
 

@@ -23,7 +23,7 @@ if (routerBasePath !== "/") {
     name: "root",
     component: () => import("./views/RootView.vue"),
   })
-}
+} 
 
 if (config.listing) {
   routes.push({
@@ -31,6 +31,12 @@ if (config.listing) {
     name: "item",
     component: () => import("./views/ItemView.vue"),
   })
+} else if (routerBasePath === "/") {
+  routes[0] = {
+    path: `${routerBasePath}:id?`,
+    name: "item",
+    component: () => import("./views/ItemView.vue"),
+  }
 }
 
 const router = createRouter({

@@ -23,7 +23,10 @@ const errors = reactive({
   loadTopError: false,
 })
 
-const schemeUri = computed(() => route.params.voc.match(/^https?:\/\//) ? route.params.voc : `${config.namespace}${route.params.voc}`)
+const schemeUri = computed(() => {
+  const voc = route.params?.voc || ""
+  return voc.match(/^https?:\/\//) ? voc : `${config.namespace}${voc}`
+})
 
 // Resolve the current scheme, accepting canonical URI *or* any alias in `identifier`.
 const scheme = computed(() => {
@@ -80,7 +83,17 @@ watch(registry, async (registry) => {
   registryLink.value = registry?._config?.baseUrl || registry?._api?.api || registry?._api?.status?.replace?.("/status", "")
 }, { immediate: true })
 
-const uri = computed(() => scheme.value && (route.params.id && `${config.namespace}${route.params.voc}/${encodeURIComponent(route.params.id)}` || route.query.uri))
+const uri = computed(() => {
+  if (scheme.value) {
+    const id = route.params?.id || ""
+    if (id) {
+      const voc = route.params?.voc || ""
+      return config.namespace + (voc ? `${voc}/` : "") +  encodeURIComponent(id)
+    }
+  }
+  return route.query.uri
+})
+
 const concept = computed({
   get() {
     if (!uri.value) {
