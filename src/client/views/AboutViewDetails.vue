@@ -2,11 +2,9 @@
 import { onMounted } from "vue"
 import { aboutDetails, fetchStatusesForRegistries } from "@/store.js"
 
-
 onMounted(async () => {
   await fetchStatusesForRegistries()
 })
-
 </script>
 
 <template>

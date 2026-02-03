@@ -8,7 +8,9 @@
     "dev": "nodemon --watch .env --watch 'src/server/*.js' --watch config/ src/server/server.js",
     "build": "vite build",
     "start": "NODE_ENV=production node src/server/server.js",
-    "test": "NODE_ENV=test mocha --exit && npm run lint",
+    "test": "npm run vitest && npm run mocha && npm run lint",
+    "mocha": "NODE_ENV=test mocha --exit ./test/server.js",
+    "vitest": "vitest run",
     "lint": "eslint",
     "fix": "eslint --fix",
     "updateTypes": "curl -s https://api.dante.gbv.de/voc/nkostype/top | jq -c '[.[] | { uri, prefLabel }]' > src/client/nkostype-concepts.json",
@@ -52,15 +54,18 @@
   },
   "devDependencies": {
     "@vitejs/plugin-vue": "^5.2.1",
+    "@vue/test-utils": "^2.4.6",
     "chai": "^5.2.0",
     "chai-http": "^5.1.1",
     "eslint": "~9.16",
     "eslint-config-gbv": "~2.6",
     "eslint-plugin-vue": "^9.32.0",
+    "happy-dom": "^20.5.0",
     "mocha": "^11.1.0",
     "nodemon": "^3.1.7",
     "vite": "^6.0.3",
     "vite-plugin-vue-devtools": "^7.6.7",
+    "vitest": "^2.1.9",
     "yesno": "^0.4.0"
   }
 }
