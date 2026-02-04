@@ -21,7 +21,6 @@ const props = defineProps({
   visited: { type: Array, default: () => [] },
 })
 
-
 // Qualified relations map (propertyUri -> statements)
 const relations = computed(() => props.item?.qualifiedRelations || {})
 
@@ -68,15 +67,12 @@ function collectUris() {
           set.add(placeUri) 
         }
       }
-
     }
   }
   return Array.from(set)
 }
 
 watch(relations, () => prefetch(collectUris()), { immediate: true, deep: true })
-onMounted(() => prefetch(collectUris()))
-
 </script>
 
 

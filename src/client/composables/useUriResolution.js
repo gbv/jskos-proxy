@@ -1,4 +1,3 @@
-// composables/useUriResolution.js
 import { reactive, computed } from "vue"
 import * as jskos from "jskos-tools"
 
@@ -37,12 +36,8 @@ export function useUriResolution({ schemesRef, loadConcept }) {
     if (!u || cache[u] || loading[u]) {
       return
     }
-    const scheme = findSchemeForUri(u)
-    if (!scheme) {
-      return
-    }
     loading[u] = true
-    loadConcept(u, scheme, false)
+    loadConcept(u, findSchemeForUri(u), false)
       .then(c => {
         cache[u] = c 
       })

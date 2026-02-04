@@ -86,6 +86,7 @@ const config = {
   namespace: new URL(env.NAMESPACE || "http://example.org/"),
   port: env.PORT || 3555,
   backend: env.BACKEND || "test/items.ndjson",
+  properties: env.PROPERTIES,
   title: env.TITLE || "JSKOS Proxy",
   logo: env.LOGO,
   name,

@@ -210,15 +210,15 @@ export function saveConceptsWithOptions(options) {
 
 let properties
 export async function loadConcept(uri, scheme, saveConceptFlag = true) {
-  const knownRegistry = await getRegistryForUri(uri, scheme)
-  const possibleRegistries = knownRegistry ? [knownRegistry] : registries
-  const existing = getConceptByUri(uri)
   // Make sure ALL details (including mappings and location) have been loaded
-  if (existing?._registry && existing?.[detailsLoadedKey] === detailsLoadedStates.allData) {
-    return existing
+  let concept = getConceptByUri(uri)
+  if (concept?._registry && concept?.[detailsLoadedKey] === detailsLoadedStates.allData) {
+    return concept
   }
 
-  let concept
+  const knownRegistry = await getRegistryForUri(uri, scheme)
+  const possibleRegistries = knownRegistry ? [knownRegistry] : registries
+
   console.time(`loadConcept ${uri}`)
   for (let registry of possibleRegistries) {
     if (!properties) {
@@ -427,6 +427,13 @@ export const fetchData = async (url) => {
     console.error(`Error fetching data from ${url}:`, error)
     return null // Return null in case of error
   }
+}
+
+// FIXME: this seems to not have any effect and it is not documented anyway
+// Preload properties of qualified statements
+if (config.properties) {
+  const properties = await fetchData(config.properties)
+  saveConceptsWithOptions({ returnNullOnError: true })(properties)
 }
 
 export const fetchStatusesForRegistries = async () => {
