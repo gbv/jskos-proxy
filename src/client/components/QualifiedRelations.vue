@@ -1,5 +1,5 @@
 <script setup>
-import { computed, watch, onMounted } from "vue"
+import { computed, watch } from "vue"
 import { AutoLink } from "jskos-vue"
 import PlaceItem from "./PlaceItem.vue"
 import { schemes, loadConcept } from "@/store.js"
@@ -101,10 +101,15 @@ watch(relations, () => prefetch(collectUris()), { immediate: true, deep: true })
             :title="propertyUri" />
         </div>
 
-        <ul class="qstmt-list">
+        <ul class="jskos-vue-qstmt-list">
           <li
             v-for="(statement, idx) in qualifiedList"
-            :key="propertyUri + '-' + idx">
+            :key="propertyUri + '-' + idx"
+            :class="{
+              'jskos-vue-rank-preferred': statement.rank === 'preferred',
+              'jskos-vue-rank-normal': statement.rank === 'normal',
+              'jskos-vue-rank-deprecated': statement.rank === 'deprecated'
+            }">
             <!-- resource -->
             <div v-if="statement.resource">
               <!-- URI -->
@@ -160,16 +165,11 @@ watch(relations, () => prefetch(collectUris()), { immediate: true, deep: true })
                 :max-depth="maxDepth"
                 :visited="localVisited" />
             </div>
-            <!-- meta (rank/date range) -->
-            <small
-              v-if="statement.rank && statement.rank != 'normal'"
-              class="qstmt-badge--rank">
-              Rank: {{ statement.rank }}
-            </small>
+
             <small
               v-if="statement.startDate || statement.endDate"
               class="qstmt-meta--range">
-              · {{ fmtRange(statement.startDate, statement.endDate) }}
+              {{ fmtRange(statement.startDate, statement.endDate) }}
             </small>
           </li>
         </ul>

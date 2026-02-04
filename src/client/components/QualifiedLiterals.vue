@@ -97,10 +97,15 @@ onMounted(() => prefetch(collectUris()))
             :title="propertyUri" />
         </div>
 
-        <ul class="qstmt-list">
+        <ul class="jskos-vue-qstmt-list">
           <li
             v-for="(statement, idx) in qualifiedList"
-            :key="propertyUri + '-' + idx">
+            :key="propertyUri + '-' + idx"
+            :class="{
+              'jskos-vue-rank-preferred': statement.rank === 'preferred',
+              'jskos-vue-rank-normal': statement.rank === 'normal',
+              'jskos-vue-rank-deprecated': statement.rank === 'deprecated'
+            }">
             <!-- literal value -->
             <div
               v-if="statement.literal"
@@ -195,12 +200,6 @@ onMounted(() => prefetch(collectUris()))
               </ul>
             </div>
 
-            <!-- meta (rank/date range) -->
-            <small
-              v-if="statement.rank && statement.rank != 'normal'"
-              class="qstmt-badge--rank">
-              Rank: {{ statement.rank }}
-            </small>
             <small
               v-if="statement.startDate || statement.endDate"
               class="qstmt-meta--range">
