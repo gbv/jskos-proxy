@@ -429,12 +429,13 @@ export const fetchData = async (url) => {
   }
 }
 
-// FIXME: this seems to not have any effect and it is not documented anyway
+/* FIXME: this seems to not have any effect and it is not documented anyway
 // Preload properties of qualified statements
 if (config.properties) {
   const properties = await fetchData(config.properties)
   saveConceptsWithOptions({ returnNullOnError: true })(properties)
 }
+*/
 
 export const fetchStatusesForRegistries = async () => {
   const fetchedStatuses = await Promise.all(
