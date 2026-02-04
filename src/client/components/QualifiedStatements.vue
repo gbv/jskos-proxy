@@ -1,25 +1,23 @@
 <script setup>
 import { computed } from "vue"
-import QualifiedRelations from "@/components/QualifiedRelations.vue"
-import QualifiedLiterals from "@/components/QualifiedLiterals.vue"
-// import QualifiedDatesBlock from "@/components/QualifiedDatesBlock.vue" 
+import QualifiedRelations from "./QualifiedRelations.vue"
+import QualifiedLiterals from "./QualifiedLiterals.vue"
 
 const props = defineProps({
   item: { type: Object, required: true },
-  maxDepth: { type: Number, default: 4 },
+  depth: { type: Number, default: 4 },
   labelForUri: { type: Function, default: null }, // optional label resolver
 })
 
-const hasQR = computed(() => !!props.item?.qualifiedRelations && Object.keys(props.item.qualifiedRelations).length > 0)
-const hasQD = computed(() => !!props.item?.qualifiedDates && Object.keys(props.item.qualifiedDates).length > 0)
-const hasQL = computed(() => !!props.item?.qualifiedLiterals && Object.keys(props.item.qualifiedLiterals).length > 0)
-const hasAny = computed(() => hasQR.value || hasQD.value || hasQL.value)
+const hasQR = computed(() => Object.keys(props.item?.qualifiedRelations || {}).length > 0)
+const hasQD = computed(() => Object.keys(props.item?.qualifiedDates || {}).length > 0)
+const hasQL = computed(() => Object.keys(props.item?.qualifiedLiterals || {}).length > 0)
 
-const visitedRoot = computed(() => [props.item?.uri].filter(Boolean))
+const visited = computed(() => [props.item?.uri].filter(Boolean))
 </script>
 
 <template>
-  <section v-if="hasAny">
+  <section v-if="hasQR || hasQD || hasQL">
     <div class="qualified-statements-title">
       {{ $t('qualifiedStatements') }}:
     </div>
@@ -30,9 +28,9 @@ const visitedRoot = computed(() => [props.item?.uri].filter(Boolean))
       class="qualified-statements-section"
       aria-label="Qualified relations">
       <QualifiedRelations
-        :item="item"
-        :max-depth="maxDepth"
-        :visited="visitedRoot" />
+        :relations="item.qualifiedRelations"
+        :depth="depth"
+        :visited="[...visited, item.uri]" />
     </section>
 
     <!-- Literals -->
@@ -42,9 +40,8 @@ const visitedRoot = computed(() => [props.item?.uri].filter(Boolean))
       aria-label="Qualified literals">
       <QualifiedLiterals
         :literals="item.qualifiedLiterals"
-        :uri="item.uri"
-        :max-depth="maxDepth"
-        :visited="visitedRoot" />
+        :depth="depth"
+        :visited="[...visited, item.uri]" />
     </section>
 
     <!-- TODO: qualified dates -->

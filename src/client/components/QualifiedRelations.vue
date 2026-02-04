@@ -1,49 +1,29 @@
 <script setup>
 import { computed, watch } from "vue"
 import { AutoLink } from "jskos-vue"
-import PlaceItem from "./PlaceItem.vue"
 import { schemes, loadConcept } from "@/store.js"
 import { useUriResolution } from "@/composables/useUriResolution"
-
+import PlaceItem from "./PlaceItem.vue"
 
 // Name component (allows recursion) + disable suspense
 defineOptions({ name: "QualifiedRelations", suspensible: false })
 
 const props = defineProps({
-  // Root item containing qualified relations
-  item: { type: Object, required: true },
-
-  // Recursion depth control
-  depth: { type: Number, default: 0 },
-  maxDepth: { type: Number, default: 4 },
-
-  // Cycle guard: prevent infinite loops by URI
-  visited: { type: Array, default: () => [] },
+  relations: { type: Object, required: true },      // Qualified relations map (propertyUri -> statements)
+  depth: { type: Number, default: 4 },              // Recursion depth control
+  visited: { type: Array, default: () => [] },      // Cycle guard: prevent infinite loops by URI
 })
-
-// Qualified relations map (propertyUri -> statements)
-const relations = computed(() => props.item?.qualifiedRelations || {})
-
-// Current item URI (if any)
-const uri = computed(() => props.item?.uri || null)
-
-// Build visited list including current
-const localVisited = computed(() => {
-  const cur = uri.value ? [uri.value] : []
-  return [...props.visited, ...cur]
-})
-
 
 const { fmtRange, labelForUri, prefetch, anyLoading } =
   useUriResolution({ schemesRef: schemes, loadConcept })
 
 // True if there is at least one relation
-const hasAny = computed(() => Object.keys(relations.value).length > 0)
+const hasAny = computed(() => Object.keys(props.relations || {}).length > 0)
 
 // Collect all URIs to resolve (properties, resources, types, places)
 function collectUris() {
   const set = new Set()
-  for (const [propUri, qualifiedList] of Object.entries(relations.value)) {
+  for (const [propUri, qualifiedList] of Object.entries(props.relations || {})) {
     if (propUri) {
       set.add(propUri)
     }
@@ -72,7 +52,7 @@ function collectUris() {
   return Array.from(set)
 }
 
-watch(relations, () => prefetch(collectUris()), { immediate: true, deep: true })
+watch(() => props.relations, () => prefetch(collectUris()), { immediate: true, deep: true })
 </script>
 
 
@@ -158,12 +138,11 @@ watch(relations, () => prefetch(collectUris()), { immediate: true, deep: true })
               <!-- recurse -->
               <QualifiedRelations
                 v-if="statement.resource?.qualifiedRelations
-                  && depth < maxDepth
+                  && depth > 0
                   && !(statement.resource?.uri && visited.includes(statement.resource.uri))"
                 :item="statement.resource"
-                :depth="depth + 1"
-                :max-depth="maxDepth"
-                :visited="localVisited" />
+                :depth="depth - 1"
+                :visited="visited" />
             </div>
 
             <small

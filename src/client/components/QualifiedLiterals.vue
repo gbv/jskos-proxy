@@ -1,39 +1,19 @@
 <script setup>
-import { computed, watch, onMounted } from "vue"
+import { computed, watch } from "vue"
 import { AutoLink } from "jskos-vue"
 import { schemes, loadConcept } from "@/store.js"
 import { useUriResolution } from "@/composables/useUriResolution"
 
 const props = defineProps({
-  // { [propertyUri]: [ statements ] }
   literals: { type: Object, default: () => ({}) },
-
-  // 
-  uri: {type: String, required: false},
-
-  // Recursion depth control
-  depth: { type: Number, default: 0 },
-  maxDepth: { type: Number, default: 4 },
-
-  // Cycle guard: prevent infinite loops by URI
-  visited: { type: Array, default: () => [] },
-
+  depth: { type: Number, default: 4 },              // Recursion depth control
+  visited: { type: Array, default: () => [] },      // Cycle guard: prevent infinite loops by URI
 })
 
 const literals = computed(() => Object.entries(props.literals || {}))
 
-// Current item URI (if any)
-const uri = computed(() => props.uri || null)
-
-// Build visited list including current
-const localVisited = computed(() => {
-  const cur = uri.value ? [uri.value] : []
-  return [...props.visited, ...cur]
-})
-
 const { fmtRange, labelForUri: lfDefault, prefetch, anyLoading } =
   useUriResolution({ schemesRef: schemes, loadConcept })
-
 
 function labelProp(u) {
   return (props.labelForUri && props.labelForUri(u)) || lfDefault(u)
@@ -68,8 +48,6 @@ function collectUris() {
 }
 
 watch(literals, () => prefetch(collectUris()), { immediate: true, deep: true })
-onMounted(() => prefetch(collectUris()))
-
 </script>
 
 <template>
@@ -190,12 +168,11 @@ onMounted(() => prefetch(collectUris()))
                   <!-- recurse -->
                   <QualifiedLiterals
                     v-if="sourceItem?.qualifiedLiterals
-                      && depth < maxDepth
+                      && depth > 0
                       && !(sourceItem?.uri && visited.includes(sourceItem.uri))"
                     :literals="sourceItem.qualifiedLiterals"
-                    :depth="depth + 1"
-                    :max-depth="maxDepth"
-                    :visited="localVisited" />
+                    :depth="depth - 1"
+                    :visited="visited" />
                 </li>
               </ul>
             </div>
@@ -203,7 +180,7 @@ onMounted(() => prefetch(collectUris()))
             <small
               v-if="statement.startDate || statement.endDate"
               class="qstmt-meta--range">
-              · {{ fmtRange(statement.startDate, statement.endDate) }}
+              {{ fmtRange(statement.startDate, statement.endDate) }}
             </small>
           </li>
         </ul>
