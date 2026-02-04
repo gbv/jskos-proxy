@@ -32,7 +32,10 @@
     "backendDetailsDoc": "API",
     "backendDetailsVoc": "Vokabulare",
     "schemeHasNoConcepts": "Dieses Vokabular enthält keine durchsuchbaren Konzepte.",
-    "qualifiedStatements": "Zusätzliche Details (Beziehungen, Bezeichnungen, Daten & Zeiträume)"
+    "qualifiedStatements": "Zusätzliche Details (Beziehungen, Bezeichnungen, Daten & Zeiträume)",
+    "created": "erstellt",
+    "issued": "veröffentlicht",
+    "modified": "aktualisiert"
   },
   "en": {
     "about": "About",
@@ -67,6 +70,9 @@
     "backendDetailsDoc": "API",
     "backendDetailsVoc": "Terminologies",
     "schemeHasNoConcepts": "This scheme does not provide concepts to browse.",
-    "qualifiedStatements": "Additional details (Relations, Labels, Dates)"
+    "qualifiedStatements": "Additional details (Relations, Labels, Dates)",
+    "created": "created",
+    "issued": "issued",
+    "modified": "modified"
   }
 }
