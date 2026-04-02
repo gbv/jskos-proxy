@@ -338,7 +338,7 @@ const hasQualifiedStatements = computed(() => {
       :flat="true"
       :fields="{ type: false, license: false, created: false, issued: false, modified: false }"
       @select="concept = { uri: $event.item.uri }">
-      <template #additionalTabs>
+      <template #afterTabs>
         <div
           v-if="concept?.startDate || concept?.endDate || concept?.startPlace?.length || concept?.endPlace?.length">
           <b>{{ $t("startEnd") }}:</b>
@@ -409,7 +409,7 @@ const hasQualifiedStatements = computed(() => {
           title="Qualified statements">
           <QualifiedStatements
             :item="concept"
-            :max-depth="4" />
+            :depth="4" />
         </div>
 
 
