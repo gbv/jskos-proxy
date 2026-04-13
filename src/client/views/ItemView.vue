@@ -382,10 +382,7 @@ const hasQualifiedStatements = computed(() => {
         <div v-if="!concept && scheme?.namespace">
           <b>{{ $t("namespace") }}: </b> 
           <span>
-            <AutoLink 
-              :title="Namespace"
-              :href="scheme.namespace"
-              :text="scheme.namespace" />
+            <AutoLink :href="scheme.namespace" /> 
           </span> 
         </div>
         <div
