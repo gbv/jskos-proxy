@@ -10,6 +10,7 @@ import { initBackend } from "./backend.js"
 
 const app = express()
 app.use(cors())
+let httpServer
 
 ViteExpress.config({ mode: config.isProduction ? "production" : "development" })
 
@@ -183,12 +184,22 @@ const startServer = async () => {
 
   return new Promise(resolve => {
     // TODO: Check if ViteExpress.listen is suitable for production
-    ViteExpress.listen(app, config.port, () => {
+    httpServer = ViteExpress.listen(app, config.port, () => {
       config.log(`JSKOS proxy ${config.namespace} from ${backend} at http://localhost:${config.port} in ${config.env} mode...`)
       resolve(app)
     })
   })
 
+}
+
+export function closeServer() {
+  return new Promise(resolve => {
+    if (httpServer?.close) {
+      httpServer.close(resolve)
+    } else {
+      resolve()
+    }
+  })
 }
 
 export const appStarted = startServer()
