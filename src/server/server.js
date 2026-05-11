@@ -165,11 +165,22 @@ app.get(`${config.namespace.pathname}:voc/:id`, validateFormat, async (req, res,
     return handleRequest(req, res, backend.getConcept.bind(backend))
   }
 
-  // For the HTML app, redirect only based on scheme URI 
-  if (norm(wantBase) !== norm(canonicalBase)) {
+  // Build HTML redirects only from local concept namespaces.
+  const conceptBaseIsLocal = conceptBase.startsWith(ns.href)
+
+  // Redirect deprecated local concept paths to the current local concept path,
+  // but keep already valid local routes unchanged.
+  if (conceptBaseIsLocal && norm(wantBase) !== norm(conceptBase)) {
+    // Local base path, e.g. "/terminology/"
     const nsPath = ns.pathname
-    const canonPathname = new URL(canonicalBase).pathname
-    const canonicalVoc = canonPathname.slice(nsPath.length)
+
+    // Local path of the canonical concept base, e.g. "/terminology/ulbb/"
+    const conceptPathname = new URL(conceptBase).pathname
+
+    // Vocabulary part of the local route, e.g. "ulbb/"
+    const canonicalVoc = conceptPathname.slice(nsPath.length)
+
+    // Redirect to the canonical local concept route.
     return res.redirect(301, `${nsPath}${canonicalVoc}${idPart}`)
   }
 

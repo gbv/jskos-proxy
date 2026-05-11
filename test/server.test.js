@@ -21,9 +21,12 @@ const { fakeBackend } = vi.hoisted(() => {
       prefLabel: { en: "FBL" },
     },
     {
-      uri: `${namespace}ulbb/`,
+      uri: "http://bartoc.org/en/node/1707",
       type: ["http://www.w3.org/2004/02/skos/core#ConceptScheme"],
       prefLabel: { en: "ULBB" },
+      // Simulates a scheme with an external canonical URI but a local concept namespace.
+      identifier: [`${namespace}ulbb/`],
+      namespace: `${namespace}ulbb/`,
     },
     {
       uri: `${namespace}prizepapers_lading_type/`,
@@ -82,7 +85,7 @@ vi.mock("vite-express", () => ({
   default: {
     config() {},
     listen(app, port, callback) {
-      app.get("/", (req, res) => {
+      app.use((req, res) => {
         res.type("html").send("<!doctype html><html><body></body></html>")
       })
       return app.listen(port, "127.0.0.1", callback)
@@ -173,9 +176,22 @@ describe("server", () => {
 
   it("redirects HTML concept route from deprecated scheme path to canonical path", async () => {
     const conceptId = "1b6398db-fc61-45f8-b325-e96666f4505b"
-    const res = await request(`/terminology/prizepapers_lading/${conceptId}`, { redirect: "manual" })
+    const res = await request(`/terminology/prizepapers_lading/${conceptId}`, {
+      redirect: "manual",
+      headers: { Accept: "text/html" },
+    })
 
     expect(res.status).toBe(301)
     expect(res.headers.get("location")).toBe(`/terminology/prizepapers_lading_type/${conceptId}`)
+  })
+
+  it("keeps HTML concept route in the local namespace when scheme URI is external", async () => {
+    const res = await request("/terminology/ulbb/ROM%20C%2041-80", {
+      redirect: "manual",
+      headers: { Accept: "text/html" },
+    })
+
+    expect(res.status).toBe(200)
+    expect(res.headers.get("location")).toBeNull()
   })
 })
