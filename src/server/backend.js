@@ -2,6 +2,61 @@ import fs from "node:fs"
 import jskos from "jskos-tools"
 import { cdk } from "cocoda-sdk"
 
+// How often to refresh the scheme list from the API backends, in milliseconds.
+const SCHEME_REFRESH_INTERVAL = 6 * 1000
+
+/**
+ * Get a readable registry label for logs.
+ */
+const registryLabel = registry =>
+  registry._api?.status || registry._jskos?.status || registry._base
+
+/**
+ * Normalize JSKOS API responses that may contain zero, one, or many schemes.
+ */
+const normalizeSchemeList = list => Array.isArray(list) ? list : (list ? [list] : [])
+
+/**
+ * Convert one registry response into ConceptScheme instances tied to that registry.
+ */
+function schemesFromRegistryList(registry, list) {
+  // Normalize first so callers can pass cached data, API arrays, single objects, or empty responses.
+  return normalizeSchemeList(list).reduce((schemes, raw) => {
+    // Only an explicit empty `concepts` array means the scheme cannot provide concepts.
+    const providesConcepts = !(Array.isArray(raw.concepts) && raw.concepts.length === 0)
+
+    // Some registries expose scheme metadata but cannot serve concepts; skip those when required.
+    if (registry._requireConcepts && !providesConcepts) {
+      return schemes
+    }
+
+    // Wrap the raw object and keep local metadata needed by later concept lookup.
+    const scheme = new jskos.ConceptScheme(raw)
+    scheme._registry = registry
+    scheme.providesConcepts = providesConcepts
+    schemes.push(scheme)
+    return schemes
+  }, [])
+}
+
+/**
+ * Merge scheme lists while preserving backend priority.
+ */
+function mergeSchemeLists(lists) {
+  const schemes = []
+
+  // Backends are ordered by priority: the first backend wins on duplicates.
+  for (const list of lists) {
+    for (const scheme of list) {
+      if (!schemes.find(existing => jskos.compare(existing, scheme))) {
+        schemes.push(scheme)
+      }
+    }
+  }
+
+  return schemes
+}
+
 // TODO!!! Adjust according to ApiBackend
 export class FileBackend {
   constructor(file, log) {
@@ -42,133 +97,147 @@ export class ApiBackend {
 
   constructor(base, log, opts = {}) {
 
+    // Backend configuration: base can contain one or more comma-separated ConceptApi URLs.
     this.base = base
     this.log = log || (() => {})
+    // Concept availability policy: default applies unless a specific backend overrides it.
     this.requireConceptsDefault = opts.requireConcepts !== false
     this.requireConceptsOverrides = opts.requireConceptsOverrides || new Map()
 
-    // Load schemes in background and update every 60 seconds
+    // Injectable SDK hooks keep tests deterministic while production uses cocoda-sdk defaults.
+    this.initializeRegistry = opts.initializeRegistry || cdk.initializeRegistry
+    this.repeat = opts.repeat || cdk.repeat
+    this.refreshInterval = opts.refreshInterval || SCHEME_REFRESH_INTERVAL
+
+    // Publicly served scheme list; null until the initial refresh succeeds.
     this.schemes = null
-    let previouslyErrored = false, partialError
+    // Per-backend cache keeps transient refresh failures from removing a backend.
+    this.schemeCache = new Map()
+    // Tracks backends currently served from cache so recovery can be logged once.
+    this.cachedBackendBases = new Set()
+    // Tracks top-level refresh failures between repeat callbacks.
+    let previouslyErrored = false
+
     this.getSchemesPromise = new Promise(resolve => {
-      cdk.repeat({
-        function: async () => {
-
-          /* if (!this.registries?.length || previouslyErrored) {
-            this.registries = this.base.split(",").map(base => cdk.initializeRegistry({
-              provider: "ConceptApi",
-              // ? Does "base" always have a trailing slash?
-              status: `${base}status`,
-            }))
-            // Explicitly set cdk instance for each registry to null so that `registryForScheme` won't be used
-            this.registries.forEach(registry => {
-              registry.cdk = null
-            })
-          } */
-
-          if (!this.registries?.length || previouslyErrored) {
-            this.registries = this.base.split(",").map(base => {
-              const registry = cdk.initializeRegistry({
-                provider: "ConceptApi",
-                status: `${base}status`,
-              })
-              // prevent automatic registryForScheme
-              registry.cdk = null
-              // attach base + per-registry requireConcepts flag (override -> default)
-              registry._base = base
-              registry._requireConcepts = this.requireConceptsOverrides.has(base)
-                ? this.requireConceptsOverrides.get(base)
-                : this.requireConceptsDefault
-              return registry
-            })
-          }
-
-          /* let schemes = []
-          partialError = null
-          const results = (await Promise.all(
-            this.registries
-              .map(
-                registry => registry.getSchemes({ params: { limit: 10000 } }).catch(error => {
-                  partialError = error
-                  log(`ApiBackend: Partial error when loading schemes (API: ${registry._jskos.status}) - ${error}`)
-                  return []
-                }),
-              ),
-          )).reduce((all, cur) => all.concat(cur), [])
-          if (partialError && results.length === 0) {
-            throw partialError
-          }
-          for (const result of results) {
-            // Only add to schemes if not there yet = backends specified first have priority
-            // Also don't add schemes that explicitly do not provide concepts
-            if (!schemes.find(scheme => jskos.compare(scheme, result))) {
-              schemes.push(result)
-            }
-          }
-          return schemes.map(scheme => new jskos.ConceptScheme(scheme)) */
-
-          let schemes = []
-          partialError = null
-
-          // fetch per registry so we know where each scheme came from
-          const perRegistry = await Promise.all(
-            this.registries.map(async (registry) => {
-              try {
-                const list = await registry.getSchemes({ params: { limit: 10000 } })
-                return { registry, list }
-              } catch (error) {
-                partialError = error
-                this.log(`ApiBackend: Partial error when loading schemes (API: ${registry._api?.status || registry._jskos?.status || registry._base}) - ${error}`)
-                return { registry, list: [] }
-              }
-            }),
-          )
-
-          const allCount = perRegistry.reduce((n, x) => n + x.list.length, 0)
-          if (partialError && allCount === 0) {
-            throw partialError
-          }
-
-          // merge with priority = earlier registries first
-          for (const { registry, list } of perRegistry) {
-            for (const raw of list) {
-              const providesConcepts = !(Array.isArray(raw.concepts) && raw.concepts.length === 0)
-              // per-registry filter
-              if (registry._requireConcepts && !providesConcepts) {
-                continue
-              }
-              // skip duplicates (compare by identity/uri)
-              if (schemes.find(s => jskos.compare(s, raw))) {
-                continue
-              }
-              // make JSKOS ConceptScheme and tag metadata for client
-              const cs = new jskos.ConceptScheme(raw)
-              cs._registry = registry
-              cs.providesConcepts = providesConcepts  // <-- visible to frontend (not underscored)
-              schemes.push(cs)
-            }
-          }
-          return schemes
-        },
+      this.repeat({
+        function: () => this.reloadSchemes(),
         callback: (error, result) => {
           if (error) {
-            log(`ApiBackend: Error when loading schemes - ${error}`)
+            this.log(`ApiBackend: Error when loading schemes - ${error}`)
             previouslyErrored = true
             return
           }
           if ((this.schemes?.length !== result?.length) || previouslyErrored) {
-            log(`Loaded ${result.length} schemes for backend.`)
+            this.log(`Loaded ${result.length} schemes for backend.`)
             previouslyErrored = false
           }
           this.schemes = result
           resolve()
         },
-        interval: 6 * 1000,
+        interval: this.refreshInterval,
         callImmediately: true,
       })
     })
   }
 
+  /**
+   * Create one ConceptApi registry for each configured backend URL.
+   */
+  createRegistries() {
+    // `base` can list multiple ConceptApi endpoints, ordered by priority.
+    return this.base.split(",").map(base => {
+      base = base.trim()
+      // Pass both api and status: the registry uses api for requests and status for labels/logs.
+      const registry = this.initializeRegistry({
+        provider: "ConceptApi",
+        api: base,
+        status: `${base}status`,
+      })
+      // Prevent automatic registryForScheme: we decide the registry by scheme.
+      registry.cdk = null
+      // Keep local metadata on the registry so refresh/cache logic can stay per backend.
+      registry._base = base
+      registry._requireConcepts = this.requireConceptsOverrides.has(base)
+        ? this.requireConceptsOverrides.get(base)
+        : this.requireConceptsDefault
+      return registry
+    })
+  }
+
+  /**
+   * Return cached schemes for one registry as ConceptScheme instances.
+   */
+  cachedSchemes(registry) {
+    return schemesFromRegistryList(registry, this.schemeCache.get(registry._base))
+  }
+
+  /**
+   * Load schemes for one registry, falling back to its cache after transient failures.
+   */
+  async loadRegistrySchemes(registry) {
+    // Cache is tracked per backend so one failing registry does not erase its last good schemes.
+    const hasCache = this.schemeCache.has(registry._base)
+
+    try {
+      const rawSchemes = normalizeSchemeList(await registry.getSchemes({ params: { limit: 10000 } }))
+      const schemes = schemesFromRegistryList(registry, rawSchemes)
+
+      // Accept fresh data when it contains usable schemes, or when this is the first load.
+      if (schemes.length || !hasCache) {
+        if (schemes.length && this.cachedBackendBases.delete(registry._base)) {
+          this.log(`ApiBackend: ${registryLabel(registry)} recovered; replacing cached schemes with ${schemes.length} fresh schemes.`)
+        }
+        this.schemeCache.set(registry._base, rawSchemes)
+        return schemes
+      }
+
+      // A cached backend returning only filtered-out schemes is treated like a transient bad refresh.
+      this.log(`ApiBackend: ${registryLabel(registry)} returned no usable schemes; keeping ${this.cachedSchemes(registry).length} cached schemes.`)
+    } catch (error) {
+      if (!hasCache) {
+        throw error
+      }
+      // After a successful previous load, keep serving the stale-but-known-good list.
+      this.log(`ApiBackend: Error when loading schemes (API: ${registryLabel(registry)}) - ${error}; keeping ${this.cachedSchemes(registry).length} cached schemes.`)
+    }
+
+    // Remember that this backend is currently running from cache, so recovery can be logged.
+    this.cachedBackendBases.add(registry._base)
+    return this.cachedSchemes(registry)
+  }
+
+  /**
+   * Refresh all registries and publish one merged scheme list.
+   */
+  async reloadSchemes() {
+    // Create registries on every reload to ensure we have fresh instances for any new/dropped backends.
+    this.registries = this.createRegistries()
+
+    const lists = await Promise.all(
+      this.registries.map(async registry => {
+        try {
+          return await this.loadRegistrySchemes(registry)
+        } catch (error) {
+          this.log(`ApiBackend: Error when loading schemes (API: ${registryLabel(registry)}) - ${error}`)
+          if (!this.schemes) {
+            throw error
+          }
+          return []
+        }
+      }),
+    )
+
+    const schemes = mergeSchemeLists(lists)
+    if (!schemes.length) {
+      throw new Error("No schemes loaded from backend.")
+    }
+
+    return schemes
+  }
+
+  /**
+   * Return the current scheme list, waiting for the initial refresh if needed.
+   */
   async getSchemes() {
     if (!this.schemes) {
       await this.getSchemesPromise
@@ -176,6 +245,9 @@ export class ApiBackend {
     return this.schemes
   }
 
+  /**
+   * Find a scheme by canonical URI or by an identifier alias.
+   */
   async getScheme(uri) {
     // Ensure schemes are loaded before we try to match
     if (!this.schemes) {
@@ -216,6 +288,9 @@ export class ApiBackend {
 
   }
 
+  /**
+   * Resolve a concept through the registry attached to its containing scheme.
+   */
   async getConcept(uri) {
     if (!this.schemes) {
       await this.getSchemesPromise
@@ -231,11 +306,17 @@ export class ApiBackend {
     return (await registry.getConcepts({ concepts: [{ uri }], params: { properties } }))?.[0]
   }
 
+  /**
+   * Return the backend configuration string.
+   */
   toString() {
     return this.base
   }
 }
 
+/**
+ * Initialize either an API-backed or file-backed backend from config.
+ */
 export function initBackend({ backend, log, requireConcepts, requireConceptsOverrides }) {
   if (backend.match(/^https?:/)) {
     return new ApiBackend(backend, log, { requireConcepts, requireConceptsOverrides })
