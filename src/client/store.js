@@ -48,6 +48,7 @@ import { cdk } from "cocoda-sdk"
 
 export const registries = config.backend.split(",").map(base => cdk.initializeRegistry({
   provider: "ConceptApi",
+  api: base,
   status: `${base}status`,
 }))
 
