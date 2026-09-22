@@ -123,12 +123,13 @@ describe("server", () => {
     expect(res.headers.get("content-type")).toContain("text/html")
   })
 
-  it("/terminology/ulbb/?format=NO_FORMAT should return a 400 Bad request with message", async () => {
-    const res = await request("/terminology/ulbb/?format=NO_FORMAT")
+  it("/terminology/ulbb/?format=%3C%2F should return a 400 Bad request with message", async () => {
+    const res = await request("/terminology/ulbb/?format=%3C")
 
     expect(res.status).toBe(400)
-    expect(res.headers.get("content-type")).toContain("text/html")
-    expect(await res.text()).toBe("Serialization format NO_FORMAT not supported!")
+    expect(await res.json()).toStrictEqual({
+      message:"Serialization format < not supported!",
+    })
   })
 
   // Run the same route checks for every RDF serialization format the server supports.

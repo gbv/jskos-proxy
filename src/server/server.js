@@ -60,7 +60,7 @@ const cleanData = (data, single=true) => {
 const validateFormat = (req, res, next) => {
   const format = req.query.format || rdf.requestFormat(req) || "jsonld"
   if (!["html", "debug"].includes(format) && !rdf.contentTypes[format]) {
-    return res.status(400).send(`Serialization format ${format} not supported!`)
+    return res.status(400).send({ message: `Serialization format ${format} not supported!` })
   }
   req.format = format
   next()
@@ -99,7 +99,6 @@ const handleRequest = async (req, res, fetchFunction) => {
       res.json(cleanedItem)
     }
   } catch (error) {
-    console.error(`Error loading ${uri}`, error)
     res.status(500).send({ message: `Error loading data from backend: ${error.message}` })
   }
 }
