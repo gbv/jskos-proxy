@@ -38,3 +38,5 @@ config/*
 
 # Will be symlinked dynamically
 public/favicon.ico
+
+/notes

@@ -1,4 +1,4 @@
-import { computed, reactive, ref } from "vue"
+import { computed, reactive, ref, toRaw } from "vue"
 import config from "@/config.js"
 import * as jskos from "jskos-tools"
 import i18n from "@/i18n.js"
@@ -218,7 +218,10 @@ export async function loadConcept(uri, scheme, saveConceptFlag = true) {
   }
 
   const knownRegistry = await getRegistryForUri(uri, scheme)
-  const possibleRegistries = knownRegistry ? [knownRegistry] : registries
+  const preferredRegistry = knownRegistry && toRaw(knownRegistry)
+  const possibleRegistries = preferredRegistry
+    ? [preferredRegistry, ...registries.filter(registry => registry !== preferredRegistry)]
+    : registries
 
   console.time(`loadConcept ${uri}`)
   for (let registry of possibleRegistries) {
